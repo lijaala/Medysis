@@ -17,7 +17,10 @@
     <section class="form">
         <form action="http://localhost:8081/api/auth/signup" method="POST" class="form-container">
             <!-- First Row: First Name, Middle Name, Last Name -->
-            
+            <div class="form-field">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="eg: abc@gmail.com" name="name" required>
+            </div>
         
         
             <!-- Second Row: Email, Contact Number -->
@@ -43,7 +46,7 @@
             <!-- Buttons Row -->
             <div class="form-field">
                 <button class="button primary" type="submit">Sign Up</button>
-                <span>New Here?<a href="signup"> Join Now</a></span>
+                <span>One of us?<a href="signup"> Login </a></span>
             </div>
         </form>
     </section>

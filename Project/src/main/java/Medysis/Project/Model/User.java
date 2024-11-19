@@ -10,32 +10,33 @@ public class User {
 
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @Column(name = "name", nullable = false)
+    @Column
     private String name;
 
-    @Column(name="email", nullable=false)
+    @Column
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name ="role" )
+    @Column
     private Role role;
 
-    @Column(name = "created_at",nullable = false)
+    @Column
     private LocalDateTime created_at;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column
     private LocalDateTime updated_at;
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
