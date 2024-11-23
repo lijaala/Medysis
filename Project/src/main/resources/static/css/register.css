@@ -1,3 +1,5 @@
+@import url(default.css);
+
 .register {
     margin: 0;
     padding: 0;
@@ -29,54 +31,11 @@
 
 }
 
-.form {
-    margin: 0;
-    width: 60%;
-justify-content: center;
-    font-size: 18px;
-    color: rgb(7, 16, 78);
-}
-
 .form-container {
-    margin-top:13vh ;
+    margin-top: 13vh;
     display: flex;
     flex-direction: column;
     padding: 2%;
     border-radius: 2vw;
-    gap: 30%;
 
-}
-
-.form-field {
-    display: flex;
-    width: 90%;
-    margin: 1%;
-    flex-direction: column;
-    flex: 1;
-    gap: 1vh;
-    align-self: center;
-
-    span {
-        align-self: flex-end;
-        font-size: 14px;
-    }
-
-}
-
-
-
-.form-field button {
-
-    margin-top: 5%;
-
-
-}
-
-.form-field input {
-    padding: 0.5vw 0.8vw;
-    background-color: #EEEFF8;
-    border: 1px solid #F5147D;
-    border-radius: .4vw;
-    font-size: 14px;
-    height: 6vh;
 }

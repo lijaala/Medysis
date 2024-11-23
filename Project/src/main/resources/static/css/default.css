@@ -1,3 +1,26 @@
+@import url(https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap);
+
+*,
+hmtl,
+body {
+    margin: 0;
+    padding: 0;
+    color: rgb(7, 16, 78);
+}
+
+.roboto-regular {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.karla {
+    font-family: "Karla", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
 .primary {
     padding: 1% 5%;
     border-radius: .6vw;
@@ -9,4 +32,50 @@
     font: 20px;
     width: 100%;
     align-self: center;
+}
+
+/*form layout*/
+.form {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    width: 60%;
+    gap: 2vh;
+    justify-content: center;
+    font-family: "Karla", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+
+}
+
+
+
+.form-field {
+    display: flex;
+    width: 90%;
+    margin: 1%;
+    flex-direction: column;
+    flex: 1;
+    gap: 2vh;
+    align-self: center;
+
+    span {
+        align-self: flex-end;
+        font-size: 14px;
+    }
+
+}
+
+
+
+
+
+.form-field input {
+    padding: 0.5vw 0.8vw;
+    background-color: #EEEFF8;
+    border: 1px solid #F5147D;
+    border-radius: .4vw;
+    font-size: 14px;
+    height: 40px;
 }

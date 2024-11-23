@@ -26,6 +26,11 @@ public class User {
     @Column
     private Role role;
 
+    @Column(name = "verificationCode", length = 64)
+    private String verificationCode;
+
+    private boolean verified=false;
+
     @Column
     private LocalDateTime created_at;
 
@@ -71,6 +76,15 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public String getVerificationCode() {return verificationCode;}
+
+    public void setVerificationCode(String verificationCode)
+    {this.verificationCode = verificationCode;}
+
+    public boolean isVerified() {return verified;}
+    public void setVerified(boolean verified) {this.verified = verified;}
+
 
     public LocalDateTime getCreated_at() {
         return created_at;

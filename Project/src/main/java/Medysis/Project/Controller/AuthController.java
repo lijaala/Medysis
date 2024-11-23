@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/auth")
 
@@ -25,14 +27,28 @@ public class AuthController {
        user.setName(name);
        user.setEmail(email);
        user.setPassword(password);
+
+
+
        userService.registerUser(user);
-       return "success";
+       return "Registered successfully. Please check your email to verify your account";
 
     }catch(IllegalArgumentException e){
         return "Email already exists";
         }
         catch (Exception e){
+            e.printStackTrace();
             return "An unexpected error occured. Please try again later";
+        }
+    }
+    @GetMapping("/verify")
+    public String verify(@RequestParam String code) {
+        boolean verified = userService.verifyUser(code);
+        if(verified){
+            return "Verified successfully";
+        }
+        else{
+            return "Not verified";
         }
     }
 

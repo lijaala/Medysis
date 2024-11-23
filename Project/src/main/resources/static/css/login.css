@@ -1,0 +1,56 @@
+@import url(default.css);
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+
+    background-color: #FDFDFF;
+
+
+
+}
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 15vh;
+
+    align-items: center;
+    align-self: center;
+    justify-items: center;
+    gap: 4vh;
+    width: 100%;
+
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    flex: 1;
+    justify-items: center;
+    align-items: center;
+}
+
+
+.form-field input {
+    height: 4vh !important;
+}
+
+.form-field span {
+    align-self: right;
+    text-align: right;
+    font-size: 16px;
+}
+
+.primary {
+    height: 6vh;
+}
+
+h1 {
+    width: fit-content;
+    align-self: left;
+
+}
