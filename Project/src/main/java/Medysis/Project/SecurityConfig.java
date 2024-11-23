@@ -24,9 +24,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()  // Protect other endpoints
                 )
                 .formLogin(form -> form
-                        .loginPage("/register")  // Custom login page
+                        .loginPage("/login")  // Custom login page
                         .permitAll()  // Allow everyone to access the login page
-                        .defaultSuccessUrl("/register", true)  // Redirect after successful login
+                        .defaultSuccessUrl("/home", true)  // Redirect after successful login
                 )
                 .logout(logout -> logout.permitAll());  // Allow everyone to access logout
 

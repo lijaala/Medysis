@@ -1,11 +1,16 @@
 package Medysis.Project.Controller;
 
 import Medysis.Project.Model.User;
+import Medysis.Project.Service.EmailService;
 import Medysis.Project.Service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -14,8 +19,13 @@ import java.util.UUID;
 
 public class AuthController {
     private final UserService userService;
-    public AuthController(UserService userService) {
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+
+    public AuthController(UserService userService, PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @PostMapping("/signup")
@@ -50,6 +60,29 @@ public class AuthController {
         else{
             return "Not verified";
         }
+    }
+    @PostMapping("/login")
+    public String login(@RequestParam(required = true) String email, @RequestParam(required = true) String password, HttpSession session) {
+        Optional<User> userOptional=userService.findByEmail(email);
+        if (!userOptional.isPresent()){
+            return " User not found";
+        }
+        User user=userOptional.get();
+
+        System.out.println("Email: " + email);
+        System.out.println("Password: " + password);
+        if (!user.isVerified()){
+            emailService.sendVerificationEmail(user);
+            return "User not verified. Please check your email to verify your account and try again. A new verification Email has been sent";
+        }
+        if (!passwordEncoder.matches(password, user.getPassword())){
+            return "Password or Email is incorrect";
+        }
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("userEmail", user.getEmail());
+        session.setAttribute("userRole", user.getRole());
+        return "Logged in successfully";
+
     }
 
 }
