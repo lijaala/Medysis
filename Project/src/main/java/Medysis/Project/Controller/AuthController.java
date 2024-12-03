@@ -3,6 +3,7 @@ package Medysis.Project.Controller;
 import Medysis.Project.Model.User;
 import Medysis.Project.Service.EmailService;
 import Medysis.Project.Service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,13 +54,14 @@ public class AuthController {
         }
     }
     @GetMapping("/verify")
-    public String verify(@RequestParam String code) {
+    public void  verify(@RequestParam String code, HttpServletResponse response) throws IOException {
         boolean verified = userService.verifyUser(code);
         if(verified){
-            return "Verified successfully";
+            response.sendRedirect("/login");
         }
         else{
-            return "Not verified";
+            response.sendRedirect("/login");
+
         }
     }
     @PostMapping("/login")

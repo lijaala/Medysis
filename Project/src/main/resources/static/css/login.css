@@ -51,6 +51,6 @@ body {
 
 h1 {
     width: fit-content;
-    align-self: left;
+    text-align: left;
 
 }

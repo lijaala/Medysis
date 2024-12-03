@@ -30,6 +30,7 @@ body {
     border: 1px solid rgb(245, 20, 125);
     color: rgb(253, 253, 255);
     font: 20px;
+    height: 5vh;
     width: 100%;
     align-self: center;
 }
@@ -73,9 +74,9 @@ body {
 
 .form-field input {
     padding: 0.5vw 0.8vw;
-    background-color: #EEEFF8;
-    border: 1px solid #F5147D;
+    background-color: rgb(238, 239, 248);
+    border: 1px solid rgb(245, 20, 125);
     border-radius: .4vw;
     font-size: 14px;
-    height: 40px;
+    height: 4vh;
 }

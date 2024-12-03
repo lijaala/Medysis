@@ -18,8 +18,8 @@ public class EmailService {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Verify your account.[Medysis]");
-        mailMessage.setText("Dear"+user.getName()+",\n\n"+
-                "Please Click the link below to verify your account:\n"+
+        mailMessage.setText("Dear "+user.getName()+",\n\n"+
+                "Please Click the link below to verify your account. You will be redirected to the login page upon sucessful verification\n" +
                 verificationUrl+"\n\nThankyou!");
         mailSender.send(mailMessage);
 
