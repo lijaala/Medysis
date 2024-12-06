@@ -1,11 +1,9 @@
 package Medysis.Project.Service;
 
+import Medysis.Project.Model.Role;
 import Medysis.Project.Model.User;
 import Medysis.Project.Repository.UserRepository;
-import Medysis.Project.Role;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +21,8 @@ public class UserService {
 
     @Autowired
     private final EmailService emailService;
+    @Autowired
+    private RoleService roleService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -38,7 +38,8 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         LocalDateTime now = LocalDateTime.now();
-        user.setRole(Role.User);
+        Role userRole = roleService.findRoleById(4);
+        user.setRole(userRole);
         user.setCreated_at(now);
         user.setUpdated_at(now);
 

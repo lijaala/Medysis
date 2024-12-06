@@ -1,9 +1,9 @@
 package Medysis.Project.Model;
 
-import Medysis.Project.Role;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import Medysis.Project.Model.Role;
 
 @Entity
 public class User {
@@ -22,8 +22,8 @@ public class User {
     @Column
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column
+    @ManyToOne
+    @JoinColumn(name = "role" , referencedColumnName = "roleID")
     private Role role;
 
     @Column(name = "verificationCode", length = 64)
@@ -69,13 +69,7 @@ public class User {
         this.password = password;
     }
 
-    public Role getRole() {
-        return role;
-    }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
 
     public String getVerificationCode() {return verificationCode;}
 
@@ -102,5 +96,11 @@ public class User {
         this.updated_at = updated_at;
     }
 
+    public Role getRole() {
+        return role;
+    }
 
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }
