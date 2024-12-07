@@ -3,7 +3,6 @@ package Medysis.Project.Model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import Medysis.Project.Model.Role;
 
 @Entity
 public class User {
@@ -11,9 +10,10 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "userID")
+    private Integer userID;
 
-    @Column
+    @Column()
     private String name;
 
     @Column
@@ -38,11 +38,11 @@ public class User {
     private LocalDateTime updated_at;
 
     public void setId(Integer id) {
-        this.id = id;
+        this.userID = userID;
     }
 
     public Integer getId() {
-        return id;
+        return userID;
     }
 
     public String getName() {

@@ -1,0 +1,55 @@
+header {
+    margin-top: 30px;
+    display: flex;
+    gap: 100px;
+    align-items: center;
+
+    font-family: "Inter", serif;
+    color: rgba(103, 43, 71, 0.81);
+    position: fixed;
+    left: 25%;
+    width: 70%;
+
+
+}
+
+.search-Header {
+    width: 410px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+
+}
+
+.search-Header input {
+    width: 300px;
+    padding: 10px;
+    border-radius: 20px;
+    outline: none;
+    border: none;
+    background-color: rgb(240, 242, 249);
+    box-shadow: 0 2px 4px rgba(59, 55, 55, 0.407);
+
+}
+
+.notification {
+    display: flex;
+    flex-direction: row;
+    gap: 5vw;
+}
+
+.loggedProfile {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    gap: 2vw;
+}
+
+.profile-picture {
+    border: 1px black solid;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgb(240, 242, 249);
+
+}
