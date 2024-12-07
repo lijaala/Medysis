@@ -2,8 +2,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../static/css/sidebar.css">
-<header>
+
+<header  xmlns:th="http://www.thymeleaf.org" th:fragment="header">
+
+<section class="header">
     <div class="search-Header">
         <input type="text" id="search" placeholder="Search.."/>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -24,4 +26,5 @@
             <span>Logged User Name</span>
         </div>
     </div>
+</section>
 </header>

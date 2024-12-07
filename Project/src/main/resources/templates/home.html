@@ -1,12 +1,40 @@
 <!doctype html>
 <html lang="en">
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/adminDashboard.css">
+
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/home.css">
+
+
     <title>Document</title>
 </head>
 <body>
+<div class=" sidebar" th:include="sidebar::sidebar"></div>
+<section class="mainBody">
+<div  class="headerContainer" th:include="header::header">
+
+</div>
+<main class="adminBody">
+    <section id="dashboard" class="section">
+        <div class="main" th:include="adminDashboardSection::admindashboard"></div>
+    </section>
+    <section id="staff" class="section" > Staff</section>
+    <section id="patients" class="section" >Patients</section>
+    <section id="appointments" class="section"> Appointments</section>
+    <section id="settings" class="section" >Settings</section>
+
+</main>
+</section>
+<script src="js/sidebar.js"></script>
 </body>
 </html>

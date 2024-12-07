@@ -1,20 +1,22 @@
-header {
-    margin-top: 30px;
-    display: flex;
-    gap: 100px;
-    align-items: center;
+.headerContainer {
 
-    font-family: "Inter", serif;
-    color: rgba(103, 43, 71, 0.81);
-    position: fixed;
-    left: 25%;
-    width: 70%;
+    width: 100%;
+    flex: 1;
 
 
 }
 
+.header {
+    margin-top: 5vh;
+    display: flex;
+    gap: 100px;
+    align-items: center;
+    font-family: "Inter", serif;
+    color: rgba(103, 43, 71, 0.81);
+}
+
 .search-Header {
-    width: 410px;
+    width: 30vw;
     display: flex;
     gap: 40px;
     align-items: center;
@@ -22,8 +24,8 @@ header {
 }
 
 .search-Header input {
-    width: 300px;
-    padding: 10px;
+    width: 100%;
+    padding: .5vw;
     border-radius: 20px;
     outline: none;
     border: none;

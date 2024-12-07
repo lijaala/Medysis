@@ -65,26 +65,25 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public String login(@RequestParam(required = true) String email, @RequestParam(required = true) String password, HttpSession session) {
+    public void login(@RequestParam(required = true) String email, @RequestParam(required = true) String password, HttpSession session, HttpServletResponse response) throws IOException{
         Optional<User> userOptional=userService.findByEmail(email);
         if (!userOptional.isPresent()){
-            return " User not found";
+            return;
         }
         User user=userOptional.get();
 
-        System.out.println("Email: " + email);
-        System.out.println("Password: " + password);
+
         if (!user.isVerified()){
             emailService.sendVerificationEmail(user);
-            return "User not verified. Please check your email to verify your account and try again. A new verification Email has been sent";
+            return ;
         }
         if (!passwordEncoder.matches(password, user.getPassword())){
-            return "Password or Email is incorrect";
+            return ;
         }
         session.setAttribute("userId", user.getId());
         session.setAttribute("userEmail", user.getEmail());
         session.setAttribute("userRole", user.getRole());
-        return "Logged in successfully";
+        response.sendRedirect("/home");
 
     }
 

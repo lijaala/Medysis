@@ -1,0 +1,75 @@
+.main {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    gap: 10vh;
+
+}
+
+.stats {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 10%;
+    justify-content: center;
+
+}
+
+.stats div {
+    border-radius: 8px;
+    flex: 1;
+    height: 30vh;
+    padding: 2%;
+    align-items: center;
+
+    box-shadow: 0 2px 5px rgba(87, 86, 86, 0.499);
+
+}
+
+.stats div:nth-child(1) {
+    background: linear-gradient(180deg, rgba(153, 249, 118, 0.623) 15%, rgba(236, 251, 230, 0.912) 80%);
+    color: #0F5E1B;
+
+}
+
+.stats div:nth-child(2) {
+    background: linear-gradient(180deg, rgba(213, 180, 255, 0.78) 5%, rgba(238, 224, 255, 0.856) 71%);
+    color: rgb(95, 58, 165);
+}
+
+.stats div:nth-child(3) {
+    background: linear-gradient(180deg, rgba(164, 254, 249, 0.816) 0%, rgba(229, 255, 254, 0.834) 69%);
+    color: rgb(21, 124, 126);
+
+}
+
+.calChart {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 3vw;
+    width: 100%;
+
+}
+
+.calChart div {
+    justify-content: center;
+    height: 50vh;
+    background-color: rgb(240, 242, 249);
+    border-radius: 8px;
+
+
+}
+
+
+.barchart {
+    flex: 2;
+
+}
+
+.calendar {
+    flex: 1;
+
+
+}

@@ -1,0 +1,32 @@
+.mainBody {
+    display: flex;
+    flex-direction: column;
+    width: 60vw;
+    gap: 5vh;
+    position: fixed;
+    right: 10%;
+    height: max-content;
+
+}
+
+.adminBody {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10%;
+
+}
+
+.section {
+    font-size: 18px;
+    display: none;
+    align-content: center;
+    justify-content: center;
+    gap: 10%;
+    /* Hide all sections by default */
+}
+
+.section.active {
+    display: flex;
+    /* Display the active section */
+}
