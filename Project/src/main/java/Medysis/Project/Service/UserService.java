@@ -1,13 +1,16 @@
 package Medysis.Project.Service;
 
+import Medysis.Project.Model.Availability;
 import Medysis.Project.Model.Role;
 import Medysis.Project.Model.User;
+import Medysis.Project.Repository.AvailabilityRepository;
 import Medysis.Project.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,6 +24,9 @@ public class UserService {
 
     @Autowired
     private final EmailService emailService;
+
+    @Autowired
+    AvailabilityRepository availabilityRepository;
     @Autowired
     private RoleService roleService;
 
@@ -70,7 +76,11 @@ public class UserService {
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-}
+
+
+    }
+
+
 
 
 

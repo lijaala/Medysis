@@ -5,7 +5,6 @@ hmtl,
 body {
     margin: 0;
     padding: 0;
-    color: rgb(7, 16, 78);
 }
 
 .roboto-regular {
@@ -72,7 +71,8 @@ body {
 
 
 
-.form-field input {
+.form-field input,
+.form-field select {
     padding: 0.5vw 0.8vw;
     background-color: rgb(238, 239, 248);
     border: 1px solid rgb(245, 20, 125);

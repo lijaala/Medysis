@@ -73,3 +73,54 @@
 
 
 }
+
+.search2 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 5%;
+
+    input {
+        padding: 5px;
+        border: none;
+        border-radius: 20px;
+        background-color: rgb(240, 242, 249);
+
+        width: 30%
+    }
+
+    button {
+        width: fit-content;
+    }
+
+
+
+}
+
+.staffTable {
+    width: 100%;
+
+    tbody {
+        padding: 5px;
+    }
+
+
+
+}
+
+th {
+    padding: 5%;
+    width: max-content;
+}
+
+thead tr {
+    background-color: rgb(240, 242, 249);
+    border-radius: 5px;
+
+}
+
+
+#staffTableBody td:nth-child(5) {
+    display: flex;
+    gap: 1vw;
+}

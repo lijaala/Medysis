@@ -6,9 +6,8 @@ html {
 }
 
 .footer {
-
-    width: 100vw;
-    position: fixed;
-    bottom: 0;
-
+    background: url(../image/Group\ 289.png);
+    background-size: cover;
+    height: 10%;
+    width: 100%;
 }

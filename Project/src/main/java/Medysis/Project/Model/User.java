@@ -13,11 +13,26 @@ public class User {
     @Column(name = "userID")
     private Integer userID;
 
-    @Column()
+    @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "phone")
+    private String Phone;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column (name = "gender")
+    private String gender;
+
+    @Column(name = "age")
+    private Integer age;
+
+    @Column (name = "image")
+    private String image;
 
     @Column
     private String password;
@@ -102,5 +117,53 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Integer getUserID() {
+        return userID;
+    }
+
+    public void setUserID(Integer userID) {
+        this.userID = userID;
+    }
+
+    public String getPhone() {
+        return Phone;
+    }
+
+    public void setPhone(String phone) {
+        Phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

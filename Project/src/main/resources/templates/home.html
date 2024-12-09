@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/addStaff.css">
+
 
 
     <title>Document</title>
@@ -26,15 +28,20 @@
 </div>
 <main class="adminBody">
     <section id="dashboard" class="section">
-        <div class="main" th:include="adminDashboardSection::admindashboard"></div>
+        <div class="main" th:include="dashboardAndStaff::admindashboard"></div>
     </section>
-    <section id="staff" class="section" > Staff</section>
+    <section id="staff" class="section" > 
+        <div class="main" th:include="dashboardAndStaff::staff"></div>
+    </section>
     <section id="patients" class="section" >Patients</section>
     <section id="appointments" class="section"> Appointments</section>
     <section id="settings" class="section" >Settings</section>
 
 </main>
 </section>
-<script src="js/sidebar.js"></script>
+<script src="js/sidebar.js">
+
+</script>
+
 </body>
 </html>

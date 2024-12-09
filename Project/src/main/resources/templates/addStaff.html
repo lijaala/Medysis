@@ -1,0 +1,60 @@
+<section  xmlns:th="http://www.thymeleaf.org" th:fragment="addStaffForm">
+
+<form action="api/admin/addStaff" method="POST" class="addStaff">
+    <!-- First Row: First Name, Middle Name, Last Name -->
+    <div class="form-field">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" placeholder="eg: abc@gmail.com" name="fullName" required>
+    </div>
+
+
+    <!-- Second Row: Email, Contact Number -->
+    <div class="form-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="eg: abc@gmail.com" name="email" required>
+    </div>
+    <div class="form-field">
+        <label for="password">Password</label>
+        <input type="password" id="password"  placeholder="enter your password" name="password" required>
+    </div>
+
+
+
+
+    <!-- Third Row: Password, Confirm Password -->
+    <div class="form-field">
+        <label for="role">Role</label>
+        <select id="role" name="role" required>
+            <option value=""> Select Role</option>
+            
+        </select>
+    </div>
+    <div id="availabilitySection" style="display: none" >
+        <h3>Doctor's Availability</h3>
+
+        <div class="form-group">
+            <label for="availableDays">Available Days:</label>
+            <select id="availableDays" name="availableDays" multiple>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+        </div>
+    
+        <div id="timeSlotsContainer">
+            <h4>Available Times:</h4>
+            <p>Select days to add time slots.</p>
+        </div>
+    </div>
+    <button type="submit" class="primary"> Add</button>
+
+        </form>
+</section>
+
+<script>
+
+</script>
