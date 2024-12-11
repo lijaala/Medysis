@@ -1,9 +1,8 @@
 package Medysis.Project.Controller;
 
+import Medysis.Project.Model.Staff;
 import Medysis.Project.Model.User;
-import Medysis.Project.Service.EmailService;
-import Medysis.Project.Service.UploadImageService;
-import Medysis.Project.Service.UserService;
+import Medysis.Project.Service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,12 @@ public class AuthController {
 
     @Autowired
     private final UploadImageService uploadImageService;
-    public AuthController(UserService userService, PasswordEncoder passwordEncoder, EmailService emailService, UploadImageService uploadImageService) {
+    @Autowired
+    private StaffService staffService;
+    @Autowired
+    private RoleService roleService;
+
+    public AuthController(UserService userService, PasswordEncoder passwordEncoder, EmailService emailService, UploadImageService uploadImageService, StaffService staffService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
@@ -48,7 +52,6 @@ public class AuthController {
                          @RequestParam Integer age,
                          @RequestParam String gender,
                          @RequestParam MultipartFile image) {
-
         System.out.println("Received signup request with name: " + name + ", email: " + email + ", password: " + password);
 
         try{
@@ -88,26 +91,53 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public void login(@RequestParam(required = true) String email, @RequestParam(required = true) String password, HttpSession session, HttpServletResponse response) throws IOException{
-        Optional<User> userOptional=userService.findByEmail(email);
-        if (!userOptional.isPresent()){
+    public void login(@RequestParam(required = true) String email, @RequestParam(required = true) String password, HttpSession session, HttpServletResponse response) throws IOException {
+        Optional<User> userOptional = userService.findByEmail(email);
+        Optional<Staff> staffOptional = staffService.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            authenticateUser(userOptional.get(), password, session, response, "/home");
             return;
+        } else if (staffOptional.isPresent()) {
+            autheticateStaff(staffOptional.get(), password, session, response, "/home");
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found");
         }
-        User user=userOptional.get();
+    }
 
-
+    private void authenticateUser(User user, String password, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
         if (!user.isVerified()){
             emailService.sendVerificationEmail(user);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "User not verified. Verification email sent.");
             return ;
         }
         if (!passwordEncoder.matches(password, user.getPassword())){
-            return ;
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
+            return;
         }
         session.setAttribute("userId", user.getId());
         session.setAttribute("userEmail", user.getEmail());
         session.setAttribute("userRole", user.getRole());
-        response.sendRedirect("/home");
-
+        response.sendRedirect(redirectUrl);
+    }
+    private void autheticateStaff(Staff staff, String password, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
+        if (!passwordEncoder.matches(password, staff.getPassword())){
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
+            return;
+        }
+        String roleName="ROLE_"+roleService.getRoleNameById(staff.getRole().getRoleID());
+        session.setAttribute("userId", staff.getStaffID());
+        session.setAttribute("userEmail",staff.getStaffEmail());
+        session.setAttribute("userRole", roleName);
+        response.sendRedirect(redirectUrl);
     }
 
+
+
+
+
+
+
 }
+
+

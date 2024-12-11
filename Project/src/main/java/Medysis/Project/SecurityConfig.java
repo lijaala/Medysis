@@ -27,6 +27,7 @@ public class SecurityConfig {
                         .loginPage("/login")  // Custom login page
                         .permitAll()  // Allow everyone to access the login page
                         .defaultSuccessUrl("/home", true)  // Redirect after successful login
+                        .failureUrl("/login?error=true")
                 )
                 .logout(logout -> logout.permitAll());  // Allow everyone to access logout
 
