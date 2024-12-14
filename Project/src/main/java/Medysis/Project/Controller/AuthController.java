@@ -36,6 +36,10 @@ public class AuthController {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
     public AuthController(UserService userService, PasswordEncoder passwordEncoder, EmailService emailService, UploadImageService uploadImageService, StaffService staffService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -91,46 +95,16 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public void login(@RequestParam(required = true) String email, @RequestParam(required = true) String password, HttpSession session, HttpServletResponse response) throws IOException {
-        Optional<User> userOptional = userService.findByEmail(email);
-        Optional<Staff> staffOptional = staffService.findByEmail(email);
-
-        if (userOptional.isPresent()) {
-            authenticateUser(userOptional.get(), password, session, response, "/home");
-            return;
-        } else if (staffOptional.isPresent()) {
-            autheticateStaff(staffOptional.get(), password, session, response, "/home");
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found");
+    public void login(@RequestParam String email, @RequestParam String password,HttpSession session, HttpServletResponse response) throws IOException {
+        try {
+            String redirectUrl=authService.authenticate(email,password, session);
+            response.sendRedirect(redirectUrl);
+        }
+        catch(Exception e){
+           response.sendError(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
         }
     }
 
-    private void authenticateUser(User user, String password, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
-        if (!user.isVerified()){
-            emailService.sendVerificationEmail(user);
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "User not verified. Verification email sent.");
-            return ;
-        }
-        if (!passwordEncoder.matches(password, user.getPassword())){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
-            return;
-        }
-        session.setAttribute("userId", user.getId());
-        session.setAttribute("userEmail", user.getEmail());
-        session.setAttribute("userRole", user.getRole());
-        response.sendRedirect(redirectUrl);
-    }
-    private void autheticateStaff(Staff staff, String password, HttpSession session, HttpServletResponse response, String redirectUrl) throws IOException {
-        if (!passwordEncoder.matches(password, staff.getPassword())){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
-            return;
-        }
-        String roleName="ROLE_"+roleService.getRoleNameById(staff.getRole().getRoleID());
-        session.setAttribute("userId", staff.getStaffID());
-        session.setAttribute("userEmail",staff.getStaffEmail());
-        session.setAttribute("userRole", roleName);
-        response.sendRedirect(redirectUrl);
-    }
 
 
 
