@@ -8,6 +8,7 @@ import Medysis.Project.Repository.RoleRepository;
 import Medysis.Project.Service.RoleService;
 import Medysis.Project.Service.StaffService;
 import Medysis.Project.Service.UploadImageService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -40,7 +41,7 @@ public class AdminController {
     }
 
     @PostMapping("/addStaff")
-    @PreAuthorize("hasRole('ROLE_Admin')")
+
     public String addStaff(@RequestParam String staffName,
                            @RequestParam String staffEmail,
                            @RequestParam String staffPhone,
@@ -48,9 +49,14 @@ public class AdminController {
                            @RequestParam String gender,
                            @RequestParam Integer age,
                            @RequestParam MultipartFile image,
-                           @RequestParam Integer role
+                           @RequestParam Integer role,
+                           HttpSession session
 
     ){
+        String userRole=(String) session.getAttribute("userRole");
+        if (userRole==null ||!userRole.equals("ROLE_ADMIN")){
+            return "Access denied ";
+        }
         try{
             Staff staff=new Staff();
             staff.setStaffName(staffName);
