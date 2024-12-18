@@ -3,6 +3,7 @@ package Medysis.Project.Model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 public class Staff {
@@ -46,6 +47,12 @@ public class Staff {
 
     @Column
     private LocalDateTime lastUpdated;
+
+    @Column (name = "startTime")
+    private LocalTime startTime;
+
+    @Column(name = "endTime")
+    private LocalTime endTime;
 
     public String getStaffID() {
         return staffID;
@@ -149,5 +156,22 @@ public class Staff {
 
     public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 }

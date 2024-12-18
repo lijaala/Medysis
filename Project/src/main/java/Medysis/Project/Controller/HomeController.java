@@ -12,10 +12,20 @@ public class HomeController {
     public String register() {
         return "register";
     }
+
     @GetMapping("/login")
     public String login() {
         return "login";
     }
+
     @GetMapping("/home")
-    public String home() {return "home";}
+    public String home() {
+        return "home";
+    }
+
+    @GetMapping("/appointment")
+    public String appointment() {
+        return "appointment";
+    }
 }
+

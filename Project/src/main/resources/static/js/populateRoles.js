@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded",function(){
 async function fetchRoles(){
     try{
         const response=await fetch('api/admin/getRoles');
+        console.log(response);
         if(!response.ok){
             throw new Error ("Failed to fetch roles");
 
@@ -21,10 +22,14 @@ async function fetchRoles(){
 
 function populateRolesDropdown(roles){
     const roleSelect=document.getElementById('role');
+
     roles.forEach(role=>{
+        console.log(roles);
         const option=document.createElement('option');
         option.value=role.roleID;
         option.textContent=role.role;
         roleSelect.appendChild(option);
     })
 }
+
+

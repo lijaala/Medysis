@@ -13,9 +13,12 @@
         <img src="image/NEO BEAUTY SALON.jpg" >
 
     </section>
-    <section class="form">
+
+
+    <section class="form" xmlns:th="http://www.thymeleaf.org" th:fragment="user">
         <form action="/api/auth/signup" method="POST" class="form-container">
             <!-- First Row: First Name, Middle Name, Last Name -->
+            <div class=form-row>
             <div class="form-field">
                 <label for="name">Full Name</label>
                 <input type="text" id="name" placeholder="Enter your full Name" name="name" required>
@@ -27,6 +30,9 @@
                 <label for="email">Email</label>
                 <input type="email" id="email" placeholder="eg: abc@gmail.com" name="email" required>
             </div>
+            </div>
+            <div class=form-row>
+
             <div class="form-field">
                 <label for="phone">Phone</label>
                 <input type="text" id="phone" placeholder="Phone Number" name="phone" required>
@@ -35,6 +41,9 @@
                 <label for="address">Address</label>
                 <input type="text" id="address" placeholder="Address" name="address" required>
             </div>
+            </div>
+            <div class=form-row>
+
             <div class="form-field">
                 <label for="age">Age</label>
                 <input type="number" id="age" placeholder="Enter Your Age" name="age" required>
@@ -48,14 +57,15 @@
 
                 </select>
             </div>
-            <div class="form-field">
-                <label for="image">Photo</label>
-                <input type="file" id="image" placeholder="eg: abc@gmail.com" name="image" accept="image/*" class="">
             </div>
 
-        
-        
-        
+
+
+
+
+
+            <div class=form-row>
+
             <!-- Third Row: Password, Confirm Password -->
             <div class="form-field">
                 <label for="password">Password</label>
@@ -65,6 +75,11 @@
                 <label for="confirmPassword">Confirm Password</label>
                 <input type="password" id="confirmPassword" placeholder="Confirm password" name="confirmPassword" required>
             </div>
+            </div>
+            <div class="form-field">
+                <label for="image">Photo</label>
+                <input type="file" id="image" placeholder="eg: abc@gmail.com" name="image" accept="image/*" class="">
+            </div>
         
         
             
@@ -73,9 +88,8 @@
                 <span>One of us?<a href="/login"> Login </a></span>
             </div>
         </form>
-
-
     </section>
+
     <section class="popUp" id="popUp" style="display: none;">
         <div id="popupModal" class="popup-modal" style="display: none;">
             <div class="modal-content">

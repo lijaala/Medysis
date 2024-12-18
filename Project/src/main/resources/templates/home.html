@@ -33,7 +33,10 @@
     <section id="staff" class="section" > 
         <div class="main" th:include="dashboardAndStaff::staff"></div>
     </section>
-    <section id="patients" class="section" >Patients</section>
+    <section id="patients" class="section" >
+        <div class="main" th:include="register::user"></div>
+
+    </section>
     <section id="appointments" class="section"> Appointments</section>
     <section id="settings" class="section" >Settings</section>
 
@@ -42,6 +45,22 @@
 <script src="js/sidebar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <script src="js/populateRoles.js"></script>
+<script>
+    document.getElementById('role').addEventListener('change', function() {
+        var role = this.value;
+        console.log("Selected Role:", role);
+
+        var availabilitySection = document.getElementById('availability-section');
+
+        if (role == "2") {
+            availabilitySection.style.display = 'block'; // Show availability section
+        } else {
+            availabilitySection.style.display = 'none'; // Hide availability section
+        }
+    });
+
+</script>
+
 
 </body>
 </html>

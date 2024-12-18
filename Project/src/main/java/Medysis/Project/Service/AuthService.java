@@ -61,6 +61,6 @@ public class AuthService {
         session.setAttribute("userId", staff.getStaffID());
         session.setAttribute("userEmail", staff.getStaffEmail());
         session.setAttribute("userRole", staff.getRole().getRole() );
-        return "/home";
+        return "redirect: /home";
     }
 }

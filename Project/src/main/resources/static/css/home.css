@@ -20,6 +20,7 @@
 
 .section {
     font-size: 18px;
+    width: 100%;
     display: none;
     align-content: center;
     justify-content: center;

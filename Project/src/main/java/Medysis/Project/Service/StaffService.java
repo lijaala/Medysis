@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.Random;
 
@@ -31,7 +32,8 @@ public class StaffService {
         this.passwordEncoder = passwordEncoder;
     }
     public Staff save(Staff staff) {
-        if (userRepository.findByEmail(staff.getStaffEmail()).isPresent()) {
+
+        if (staffRepository.findByStaffEmail(staff.getStaffEmail()).isPresent()) {
             throw new IllegalArgumentException("Staff with email address  already exists");
 
         }
@@ -42,8 +44,6 @@ public class StaffService {
         LocalDateTime now= LocalDateTime.now();
         staff.setAddedOn(now);
         staff.setLastUpdated(now);
-
-
 
         // Save the staff entity
         return staffRepository.save(staff);

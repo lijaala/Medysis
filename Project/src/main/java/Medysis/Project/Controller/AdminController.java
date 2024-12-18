@@ -1,6 +1,7 @@
 package Medysis.Project.Controller;
 
 
+import Medysis.Project.Model.Availability;
 import Medysis.Project.Model.Role;
 import Medysis.Project.Model.Staff;
 import Medysis.Project.Repository.AvailabilityRepository;
@@ -15,7 +16,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -27,12 +32,12 @@ public class AdminController {
     @Autowired
     private AvailabilityRepository availabilityRepository;
     @Autowired
-    public  final UploadImageService uploadImageService;
+    public final UploadImageService uploadImageService;
     @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
-    public AdminController( StaffService staffService, RoleService roleService, AvailabilityRepository availabilityRepository ) {
+    public AdminController(StaffService staffService, RoleService roleService, AvailabilityRepository availabilityRepository) {
         this.staffService = staffService;
         this.roleService = roleService;
         this.availabilityRepository = availabilityRepository;
@@ -50,35 +55,52 @@ public class AdminController {
                            @RequestParam Integer age,
                            @RequestParam MultipartFile image,
                            @RequestParam Integer role,
+                           @RequestParam(required=false) String startTime,
+                           @RequestParam(required=false) String endTime,
                            HttpSession session
 
-    ){
-        String userRole=(String) session.getAttribute("userRole");
-        if (userRole==null ||!userRole.equals("ROLE_ADMIN")){
+    ) {
+        String userRole = (String) session.getAttribute("userRole");
+        if (userRole == null || !userRole.equals("ROLE_ADMIN")) {
             return "Access denied ";
         }
-        try{
-            Staff staff=new Staff();
+        try {
+            Staff staff = new Staff();
             staff.setStaffName(staffName);
             staff.setStaffEmail(staffEmail);
             staff.setStaffPhone(staffPhone);
             staff.setStaffAddress(staffAddress);
             staff.setGender(gender);
             staff.setAge(age);
-            String imageUrl=uploadImageService.saveImage(image);
+            String imageUrl = uploadImageService.saveImage(image);
             staff.setImage(imageUrl);
-            Role roleId=roleRepository.findById(role).orElseThrow(()-> new RuntimeException("Role not found"));
+
+            Role roleId = roleRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
             staff.setRole(roleId);
+
+            DateTimeFormatter formatter=DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
+            LocalTime start_Time=LocalTime.parse(startTime, formatter);
+            LocalTime end_Time=LocalTime.parse(endTime, formatter);
+            if (end_Time.isBefore(start_Time)){
+                return "End time cannot be before start time";
+            }
+            staff.setStartTime(start_Time);
+            staff.setEndTime(end_Time);
+
+
+
             staffService.save(staff);
-            return "Staff added sucessfully";
+
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return "Error:" + e.getMessage();
         }
 
-    }
+        return "Success";
 
+    }
     @GetMapping("/getRoles")
-    public List<Role> getAllRoles(){
+    public List<Role> getAllRoles () {
         return roleService.getAllRoles();
 
     }

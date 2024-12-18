@@ -20,8 +20,8 @@ public class Availability {
     private LocalTime endTime;
 
     @ManyToOne
-    @JoinColumn(name = "doctorID", referencedColumnName = "userID")
-    private User doctorID;
+    @JoinColumn(name = "doctorID", referencedColumnName = "staffID")
+    private Staff doctorID;
 
     public int getId() {
         return id;
@@ -55,11 +55,11 @@ public class Availability {
         this.endTime = endTime;
     }
 
-    public User getDoctorID() {
+    public Staff getDoctorID() {
         return doctorID;
     }
 
-    public void setDoctorID(User doctorID) {
+    public void setDoctorID(Staff doctorID) {
         this.doctorID = doctorID;
     }
 }
