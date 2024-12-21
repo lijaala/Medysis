@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
@@ -37,15 +36,13 @@
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4 form-container">
             <h2 class="form-title text-center">Book an Appointment</h2>
-            <form action="/submit-appointment" method="POST">
+            <form action="/appointment/book" method="POST">
                 <!-- Select Doctor -->
                 <div class="form-group">
-                    <label for="doctor">Select Doctor</label>
+                    <label for="doctor" onchange="updateTimeSlots()">Select Doctor</label>
                     <select class="form-control" id="doctor" name="doctor" required>
                         <option value="" disabled selected>Select a doctor</option>
-                        <option value="Dr. John Doe">Dr. John Doe</option>
-                        <option value="Dr. Jane Smith">Dr. Jane Smith</option>
-                        <option value="Dr. Michael Brown">Dr. Michael Brown</option>
+
                     </select>
                 </div>
 
@@ -60,12 +57,7 @@
                     <label for="time">Select Time</label>
                     <select class="form-control" id="time" name="time" required>
                         <option value="" disabled selected>Select a time</option>
-                        <option value="9:00 AM">9:00 AM</option>
-                        <option value="10:00 AM">10:00 AM</option>
-                        <option value="11:00 AM">11:00 AM</option>
-                        <option value="1:00 PM">1:00 PM</option>
-                        <option value="2:00 PM">2:00 PM</option>
-                        <option value="3:00 PM">3:00 PM</option>
+
                     </select>
                 </div>
 
@@ -82,6 +74,148 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.0/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded",function(){
+        fetchDoctors();
+        const doctorSelect = document.getElementById('doctor');
+
+        // Check if doctor select element exists and attach event listener
+        if (doctorSelect) {
+            console.log("Attaching change event listener to doctor select element");
+            doctorSelect.addEventListener('change', updateTimeSlots);
+        } else {
+            console.log("Doctor select element not found");
+        }
+
+    })
+
+    function fetchDoctors() {
+        fetch('/appointment/fetchDoctors',{
+            method: 'POST',  // Make sure to use POST
+            headers: {
+                'Content-Type': 'application/json',
+        },
+        })
+            .then(response => response.json())
+            .then(doctors => {
+                const doctorSelect = document.getElementById('doctor');
+                if (doctorSelect) {
+                    doctorSelect.innerHTML = '<option value="" disabled selected>Select a doctor</option>'; // Clear previous options
+                    doctors.forEach(doctor => {
+                        const option = document.createElement('option');
+                        option.value = doctor.staffID; // Set the value to the doctor ID
+                        option.textContent = doctor.staffName;
+
+                        // Store the startTime and endTime as data attributes
+                        option.setAttribute('data-startTime', doctor.startTime);
+                        option.setAttribute('data-endTime', doctor.endTime);
+
+                        doctorSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => console.log('Error fetching doctors:', error));
+    }
+
+
+    function updateTimeSlots() {
+        const doctorSelect = document.getElementById('doctor');
+        const selectedDoctorID = doctorSelect.value; // Get the selected doctor ID
+
+        console.log("Selected Doctor ID:", selectedDoctorID); // Log the selected doctor ID
+
+        if (selectedDoctorID) {
+            const selectedOption = doctorSelect.options[doctorSelect.selectedIndex]; // Get the selected option
+            const startTime = selectedOption.getAttribute('data-startTime'); // Get the startTime from data attributes
+            const endTime = selectedOption.getAttribute('data-endTime'); // Get the endTime from data attributes
+
+            const dateInput = document.getElementById('date');
+            const timeSelect = document.getElementById('time');
+
+            console.log("Selected Start Time:", startTime); // Log the start time
+            console.log("Selected End Time:", endTime); // Log the end time
+
+            // Clear previous time slots
+            timeSelect.innerHTML = '<option value="" disabled selected>Select a time</option>';
+
+            if (startTime && endTime) {
+                // Generate time slots if a doctor, start/end time, and date are selected
+                const availableSlots = generateSlots(
+                    startTime,
+                    endTime,
+                    8 // Duration in minutes
+                );
+
+
+                console.log("Generated Available Time Slots:", availableSlots);
+
+                if (availableSlots.length > 0) {
+                    availableSlots.forEach(slot => {
+                        const option = document.createElement('option');
+                        const formattedSlot=formatTo12Hour(slot);
+                        option.value = slot;
+                        option.textContent = formattedSlot;
+                        timeSelect.appendChild(option);
+                    });
+                } else {
+                    console.log("No available time slots.");
+                }
+            }
+        } else {
+            console.log("No doctor selected.");
+        }
+    }
+
+
+    // Generate available time slots based on doctor's working hours
+    function generateSlots(startTime, endTime, intervalMinutes) {
+        const slots = [];
+        console.log("Starting slot generation...");
+
+        // Split start and end times
+        const [startHour, startMinute] = startTime.split(":");
+        const [endHour, endMinute] = endTime.split(":");
+
+        console.log("Parsed start time:", startHour, startMinute);
+        console.log("Parsed end time:", endHour, endMinute);
+
+        // Create Date objects for start and end times
+        const start = new Date();
+        start.setHours(parseInt(startHour), parseInt(startMinute), 0, 0); // Set time to start hour and minute
+
+        const end = new Date();
+        end.setHours(parseInt(endHour), parseInt(endMinute), 0, 0); // Set time to end hour and minute
+
+        console.log("Start date object:", start);
+        console.log("End date object:", end);
+
+        const interval = intervalMinutes * 60 * 1000; // Convert minutes to milliseconds
+
+        let current = start;
+        while (current < end) {
+            slots.push(current.toTimeString().substring(0, 5)); // Format as HH:MM
+            console.log("Added time slot:", current.toTimeString().substring(0, 5));
+            current = new Date(current.getTime() + interval);
+        }
+
+        console.log("Generated Time Slots:", slots); // Log the generated slots
+        return slots;
+    }function formatTo12Hour(time24) {
+        const [hours, minutes] = time24.split(":");
+        let formattedHours = parseInt(hours);
+        const period = formattedHours >= 12 ? "PM" : "AM";
+
+        if (formattedHours > 12) {
+            formattedHours -= 12;
+        } else if (formattedHours === 0) {
+            formattedHours = 12; // For midnight case (00:00 -> 12:00 AM)
+        }
+
+        return `${formattedHours}:${minutes} ${period}`;
+    }
+
+
+</script>
 </body>
 
 </html>
