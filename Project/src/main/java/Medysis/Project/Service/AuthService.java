@@ -50,7 +50,7 @@ public class AuthService {
         session.setAttribute("userId", user.getId());
         session.setAttribute("userEmail", user.getEmail());
         session.setAttribute("userRole", user.getRole().getRole());
-        return "/home";
+        return "/appointment";
     }
 
     private String authenticateStaff(Staff staff, String password, HttpSession session) throws Exception {
@@ -61,6 +61,6 @@ public class AuthService {
         session.setAttribute("userId", staff.getStaffID());
         session.setAttribute("userEmail", staff.getStaffEmail());
         session.setAttribute("userRole", staff.getRole().getRole() );
-        return "redirect: /home";
+        return "/home";
     }
 }

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
 async function fetchRoles(){
     try{
-        const response=await fetch('api/admin/getRoles');
+        const response=await fetch('api/roles');
         console.log(response);
         if(!response.ok){
             throw new Error ("Failed to fetch roles");

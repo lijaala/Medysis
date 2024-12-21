@@ -36,6 +36,8 @@ public class AdminController {
     @Autowired
     private RoleRepository roleRepository;
 
+
+
     @Autowired
     public AdminController(StaffService staffService, RoleService roleService, AvailabilityRepository availabilityRepository) {
         this.staffService = staffService;
@@ -55,6 +57,7 @@ public class AdminController {
                            @RequestParam Integer age,
                            @RequestParam MultipartFile image,
                            @RequestParam Integer role,
+                           @RequestParam String password,
                            @RequestParam(required=false) String startTime,
                            @RequestParam(required=false) String endTime,
                            HttpSession session
@@ -75,21 +78,30 @@ public class AdminController {
             String imageUrl = uploadImageService.saveImage(image);
             staff.setImage(imageUrl);
 
+            staff.setPassword(password);
+
             Role roleId = roleRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
             staff.setRole(roleId);
+            staffService.save(staff);
 
-            DateTimeFormatter formatter=DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
-            LocalTime start_Time=LocalTime.parse(startTime, formatter);
-            LocalTime end_Time=LocalTime.parse(endTime, formatter);
-            if (end_Time.isBefore(start_Time)){
-                return "End time cannot be before start time";
-            }
-            staff.setStartTime(start_Time);
-            staff.setEndTime(end_Time);
+            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {DateTimeFormatter formatter=DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
+                try{LocalTime start_Time=LocalTime.parse(startTime, formatter);
+                    LocalTime end_Time=LocalTime.parse(endTime, formatter);
+                    if (end_Time.isBefore(start_Time)){
+                        return "End time cannot be before start time";
+                    }
+                    staff.setStartTime(start_Time);
+                    staff.setEndTime(end_Time);
+
+                }
+                catch (DateTimeParseException e){
+                    return "Invalid time format";
+                }
 
 
 
             staffService.save(staff);
+            }
 
 
         } catch (Exception e) {

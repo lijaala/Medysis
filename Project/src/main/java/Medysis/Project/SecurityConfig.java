@@ -20,8 +20,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disabling CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register","/login", "/css/**", "/js/**", "/image/**","/api/**","/home").permitAll()  // Allow public access
-                        .anyRequest().authenticated()  // Protect other endpoints
+                        .requestMatchers("/register","/login", "/css/**", "/js/**", "/image/**","/api/**","/home","/appointment","appointment/**").permitAll()  // Allow public access
+                        .anyRequest().permitAll()  // Protect other endpoints
                 )
                 .formLogin(form -> form
                         .loginPage("/login")  // Custom login page
