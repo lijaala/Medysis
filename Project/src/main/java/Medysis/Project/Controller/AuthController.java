@@ -90,7 +90,7 @@ public class AuthController {
             response.sendRedirect("/login");
         }
         else{
-            response.sendRedirect("/login");
+            response.sendRedirect("/appointment");
 
         }
     }
