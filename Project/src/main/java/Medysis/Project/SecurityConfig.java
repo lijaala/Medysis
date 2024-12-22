@@ -20,7 +20,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disabling CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register","/login", "/css/**", "/js/**", "/image/**","/api/**","/home","/appointment","appointment/**").permitAll()  // Allow public access
+                        .requestMatchers("/register","/login", "/css/**", "/js/**", "/image/**","/api/**","/home","/appointment","appointment/**","addPastmedical").permitAll()  // Allow public access
                         .anyRequest().permitAll()  // Protect other endpoints
                 )
                 .formLogin(form -> form

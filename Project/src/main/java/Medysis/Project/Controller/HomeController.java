@@ -27,5 +27,9 @@ public class HomeController {
     public String appointment() {
         return "appointment";
     }
+    @GetMapping("/addPastmedical")
+    public String addPastmedical() {
+        return "addPastmedical";
+    }
 }
 
