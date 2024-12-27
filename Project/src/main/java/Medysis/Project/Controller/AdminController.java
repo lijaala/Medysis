@@ -57,7 +57,6 @@ public class AdminController {
                            @RequestParam Integer age,
                            @RequestParam MultipartFile image,
                            @RequestParam Integer role,
-                           @RequestParam String password,
                            @RequestParam(required=false) String startTime,
                            @RequestParam(required=false) String endTime,
                            HttpSession session
@@ -67,8 +66,9 @@ public class AdminController {
         if (userRole == null || !userRole.equals("ROLE_ADMIN")) {
             return "Access denied ";
         }
+        Staff staff;
         try {
-            Staff staff = new Staff();
+            staff = new Staff();
             staff.setStaffName(staffName);
             staff.setStaffEmail(staffEmail);
             staff.setStaffPhone(staffPhone);
@@ -78,29 +78,29 @@ public class AdminController {
             String imageUrl = uploadImageService.saveImage(image);
             staff.setImage(imageUrl);
 
-            staff.setPassword(password);
 
             Role roleId = roleRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
             staff.setRole(roleId);
             staffService.save(staff);
 
-            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {DateTimeFormatter formatter=DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
-                try{LocalTime start_Time=LocalTime.parse(startTime, formatter);
-                    LocalTime end_Time=LocalTime.parse(endTime, formatter);
-                    if (end_Time.isBefore(start_Time)){
+            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
+                try {
+                    LocalTime start_Time = LocalTime.parse(startTime, formatter);
+                    LocalTime end_Time = LocalTime.parse(endTime, formatter);
+                    if (end_Time.isBefore(start_Time)) {
                         return "End time cannot be before start time";
                     }
                     staff.setStartTime(start_Time);
                     staff.setEndTime(end_Time);
 
-                }
-                catch (DateTimeParseException e){
+                } catch (DateTimeParseException e) {
                     return "Invalid time format";
                 }
 
+                staffService.save(staff);
+                return "Staff added successfully. Generated Staff ID: " + staff.getStaffID();
 
-
-            staffService.save(staff);
             }
 
 
@@ -108,7 +108,8 @@ public class AdminController {
             return "Error:" + e.getMessage();
         }
 
-        return "Success";
+        return "Staff added successfully. Generated Staff ID: " + staff.getStaffID();
+
 
     }
     @GetMapping("/getRoles")

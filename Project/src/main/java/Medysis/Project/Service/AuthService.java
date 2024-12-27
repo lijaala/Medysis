@@ -26,16 +26,22 @@ public class AuthService {
 
     public String authenticate(String email, String password, HttpSession session) throws Exception {
         Optional<User> userOptional = userService.findByEmail(email);
+        Optional<Staff> staffOptional = staffService.findByEmail(email);
+
         if (userOptional.isPresent()) {
             return authenticateUser(userOptional.get(), password, session);
         }
-
-        Optional<Staff> staffOptional = staffService.findByEmail(email);
-        if (staffOptional.isPresent()) {
+        else if (staffOptional.isPresent()) {
             return authenticateStaff(staffOptional.get(), password, session);
+
+        }
+        else {
+            return "User not found";
         }
 
-        throw new Exception("User not found");
+
+
+
     }
     private String authenticateUser(User user, String password, HttpSession session) throws Exception {
         if (!user.isVerified()) {
@@ -50,14 +56,19 @@ public class AuthService {
         session.setAttribute("userId", user.getId());
         session.setAttribute("userEmail", user.getEmail());
         session.setAttribute("userRole", user.getRole().getRole());
-        return "/home";
+        return "/appointment";
     }
 
     private String authenticateStaff(Staff staff, String password, HttpSession session) throws Exception {
+        System.out.println("Staff Email: " + staff.getStaffEmail());
+        System.out.println("Stored Password: " + staff.getPassword());
+        System.out.println("Entered Password: " + password);
+        System.out.println("Password Match: " + passwordEncoder.matches(password, staff.getPassword()));
+
+
         if (!passwordEncoder.matches(password, staff.getPassword())) {
             throw new Exception("Invalid credentials");
         }
-
         session.setAttribute("userId", staff.getStaffID());
         session.setAttribute("userEmail", staff.getStaffEmail());
         session.setAttribute("userRole", staff.getRole().getRole() );

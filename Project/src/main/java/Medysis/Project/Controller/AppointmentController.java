@@ -32,7 +32,7 @@ public class AppointmentController {
         return staffRepository.findByRoleRoleID(2);
     }
     @PostMapping("/book")
-    public Appointment bookAppointment(
+    public String bookAppointment(
             @RequestParam("doctor") String doctor,
             @RequestParam("date") String appDateStr,
             @RequestParam("time") String appTimeStr,
@@ -51,7 +51,7 @@ public class AppointmentController {
         // Call service to book appointment
         Appointment appointment = appointmentService.bookAppointment(patientID, doctor, appDate, appTime);
 
-        return appointment; // Return the appointment object
+        return "Appointment added sucessfully"; // Return the appointment object
     }
 
 }
