@@ -56,7 +56,7 @@ public class AuthService {
         session.setAttribute("userId", user.getId());
         session.setAttribute("userEmail", user.getEmail());
         session.setAttribute("userRole", user.getRole().getRole());
-        return "/appointment";
+        return "/addPastmedical";
     }
 
     private String authenticateStaff(Staff staff, String password, HttpSession session) throws Exception {

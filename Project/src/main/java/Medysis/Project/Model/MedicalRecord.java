@@ -1,4 +1,90 @@
 package Medysis.Project.Model;
 
+
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+
+@Entity
 public class MedicalRecord {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "recordID")
+    private Integer recordID;
+
+    @Column(name = "conditionName")
+    private String conditionName;
+
+    @Column(name = "isTreated")
+    private String isTreated;
+
+    @Column(name = "scans")
+    private String scans;
+
+    @Column(name = "diagnosedDate")
+    private LocalDate diagnosedDate;
+
+    @ManyToOne
+    @JoinColumn(name = "user", referencedColumnName = "userID")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn (name = "doctor", referencedColumnName="staffID", nullable= true)
+    private Staff doctor;
+
+    public Integer getRecordID() {
+        return recordID;
+    }
+
+    public void setRecordID(Integer recordID) {
+        this.recordID = recordID;
+    }
+
+    public String getConditionName() {
+        return conditionName;
+    }
+
+    public void setConditionName(String conditionName) {
+        this.conditionName = conditionName;
+    }
+
+    public String getIsTreated() {
+        return isTreated;
+    }
+
+    public void setIsTreated(String isTreated) {
+        this.isTreated = isTreated;
+    }
+
+    public String getScans() {
+        return scans;
+    }
+
+    public void setScans(String scans) {
+        this.scans = scans;
+    }
+
+    public LocalDate getDiagnosedDate() {
+        return diagnosedDate;
+    }
+
+    public void setDiagnosedDate(LocalDate diagnosedDate) {
+        this.diagnosedDate = diagnosedDate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Staff getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Staff doctor) {
+        this.doctor = doctor;
+    }
 }
