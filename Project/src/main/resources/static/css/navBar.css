@@ -1,0 +1,57 @@
+.navbar{
+    position: fixed;
+    bottom: -2vh;
+}
+.nav-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10vw;
+    height: 10vw;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.bg-light{
+    background-color: #F0F2F9 !important;
+}
+.nav-link:hover {
+    svg path{
+        stroke:rgb(255, 10, 124);
+    }
+    circle{
+        color: rgb(255, 10, 124);
+    }
+
+
+}
+
+.nav-link.active {
+    svg path{
+        stroke:rgb(255, 10, 124);;
+    }
+    background-color: rgba(255, 219, 237, 0.92);
+}
+
+.nav-link.active svg {
+    stroke: white;
+}
+
+.nav-link svg {
+    width: 24px;
+    height: 24px;
+    stroke: black;
+    fill: none;
+}
+
+.badge {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    font-size: 0.75rem;
+}
+svg path{
+    stroke:#07104e;
+}
+/* Adjustments for smaller screens */
+

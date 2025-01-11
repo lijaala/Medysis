@@ -7,20 +7,18 @@
     <link  href="css/default.css" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/navBar.css">
+
     <style>
         body {
             background-color: #f8f9fa;
         }
 
-        .container {
-            margin-top: 50px;
-        }
 
         .form-container {
             background-color: #ffffff;
             border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .form-title {
@@ -28,15 +26,20 @@
             font-size: 24px;
             font-weight: bold;
         }
+        .container-info {
+
+
+        }
     </style>
 </head>
 
-<body>
-<div class="container">
+<body >
+
+<div class="container-info ">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4 form-container">
             <h2 class="form-title text-center">Book an Appointment</h2>
-            <form action="/appointment/book" method="POST">
+            <form action="/appointment/book" method="POST" class="container-info">
                 <!-- Select Doctor -->
                 <div class="form-group">
                     <label for="doctor" onchange="updateTimeSlots()">Select Doctor</label>
@@ -69,6 +72,8 @@
         </div>
     </div>
 </div>
+<div th:include="navBar::navBar" class="navBar"></div>
+
 
 <!-- Bootstrap JS and Dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

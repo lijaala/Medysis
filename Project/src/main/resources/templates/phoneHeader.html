@@ -1,0 +1,106 @@
+
+<section  xmlns:th="http://www.thymeleaf.org" th:fragment="header">
+    <style>
+        header{
+            padding: 10%;
+            display:flex;
+            flex-direction: column;
+            border-bottom-left-radius:50px;
+            border-bottom-right-radius: 50px;
+            height: fit-content;
+            width: 100vw;
+            background-color: #07104e;
+            color: #f3f3f3;
+            gap:5vh ;
+            z-index: 1;
+        }
+        button {
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            border:none;
+            svg {
+                path
+                {
+                    stroke: #f3f3f3 !important;
+
+                }
+            }
+        }
+
+        .search-bar {
+            padding: 5px;
+            width: 80%;
+            border: none;
+            border-radius:12px;
+            font-size: 1em;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .header-top {
+            display: flex;
+            width: 100%;
+            align-self: center;
+            gap: 2vw;
+        }
+
+
+
+    </style>
+    <header class="d-flex justify-content-center align-items-center py-3 position-fixed top-0">
+
+        <div class="header-top justify-content-center align-items-center">
+            <button  onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18l-6-6l6-6" />
+                </svg>
+            </button>
+            <h2 id="page-title" class="m-0">Default Title</h2>
+        </div>
+        <div class="search-container mx-3">
+            <input type="text" class="search-bar" placeholder="Search...">
+        </div>
+    </header>
+
+
+
+
+
+    <script>
+        // Define the function to set the page title based on the current page
+        // Function to set the page title based on the current page
+        function setPageTitle() {
+            const pageTitle = document.getElementById('page-title');
+            const path = window.location.pathname;
+
+            // Set different titles based on the URL path
+            if (path.includes('patientHome')) {
+                pageTitle.textContent = 'HOME';
+            } else if (path.includes('appointment')) {
+                pageTitle.textContent = 'Appointments';
+            } else if (path.includes('Medical')) {
+                pageTitle.textContent = 'Add Medical Records';
+            } else {
+                pageTitle.textContent = 'WELCOME'; // Fallback title
+            }
+        }
+
+        // Ensure the function runs on page load
+        document.addEventListener('DOMContentLoaded', setPageTitle);
+
+        // If you have client-side routing (SPA) or dynamic content loading, you can listen for URL changes:
+        window.onpopstate = function() {
+            setPageTitle();
+        };
+
+    </script>
+</section>
+
+
+
+

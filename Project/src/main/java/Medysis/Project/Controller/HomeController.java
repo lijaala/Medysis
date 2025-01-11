@@ -31,5 +31,10 @@ public class HomeController {
     public String addPastmedical() {
         return "addPastmedical";
     }
+
+    @GetMapping("/patientHome")
+    public String patientHome() {
+        return "patientHome";
+          }
 }
 
