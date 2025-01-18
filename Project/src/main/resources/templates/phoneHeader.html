@@ -52,7 +52,7 @@
 
 
     </style>
-    <header class="d-flex justify-content-center align-items-center py-3 position-fixed top-0">
+    <header class="d-flex justify-content-center align-items-center py-3 fixed-top">
 
         <div class="header-top justify-content-center align-items-center">
             <button  onclick="goBack()">
@@ -72,6 +72,10 @@
 
 
     <script>
+        function goBack() {
+            window.history.back();  // Go back to the previous page
+        }
+
         // Define the function to set the page title based on the current page
         // Function to set the page title based on the current page
         function setPageTitle() {

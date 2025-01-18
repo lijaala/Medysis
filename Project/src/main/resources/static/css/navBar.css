@@ -1,57 +1,68 @@
-.navbar{
+/* Base Styles */
+.navbar {
     position: fixed;
-    bottom: -2vh;
+    bottom: 0;
+    width: 100%;
+    background-color: #F0F2F9;
+    padding: 0.5rem 0;
+
+
+}
+a{
+    color: #07104e;
 }
 .nav-link {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 10vw;
-    height: 10vw;
+    width: 15vw;
+    height: 15vw;
+    max-width: 60px;
+    max-height: 60px;
     border-radius: 50%;
     transition: all 0.2s ease;
-}
-
-.bg-light{
-    background-color: #F0F2F9 !important;
-}
-.nav-link:hover {
-    svg path{
-        stroke:rgb(255, 10, 124);
-    }
-    circle{
-        color: rgb(255, 10, 124);
-    }
-
-
-}
-
-.nav-link.active {
-    svg path{
-        stroke:rgb(255, 10, 124);;
-    }
-    background-color: rgba(255, 219, 237, 0.92);
-}
-
-.nav-link.active svg {
-    stroke: white;
 }
 
 .nav-link svg {
     width: 24px;
     height: 24px;
-    stroke: black;
+    stroke: #07104e;
     fill: none;
 }
 
-.badge {
-    position: absolute;
-    top: 5px;
-    right: 15px;
-    font-size: 0.75rem;
+/* Hover and Active States */
+.nav-link:hover svg path,
+.nav-link.active svg path {
+    stroke: rgb(255, 10, 124);
 }
-svg path{
-    stroke:#07104e;
-}
-/* Adjustments for smaller screens */
 
+.nav-link.active {
+    background-color: rgba(255, 219, 237, 0.92);
+}
+
+/* Media Queries for Smaller Screens */
+@media (max-width: 768px) {
+    .nav-link {
+        width: 20vw;
+        height: 20vw;
+
+    }
+
+    .nav-link svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .nav-link {
+        width: 20vw;
+        height: 20vw;
+
+    }
+
+    .nav-link svg {
+        width: 20px;
+        height: 20px;
+    }
+}

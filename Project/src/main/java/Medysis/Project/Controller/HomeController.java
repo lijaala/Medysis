@@ -36,5 +36,9 @@ public class HomeController {
     public String patientHome() {
         return "patientHome";
           }
+          @GetMapping("/test")
+    public String test() {
+        return "test";
+          }
 }
 

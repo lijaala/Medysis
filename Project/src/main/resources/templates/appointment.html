@@ -1,10 +1,10 @@
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment Booking</title>
-    <link  href="css/default.css" rel="stylesheet">
+    <link  href="/css/default.css" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/navBar.css">
@@ -14,34 +14,31 @@
             background-color: #f8f9fa;
         }
 
+        button{
+            width: fit-content !important;
+            height: fit-content;
+            padding: 1%  2% !important;
 
-        .form-container {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 30px;
+
         }
 
-        .form-title {
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
+
         .container-info {
-
+            margin-top: 45%;
 
         }
+
     </style>
 </head>
 
-<body >
+<body>
 
-<div class="container-info ">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4 form-container">
-            <h2 class="form-title text-center">Book an Appointment</h2>
-            <form action="/appointment/book" method="POST" class="container-info">
+<div  th:include="phoneHeader::header"></div>
+
+    <div class="container container-info ">
+            <form action="/appointment/book" method="POST" >
                 <!-- Select Doctor -->
-                <div class="form-group">
+                <div class="mb-3">
                     <label for="doctor" onchange="updateTimeSlots()">Select Doctor</label>
                     <select class="form-control" id="doctor" name="doctor" required>
                         <option value="" disabled selected>Select a doctor</option>
@@ -50,13 +47,13 @@
                 </div>
 
                 <!-- Select Date -->
-                <div class="form-group">
+                <div class="mb-3">
                     <label for="date">Select Date</label>
                     <input type="date" class="form-control" id="date" name="date" required>
                 </div>
 
                 <!-- Select Time -->
-                <div class="form-group">
+                <div class="mb-3">
                     <label for="time">Select Time</label>
                     <select class="form-control" id="time" name="time" required>
                         <option value="" disabled selected>Select a time</option>
@@ -65,14 +62,15 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="form-group text-center ">
-                    <button type="submit" class="primary">Book Appointment</button>
+                <div class="mb-3">
+                    <button type="submit" class="primary w-100">Book Appointment</button>
                 </div>
             </form>
-        </div>
-    </div>
+
+        <div class= "fixed-bottom navbar" th:include="navBar::navBar"></div>
+
 </div>
-<div th:include="navBar::navBar" class="navBar"></div>
+
 
 
 <!-- Bootstrap JS and Dependencies -->
