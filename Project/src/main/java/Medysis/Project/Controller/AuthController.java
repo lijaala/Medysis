@@ -98,6 +98,8 @@ public class AuthController {
     public void login(@RequestParam String email, @RequestParam String password,HttpSession session, HttpServletResponse response) throws IOException {
         try {
             String redirectUrl=authService.authenticate(email,password, session);
+            System.out.println(session.getAttribute("userRole"));
+
             response.sendRedirect(redirectUrl);
         }
         catch(Exception e){
