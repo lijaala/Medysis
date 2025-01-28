@@ -62,4 +62,33 @@ public class AppointmentController {
 
         return appointmentService.getAppointmentsByRole(userRole, userId);
     }
+
+    @PostMapping("/edit")
+    public String editAppointment(
+            @RequestParam("appointmentID") Integer appointmentID,
+            @RequestParam("date") String appDateStr,
+            @RequestParam("time") String appTimeStr,
+            @RequestParam("status") String status,
+            HttpSession session) {
+
+        // Get the doctor ID from the session (assuming it's stored as 'doctorId')
+        String doctorID = (String) session.getAttribute("userId");
+
+        // If doctorID is not found in the session, you may want to handle this error
+        if (doctorID == null) {
+            return "Doctor ID is not available in the session.";
+        }
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        // Parse the date and time
+        LocalDate appDate = LocalDate.parse(appDateStr, dateFormatter);
+        LocalTime appTime = LocalTime.parse(appTimeStr, timeFormatter);
+
+        // Call service to edit the appointment
+        Appointment appointment = appointmentService.editAppointment(appointmentID, doctorID, appDate, appTime, status);
+
+        return "Appointment updated successfully";
+    }
 }

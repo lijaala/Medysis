@@ -65,91 +65,113 @@
 
     document.addEventListener("DOMContentLoaded", async () => {
         try {
-            // Fetch user role
-            const roleResponse = await fetch('api/auth/role', {
-                method: 'GET',
-                credentials: 'same-origin'  // Ensure cookies are sent with the request
-            });
+            const roleResponse = await fetch('api/auth/role', { method: 'GET', credentials: 'same-origin' });
             if (!roleResponse.ok) {
                 console.error("Failed to fetch role:", roleResponse.status);
                 return;
             }
             const userRole = await roleResponse.text();
-            console.log("Fetched userRole:", userRole);
+            console.log("User Role:", userRole);
 
-            // Fetch appointments
-            const appointmentResponse = await fetch('/appointment/list', {
-                method: 'GET',
-                credentials: 'same-origin'  // Ensure cookies are sent with the request
-            });
+            const appointmentResponse = await fetch('/appointment/list', { method: 'GET', credentials: 'same-origin' });
             if (!appointmentResponse.ok) {
                 console.error("Failed to fetch appointments:", appointmentResponse.status);
                 return;
             }
-
             const appointments = await appointmentResponse.json();
-            console.log("Appointments data:", appointments);
-
             const tbody = document.getElementById('appointmentTableBody');
-            const doctorColumnIndex = 1; // Assuming the "Doctor" column is the second column (index 1)
+            const doctorColumnIndex = 1;
 
-            // Hide the "Doctor" column if the role is ROLE_DOCTOR
             if (userRole === 'ROLE_DOCTOR') {
-                const headers = document.querySelectorAll('.Table thead tr td'); // Target the headers
-                headers[doctorColumnIndex].style.display = 'none'; // Hide the "Doctor" header
-
-                const rows = tbody.querySelectorAll('tr'); // Target table rows
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length > doctorColumnIndex) {
-                        cells[doctorColumnIndex].style.display = 'none'; // Hide the "Doctor" column cells
-                    }
-                });
+                const headers = document.querySelectorAll('.Table thead tr td');
+                headers[doctorColumnIndex].style.display = 'none';
             }
 
-            // Render appointments
             if (Array.isArray(appointments)) {
                 appointments.forEach(appointment => {
                     const row = document.createElement('tr');
-                    row.setAttribute('data-id', appointment.appointmentID); // Use appointmentID as unique identifier
+                    row.setAttribute('data-id', appointment.appointmentID);
 
                     row.innerHTML = `
-                    <td>${appointment.patientID?.name || 'Unknown Patient'}</td>
-                    <td>${appointment.doctorID?.staffName || 'Unknown Doctor'}</td>
-                    <td>${appointment.appDate || 'N/A'}</td>
-                    <td>${appointment.appTime || 'N/A'}</td>
-                    <td>${appointment.status || 'N/A'}</td>
-                    <td class="actions">
-                        ${userRole === 'ROLE_ADMIN' ? `
-                            <button onclick="editAppointment('${appointment.appointmentID}')">Edit</button>
-                            <button onclick="deleteAppointment('${appointment.appointmentID}')">Delete</button>
-                        ` : ''}
-                        ${userRole === 'ROLE_DOCTOR' ? `
-                            <button onclick="startAppointment('${appointment.appointmentID}')">Start</button>
-                        ` : ''}
-                    </td>
-                `;
+                        <td>${appointment.patientID?.name || 'Unknown Patient'}</td>
+                        <td>${appointment.doctorID?.staffName || 'Unknown Doctor'}</td>
+                        <td>${appointment.appDate || 'N/A'}</td>
+                        <td>${appointment.appTime || 'N/A'}</td>
+                        <td>${appointment.status || 'N/A'}</td>
+                        <td class="actions">
+                            <button type="button" class="edit" onclick="openEditModal('${appointment.appointmentID}', '${appointment.appDate}', '${appointment.appTime}', '${appointment.status}')"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+\t<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+\t\t<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+\t\t<path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+\t</g>
+</svg></button>
+                            ${userRole === 'ROLE_DOCTOR' ? `<button type="submit" class="primary" onclick="startAppointment('${appointment.appointmentID}')">Start</button>` : ''}
+                        </td>
+                    `;
                     tbody.appendChild(row);
                 });
 
-                // After adding rows, hide the doctor column for rows as well
                 if (userRole === 'ROLE_DOCTOR') {
                     const rows = tbody.querySelectorAll('tr');
                     rows.forEach(row => {
                         const cells = row.querySelectorAll('td');
                         if (cells.length > doctorColumnIndex) {
-                            cells[doctorColumnIndex].style.display = 'none'; // Hide the "Doctor" column cells
+                            cells[doctorColumnIndex].style.display = 'none';
                         }
                     });
                 }
             } else {
-                console.error("Expected an array, but got:", appointments);
                 tbody.innerHTML = `<tr><td colspan="6">No appointments found</td></tr>`;
             }
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     });
+
+    function openEditModal(id, appDate, appTime, status) {
+
+
+        document.getElementById('editAppointmentID').value = id;
+        document.getElementById('editAppDate').value = appDate;
+        document.getElementById('editAppTime').value = appTime;
+        document.getElementById('editStatus').value = status;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    function saveAppointmentChanges() {
+        const appointmentID = document.getElementById("editAppointmentID").value;
+        const appDate = document.getElementById("editAppDate").value;
+        const appTime = document.getElementById("editAppTime").value;
+        const status = document.getElementById("editStatus").value;
+
+        // Prepare the form data
+        const data = new URLSearchParams();
+        data.append("appointmentID", appointmentID);
+        data.append("date", appDate || '');  // Send empty string if no date is selected
+        data.append("time", appTime || '');  // Send empty string if no time is selected
+        data.append("status", status || '');  // Send empty string if no status is selected
+
+        fetch("/appointment/edit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: data.toString(),
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data); // Show success message
+                closeEditModal(); // Close the modal after editing
+                location.reload(); // Optionally reload the page to reflect changes
+            })
+            .catch(error => {
+                console.error("Error editing appointment:", error);
+            });
+    }
 
 
 

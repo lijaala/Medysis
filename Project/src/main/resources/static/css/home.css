@@ -144,7 +144,7 @@
 
 
 }
-
+/*Table styling*/
 .Table {
     width: 100%;
     border-collapse: collapse;
@@ -167,16 +167,104 @@ thead{
 th,td {
     padding: 1%;
     width: 20vw;
+    margin-top:3vh;
+    text-align: center;
 
 }
-.Table tr:first-child{
-    border-radius: 10px;
+tr{
+    margin-top: 2%;
 }
+
+thead td:first-child{
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+
+
+}
+
+thead td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+}
+/* WHens role is doctor hiding doctor column*/
 .role-doctor .doctor-column {
     display: none;
 }
+/*Action column styling*/
+td.actions{
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
 
 
+}
+td.actions button{
+    flex:1 !important;
+}
 
+.edit{
+    border: none !important;
+    background-color: transparent !important;
+}
+/*edit modal styling*/
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);  /* Dark background */
+    display: none;  /* Initially hidden */
+    z-index: 9999;
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    transition: all 0.3s ease;
+}
 
+/* Blur the background */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+/* Modal content */
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+    z-index: 10000;
+}
+
+/* Close button (top-right corner) */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    color: #aaa;
+    cursor: pointer;
+}
+
+/* Form styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input[type="date"], input[type="time"], select {
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 
