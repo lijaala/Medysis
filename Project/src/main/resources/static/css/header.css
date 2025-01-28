@@ -1,20 +1,15 @@
 @import url(default.css);
 
-.headerContainer {
 
-    width: 100%;
-    flex: 1;
-
-
-}
 
 .header {
-    margin-top: 5vh;
+    margin-top: 3vh;
     display: flex;
-    gap: 100px;
+    gap: 15vw;
     align-items: center;
     font-family: "Inter", serif;
     color: rgba(103, 43, 71, 0.81);
+    align-content: center;
 }
 
 .search-Header {
@@ -40,6 +35,8 @@
     display: flex;
     flex-direction: row;
     gap: 5vw;
+    align-items: center;
+
 }
 
 .loggedProfile {

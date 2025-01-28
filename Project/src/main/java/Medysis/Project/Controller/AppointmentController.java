@@ -1,6 +1,5 @@
 package Medysis.Project.Controller;
 
-
 import Medysis.Project.Model.Appointment;
 import Medysis.Project.Model.Staff;
 import Medysis.Project.Repository.StaffRepository;
@@ -17,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/appointment")
 public class AppointmentController {
+
     @Autowired
     private final StaffRepository staffRepository;
     @Autowired
@@ -27,10 +27,11 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    @PostMapping ("/fetchDoctors")
-    public List<Staff> getDoctors(){
-        return staffRepository.findByRoleRoleID(2);
+    @PostMapping("/fetchDoctors")
+    public List<Staff> getDoctors() {
+        return staffRepository.findByRoleRoleID(2);  // Role ID for doctors
     }
+
     @PostMapping("/book")
     public String bookAppointment(
             @RequestParam("doctor") String doctor,
@@ -38,7 +39,6 @@ public class AppointmentController {
             @RequestParam("time") String appTimeStr,
             HttpSession session) {
 
-        // Define the format for the date and time strings
         Integer patientID = (Integer) session.getAttribute("userId");
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -51,7 +51,15 @@ public class AppointmentController {
         // Call service to book appointment
         Appointment appointment = appointmentService.bookAppointment(patientID, doctor, appDate, appTime);
 
-        return "Appointment added sucessfully"; // Return the appointment object
+        return "Appointment added successfully";
     }
 
+    @GetMapping("/list")
+    public List<Appointment> getAppointments(HttpSession session) {
+        String userRole = (String) session.getAttribute("userRole");
+        String userId = (String) session.getAttribute("userId");
+
+
+        return appointmentService.getAppointmentsByRole(userRole, userId);
+    }
 }

@@ -12,12 +12,14 @@ public class Appointment {
     @Column(name = "appointmentID")
     private int appointmentID;
 
+    @ManyToOne
+    @JoinColumn(name = "patientID", referencedColumnName = "userID", nullable = false)
+     private User patientID;
 
-    @Column(name = "patientID")
-    private Integer patientID;
+    @ManyToOne
+    @JoinColumn(name = "doctorID", referencedColumnName = "staffID", nullable = false)
 
-    @Column(name = "doctorID")
-    private String doctorID;
+    private Staff doctorID;
 
     @Column(name ="appDate")
     private LocalDate appDate;
@@ -36,19 +38,19 @@ public class Appointment {
         this.appointmentID = appointmentID;
     }
 
-    public Integer getPatientID() {
+    public User getPatientID() {
         return patientID;
     }
 
-    public void setPatientID(Integer patientID) {
+    public void setPatientID(User patientID) {
         this.patientID = patientID;
     }
 
-    public String getDoctorID() {
+    public Staff getDoctorID() {
         return doctorID;
     }
 
-    public void setDoctorID(String doctorID) {
+    public void setDoctorID(Staff doctorID) {
         this.doctorID = doctorID;
     }
 

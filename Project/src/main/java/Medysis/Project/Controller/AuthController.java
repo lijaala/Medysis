@@ -106,6 +106,11 @@ public class AuthController {
            response.sendError(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
         }
 
+
+    }
+    @GetMapping("/role")
+    public String getUserRole(HttpSession session) {
+        return (String) session.getAttribute("userRole");
     }
 
 
