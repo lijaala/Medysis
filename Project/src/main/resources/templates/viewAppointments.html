@@ -23,7 +23,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h3>Edit Appointment</h3>
-            <form id="editAppointmentForm">
+            <form id="editAppointmentForm" action="appointment/edit" method="post">
                 <label for="editAppDate">Appointment Date:</label>
                 <input type="date" id="editAppDate" name="appDate">
 
@@ -42,6 +42,9 @@
             </form>
         </div>
     </div>
+    <div id="messageBox" style="display: none; padding: 10px; text-align: center; font-weight: bold;"></div>
+
+
 
 </section>
 

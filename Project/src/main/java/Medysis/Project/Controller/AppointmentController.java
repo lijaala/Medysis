@@ -78,7 +78,8 @@ public class AppointmentController {
         if (doctorID == null) {
             return "Doctor ID is not available in the session.";
         }
-
+        System.out.println("Edit request received for appointment ID: " + appointmentID);
+        try{
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -89,6 +90,11 @@ public class AppointmentController {
         // Call service to edit the appointment
         Appointment appointment = appointmentService.editAppointment(appointmentID, doctorID, appDate, appTime, status);
 
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         return "Appointment updated successfully";
+
     }
 }
