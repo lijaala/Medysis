@@ -38,6 +38,8 @@
     align-content: center;
     justify-content: center;
     gap: 10%;
+    display: flex;
+    flex-direction: row;
     /* Hide all sections by default */
 }
 
@@ -144,6 +146,7 @@
 
 
 }
+
 /*Table styling*/
 .Table {
     width: 100%;

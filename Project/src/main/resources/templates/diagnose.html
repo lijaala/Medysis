@@ -1,0 +1,33 @@
+<section  xmlns:th="http://www.thymeleaf.org" th:fragment="diagnosisModal">
+
+
+<div id="diagnosisModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div> <!-- Blur background -->
+    <div class="modal-content">
+        <span class="close" onclick="closeDiagnosisModal()">&times;</span>
+        <h3>Add Diagnosis</h3>
+
+        <form id="diagnosisForm">
+            <input type="hidden" id="userIdInput" name="userID">
+            <input type="hidden" id="doctorIdInput" name="doctorID">
+
+            <label for="conditionName">Condition Name:</label>
+            <input type="text" id="conditionName" name="conditionName" required>
+
+            <label for="isTreated">Is Treated?</label>
+            <select id="isTreated" name="isTreated" required>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select>
+
+            <label for="scans">Upload Scans:</label>
+            <input type="file" id="scans" name="scans" accept="image/*">
+
+            <label for="diagnosedDate">Diagnosed Date:</label>
+            <input type="date" id="diagnosedDate" name="diagnosedDate" required>
+
+            <button type="submit" class="primary" onclick="saveDiagnosis()">Save Diagnosis</button>
+        </form>
+    </div>
+</div>
+</section>
