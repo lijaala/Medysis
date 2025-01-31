@@ -1,38 +1,42 @@
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="diagnosisModal">
 
 
-<div id="diagnosisModal" class="modal" style="display: none;">
-    <div class="modal-overlay"></div> <!-- Blur background -->
-    <div class="modal-content">
-        <span class="close" onclick="closeDiagnosisModal()">&times;</span>
-        <h3>Add Diagnosis</h3>
+    <div id="diagnosisModal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div> <!-- Blur background -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <!-- View Past Medical Records Button -->
+                <button type="button" class="secondary" onclick="viewPastRecords()">View Past Medical Records</button>
 
-        <form id="diagnosisForm" action="api/medicalRecords/saveDiagnosis" method="POST" enctype="multipart/form-data">
-            <input type="hidden" id="appointmentIdInput" name="appointmentID">
-            <input type="hidden" id="userIdInput" name="userID">
-            <input type="hidden" id="doctorIdInput" name="doctorID">
-
-            <label for="conditionName">Condition Name:</label>
-            <input type="text" id="conditionName" name="conditionName" required>
-
-            <label>Is Treated?</label>
-            <div>
-                <input type="radio" id="treatedYes" name="isTreated" value="Yes" required>
-                <label for="treatedYes">Yes</label>
-
-                <input type="radio" id="treatedNo" name="isTreated" value="No" required>
-                <label for="treatedNo">No</label>
+                <!-- Close Button -->
+                <span class="close" onclick="closeDiagnosisModal()">&times;</span>
             </div>
 
+            <h3>Add Diagnosis</h3>
 
-            <label for="scans">Upload Scans:</label>
-            <input type="file" id="scans" name="scans" accept="image/*">
+            <form id="diagnosisForm" action="api/medicalRecords/saveDiagnosis" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="appointmentIdInput" name="appointmentID">
+                <input type="hidden" id="userIdInput" name="userID">
+                <input type="hidden" id="doctorIdInput" name="doctorID">
 
-            <label for="diagnosedDate">Diagnosed Date:</label>
-            <input type="date" id="diagnosedDate" name="diagnosedDate" required>
+                <label for="conditionName">Condition Name:</label>
+                <input type="text" id="conditionName" name="conditionName" required>
 
-            <button type="submit" class="primary" onclick="saveDiagnosis()">Save Diagnosis</button>
-        </form>
+                <!-- Treatment Plan -->
+                <label for="treatmentPlan">Treatment Plan:</label>
+                <textarea id="treatmentPlan" name="treatmentPlan" required></textarea>
+
+                <!-- Follow-up Period (in months) -->
+                <label for="followUpMonths">Follow-up (in months):</label>
+                <input type="number" id="followUpMonths" name="followUpMonths" min="1" max="12" required>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="primary">Next</button>
+                    <button type="button" class="secondary" onclick="doneAppointment()">Done</button>
+                </div>
+
+            </form>
+        </div>
     </div>
-</div>
 </section>

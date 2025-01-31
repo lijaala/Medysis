@@ -52,23 +52,20 @@ public class MedicalRecordController {
     @PostMapping("/saveDiagnosis")
     public String saveDiagnosis(@RequestParam Integer userID,
                                 @RequestParam String conditionName,
-                                @RequestParam String isTreated,
-                                @RequestParam String diagnosedDate,
-                                @RequestParam(required = false) MultipartFile[] scans,
                                 @RequestParam Integer appointmentID,
+                                @RequestParam Integer followUpMonths, // New field for follow-up
+                                @RequestParam String treatmentPlan, // Treatment plan field
                                 HttpSession session) {
 
-        String doctorID =(String) session.getAttribute("userId");  // Retrieve doctorID from the session
+        // Retrieve doctorID from the session
+        String doctorID = (String) session.getAttribute("userId");
 
         if (doctorID == null) {
             return "Doctor ID is not found in session.";
         }
 
-        // Parse the diagnosedDate string to a LocalDate object
-        LocalDate date = LocalDate.parse(diagnosedDate);
-
-        // Call the service to add the diagnosis
-        return recordService.addDiagnosis(userID, doctorID, conditionName, date, isTreated, scans, appointmentID);
+        // Call the service to add the diagnosis and update the appointment
+        return recordService.addDiagnosis(userID, doctorID, conditionName, treatmentPlan, appointmentID, followUpMonths);
     }
 
 }

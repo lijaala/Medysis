@@ -39,6 +39,10 @@ button[type=submit]{
 
 
 }
+button [type=button] .secondary{
+    background-color: #F0F2F9;
+    color:#36B1FF;
+}
 .cancel{
     background-color: red!important;
 

@@ -20,6 +20,8 @@ public class RecordService {
     private MedicalRecordsRepository medicalRecordsRepository;
     @Autowired
     private UploadImageService uploadImageService;
+    @Autowired
+    private AppointmentService appointmentService;
 
     @Autowired
     private UserRepository userRepository;
@@ -66,33 +68,7 @@ public class RecordService {
         }
         return pathBuilder.toString();
     }
-    public String addDaignosis(Integer userID, String staffID, String coondiitonName, LocalDate diagnosedDate,String isTreated, MultipartFile[] scans ){
-        try{
-            User user=userRepository.findById(userID).orElse(null);
-            if(user==null){
-                return "User Not Found";
-            }
-            Staff doctor=staffRepository.findById(staffID).orElse(null);
-            if(doctor==null){
-                return "Doctor Not Found";
-            }
-            String filePaths=saveUploadedFiles(scans);
-            MedicalRecord history = new MedicalRecord();
-            history.setUser(user);
-            history.setDoctor(doctor);
-            history.setConditionName(coondiitonName);
-            history.setDiagnosedDate(diagnosedDate);
-            history.setIsTreated(isTreated);
-            history.setScans(filePaths);
-            medicalRecordsRepository.save(history);
-            return "Success";
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return "Error";
-        }
-    }
-    public String addDiagnosis(Integer userID, String doctorID, String conditionName, LocalDate diagnosedDate, String isTreated, MultipartFile[] scans, Integer appointmentID) {
+    public String addDiagnosis(Integer userID, String doctorID, String conditionName, String treatmentPlan, Integer appointmentID, Integer followUpMonths) {
         try {
             // Fetch user and doctor from the database
             User user = userRepository.findById(userID).orElse(null);
@@ -111,8 +87,14 @@ public class RecordService {
                 return "Appointment Not Found";
             }
 
-            // Save the scan images and get the file paths
-            String filePaths = saveUploadedFiles(scans);
+            // Set the diagnosed date to today
+            LocalDate diagnosedDate = LocalDate.now();
+
+            // Set status to "Ongoing" as per your requirement
+            String status = "Ongoing";
+
+            // Set scans to null (no scans provided)
+            String filePaths = null;
 
             // Create a new medical record with the provided details
             MedicalRecord history = new MedicalRecord();
@@ -120,12 +102,22 @@ public class RecordService {
             history.setDoctor(doctor); // Set the doctor
             history.setConditionName(conditionName); // Set the condition name
             history.setDiagnosedDate(diagnosedDate); // Set the diagnosis date
-            history.setIsTreated(isTreated); // Set whether it's treated or not
-            history.setScans(filePaths); // Attach the scans
+            history.setIsTreated(status); // Set status to Ongoing
+            history.setScans(filePaths); // No scans provided
+            history.setTreatmentPlan(treatmentPlan); // Set treatment plan
             history.setAppointment(appointment); // Link the medical record to the appointment
 
             // Save the medical record in the database
             medicalRecordsRepository.save(history);
+
+            // Calculate the follow-up date based on the appointment date
+            LocalDate appointmentDate = appointment.getAppDate(); // Get the actual appointment date
+            LocalDate followUpDate = appointmentDate.plusMonths(followUpMonths); // Add the follow-up months
+
+            // Update the appointment's follow-up date
+            appointmentService.editAppointment(appointmentID, doctorID, appointmentDate, appointment.getAppTime(), status); // Call editAppointment to update the appointment
+            appointment.setFollowUpDate(followUpDate); // Set the follow-up date
+            appointmentRepository.save(appointment);  // Save the updated appointment
 
             return "Success";  // Return success message
 

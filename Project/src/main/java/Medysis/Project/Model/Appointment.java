@@ -30,6 +30,9 @@ public class Appointment {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "followUpDate", nullable = true)
+    private LocalDate followUpDate;
+
     public int getAppointmentID() {
         return appointmentID;
     }
@@ -76,6 +79,14 @@ public class Appointment {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDate getFollowUpDate() {
+        return followUpDate;
+    }
+
+    public void setFollowUpDate(LocalDate followUpDate) {
+        this.followUpDate = followUpDate;
     }
 }
 

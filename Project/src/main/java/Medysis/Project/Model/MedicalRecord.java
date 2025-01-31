@@ -24,6 +24,9 @@ public class MedicalRecord {
     @Column(name = "diagnosedDate")
     private LocalDate diagnosedDate;
 
+    @Column(name="treatmentPlan", nullable = true)
+    private String treatmentPlan;
+
     @ManyToOne
     @JoinColumn(name = "user", referencedColumnName = "userID")
     private User user;
@@ -100,4 +103,13 @@ public class MedicalRecord {
     public void setDoctor(Staff doctor) {
         this.doctor = doctor;
     }
+
+    public String getTreatmentPlan() {
+        return treatmentPlan;
+    }
+
+    public void setTreatmentPlan(String treatmentPlan) {
+        this.treatmentPlan = treatmentPlan;
+    }
 }
+
