@@ -32,6 +32,11 @@ public class MedicalRecord {
     @JoinColumn (name = "doctor", referencedColumnName="staffID", nullable= true)
     private Staff doctor;
 
+    @ManyToOne
+    @JoinColumn(name = "appointment", referencedColumnName = "appointmentID", nullable = true)
+    private Appointment appointment;  // New field linking to Appointment
+
+
     public Integer getRecordID() {
         return recordID;
     }
@@ -82,6 +87,14 @@ public class MedicalRecord {
 
     public Staff getDoctor() {
         return doctor;
+    }
+
+    public Appointment getAppointment() {
+        return appointment;
+    }
+
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
     }
 
     public void setDoctor(Staff doctor) {

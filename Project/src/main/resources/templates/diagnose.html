@@ -7,18 +7,23 @@
         <span class="close" onclick="closeDiagnosisModal()">&times;</span>
         <h3>Add Diagnosis</h3>
 
-        <form id="diagnosisForm">
+        <form id="diagnosisForm" action="api/medicalRecords/saveDiagnosis" method="POST" enctype="multipart/form-data">
+            <input type="hidden" id="appointmentIdInput" name="appointmentID">
             <input type="hidden" id="userIdInput" name="userID">
             <input type="hidden" id="doctorIdInput" name="doctorID">
 
             <label for="conditionName">Condition Name:</label>
             <input type="text" id="conditionName" name="conditionName" required>
 
-            <label for="isTreated">Is Treated?</label>
-            <select id="isTreated" name="isTreated" required>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-            </select>
+            <label>Is Treated?</label>
+            <div>
+                <input type="radio" id="treatedYes" name="isTreated" value="Yes" required>
+                <label for="treatedYes">Yes</label>
+
+                <input type="radio" id="treatedNo" name="isTreated" value="No" required>
+                <label for="treatedNo">No</label>
+            </div>
+
 
             <label for="scans">Upload Scans:</label>
             <input type="file" id="scans" name="scans" accept="image/*">

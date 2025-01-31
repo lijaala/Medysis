@@ -1,8 +1,10 @@
 package Medysis.Project.Service;
 
+import Medysis.Project.Model.Appointment;
 import Medysis.Project.Model.MedicalRecord;
 import Medysis.Project.Model.Staff;
 import Medysis.Project.Model.User;
+import Medysis.Project.Repository.AppointmentRepository;
 import Medysis.Project.Repository.MedicalRecordsRepository;
 import Medysis.Project.Repository.StaffRepository;
 import Medysis.Project.Repository.UserRepository;
@@ -23,6 +25,8 @@ public class RecordService {
     private UserRepository userRepository;
     @Autowired
     private StaffRepository staffRepository;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     public String addMedicalHistory(Integer userID, String conditionName, LocalDate diagnosedDate, String isTreated,MultipartFile[] scans){
         try{
@@ -88,6 +92,49 @@ public class RecordService {
             return "Error";
         }
     }
+    public String addDiagnosis(Integer userID, String doctorID, String conditionName, LocalDate diagnosedDate, String isTreated, MultipartFile[] scans, Integer appointmentID) {
+        try {
+            // Fetch user and doctor from the database
+            User user = userRepository.findById(userID).orElse(null);
+            if (user == null) {
+                return "User Not Found";
+            }
+
+            Staff doctor = staffRepository.findById(doctorID).orElse(null);
+            if (doctor == null) {
+                return "Doctor Not Found";
+            }
+
+            // Fetch the appointment by appointmentID
+            Appointment appointment = appointmentRepository.findById(appointmentID).orElse(null);
+            if (appointment == null) {
+                return "Appointment Not Found";
+            }
+
+            // Save the scan images and get the file paths
+            String filePaths = saveUploadedFiles(scans);
+
+            // Create a new medical record with the provided details
+            MedicalRecord history = new MedicalRecord();
+            history.setUser(user); // Set the user (patient)
+            history.setDoctor(doctor); // Set the doctor
+            history.setConditionName(conditionName); // Set the condition name
+            history.setDiagnosedDate(diagnosedDate); // Set the diagnosis date
+            history.setIsTreated(isTreated); // Set whether it's treated or not
+            history.setScans(filePaths); // Attach the scans
+            history.setAppointment(appointment); // Link the medical record to the appointment
+
+            // Save the medical record in the database
+            medicalRecordsRepository.save(history);
+
+            return "Success";  // Return success message
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error";  // Handle any exceptions
+        }
+    }
+
 
 }
 

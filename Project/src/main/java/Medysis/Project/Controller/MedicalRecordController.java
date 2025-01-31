@@ -49,4 +49,26 @@ public class MedicalRecordController {
          return recordService.addMedicalHistory(userID,conditionName,date, isTreated, scans);
 
     }
+    @PostMapping("/saveDiagnosis")
+    public String saveDiagnosis(@RequestParam Integer userID,
+                                @RequestParam String conditionName,
+                                @RequestParam String isTreated,
+                                @RequestParam String diagnosedDate,
+                                @RequestParam(required = false) MultipartFile[] scans,
+                                @RequestParam Integer appointmentID,
+                                HttpSession session) {
+
+        String doctorID =(String) session.getAttribute("userId");  // Retrieve doctorID from the session
+
+        if (doctorID == null) {
+            return "Doctor ID is not found in session.";
+        }
+
+        // Parse the diagnosedDate string to a LocalDate object
+        LocalDate date = LocalDate.parse(diagnosedDate);
+
+        // Call the service to add the diagnosis
+        return recordService.addDiagnosis(userID, doctorID, conditionName, date, isTreated, scans, appointmentID);
+    }
+
 }
