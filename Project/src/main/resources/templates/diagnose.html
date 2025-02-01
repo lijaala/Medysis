@@ -4,15 +4,24 @@
     <div id="diagnosisModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div> <!-- Blur background -->
         <div class="modal-content">
-            <div class="modal-header">
-                <!-- View Past Medical Records Button -->
-                <button type="button" class="secondary" onclick="viewPastRecords()">View Past Medical Records</button>
+            <span class="close" onclick="closeDiagnosisModal()">&times;</span>
 
-                <!-- Close Button -->
-                <span class="close" onclick="closeDiagnosisModal()">&times;</span>
+            <div class="modal-header">
+                <h3>Add Diagnosis</h3>
+
+                <!-- View Past Medical Records Button -->
+                <button type="button" class="icon" onclick="viewPastRecords()" style="margin-right: 2vw">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5.697M18 14v4h4m-4-7V7a2 2 0 0 0-2-2h-2"/>
+                            <path d="M8 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2m6 13a4 4 0 1 0 8 0a4 4 0 1 0-8 0m-6-7h4m-4 4h3"/>
+                        </g
+                        ></svg>
+                </button>
+
+
             </div>
 
-            <h3>Add Diagnosis</h3>
 
             <form id="diagnosisForm" action="api/medicalRecords/saveDiagnosis" method="POST" enctype="multipart/form-data">
                 <input type="hidden" id="appointmentIdInput" name="appointmentID">
@@ -37,6 +46,30 @@
                 </div>
 
             </form>
+        </div>
+    </div>
+
+    <div id="medicalHistoryModal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <span class="close" onclick="closeMedicalHistoryModal()">&times;</span>
+            <h3>Medical History</h3>
+
+            <!-- Medical Records Table -->
+            <table class="Table">
+                <thead>
+                <tr>
+                    <th>Condition</th>
+                    <th>Diagnosed Date</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody id="medicalRecordsBody">
+                <!-- Data will be inserted here dynamically -->
+                </tbody>
+            </table>
+
+            <button type="button" class="primary" onclick="updateMedicalHistory()">Save Changes</button>
         </div>
     </div>
 </section>

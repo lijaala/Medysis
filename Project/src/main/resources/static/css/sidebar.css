@@ -46,15 +46,19 @@ body {
     border-radius: 8px;
     color: rgba(103, 43, 71, 0.81);
     transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
+
+    svg path, svg g {
+        stroke: rgba(103, 43, 71, 0.81);
+
+
+
+    }
+
 }
 
 .menu li:hover {
     background-color: rgba(255, 219, 237, 0.92);
     box-shadow: 0 2px 4px rgba(79, 75, 77, 0.44);
-
-
-
-
 }
 
 .menu li.active {
@@ -63,8 +67,8 @@ body {
     box-shadow: 0 2px 4px rgba(255, 10, 124, 0.44);
 
 
-    svg {
-        color: rgb(255, 10, 124);
+    svg path,svg g {
+        stroke: rgb(255, 10, 124);
     }
 
 

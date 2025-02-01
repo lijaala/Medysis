@@ -15,6 +15,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/medicalRecords")
@@ -67,5 +68,18 @@ public class MedicalRecordController {
         // Call the service to add the diagnosis and update the appointment
         return recordService.addDiagnosis(userID, doctorID, conditionName, treatmentPlan, appointmentID, followUpMonths);
     }
+
+
+    @GetMapping("/getByUserId")
+    public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam Integer userID) {
+        return recordService.getMedicalRecordsByUserId(userID);
+    }
+
+    @PostMapping("/updateStatus")
+    public String updateTreatmentStatus(@RequestBody List<MedicalRecord> records) {
+        recordService.updateTreatmentStatus(records);
+        return "Treatment status updated successfully!";
+    }
+
 
 }

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecordService {
@@ -126,7 +128,22 @@ public class RecordService {
             return "Error";  // Handle any exceptions
         }
     }
+    public List<MedicalRecord> getMedicalRecordsByUserId(Integer userID) {
+        return medicalRecordsRepository.findByUserId(userID);
+    }
+
+    public void updateTreatmentStatus(List<MedicalRecord> records) {
+        for (MedicalRecord record : records) {
+            Optional<MedicalRecord> optionalRecord = medicalRecordsRepository.findById(record.getRecordID());
+            optionalRecord.ifPresent(existingRecord -> {
+                existingRecord.setIsTreated(record.getIsTreated()); // Only update status
+                medicalRecordsRepository.save(existingRecord);
+            });
+        }
+    }
+    }
 
 
-}
+
+
 

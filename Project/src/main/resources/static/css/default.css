@@ -5,6 +5,14 @@ hmtl,
 body {
     margin: 0;
     padding: 0;
+    color:#07104E;
+    font-size:1rem;
+}
+
+h3{
+    font-size:1.2rem;
+    font-weight: normal;
+    border-bottom: 2vh;
 }
 
 .roboto-regular {
@@ -19,7 +27,7 @@ body {
     font-weight: 400;
     font-style: normal;
 }
-button[type=submit]{
+button{
     padding: 1% 5%;
     border-radius: .6vw;
     text-transform: uppercase;
@@ -39,12 +47,30 @@ button[type=submit]{
 
 
 }
-button [type=button] .secondary{
+.secondary{
     background-color: #F0F2F9;
     color:#36B1FF;
+    border:none;
 }
 .cancel{
     background-color: red!important;
+
+}
+.icon{
+
+    padding: 1%;
+    border-radius:50%;
+    width:fit-content;
+    height:fit-content;
+    background-color: transparent;
+
+
+    svg path, svg g {
+        stroke: #07104E;
+
+
+    }
+
 
 }
 .upload{

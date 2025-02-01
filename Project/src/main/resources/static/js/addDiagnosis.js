@@ -52,4 +52,71 @@ function closeDiagnosisModal() {
     diagnosisModal.style.display = "none";
 }
 
-// Attach event listener to form submission
+
+    function viewPastRecords() {
+    const userID = document.getElementById("userIdInput").value;
+
+    fetch(`/api/medicalRecords/getByUserId?userID=${userID}`)
+    .then(response => response.json())
+    .then(data => {
+    const tableBody = document.getElementById("medicalRecordsBody");
+    tableBody.innerHTML = ""; // Clear previous data
+
+    data.forEach(record => {
+    const row = document.createElement("tr");
+
+    // Condition Name
+    const conditionCell = document.createElement("td");
+    conditionCell.textContent = record.conditionName;
+    row.appendChild(conditionCell);
+
+    // Diagnosed Date
+    const dateCell = document.createElement("td");
+    dateCell.textContent = record.diagnosedDate;
+    row.appendChild(dateCell);
+
+    // Status (Editable)
+    const statusCell = document.createElement("td");
+    const statusSelect = document.createElement("select");
+    statusSelect.innerHTML = `
+                        <option value="Ongoing" ${record.isTreated === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
+                        <option value="Completed" ${record.isTreated === 'Completed' ? 'selected' : ''}>Completed</option>
+                    `;
+    statusSelect.setAttribute("data-record-id", record.recordID);
+    statusCell.appendChild(statusSelect);
+    row.appendChild(statusCell);
+
+    tableBody.appendChild(row);
+});
+
+    document.getElementById("medicalHistoryModal").style.display = "flex";
+})
+    .catch(error => console.error("Error fetching medical history:", error));
+}
+
+    function updateMedicalHistory() {
+    const statusUpdates = [];
+
+    document.querySelectorAll("#medicalRecordsBody select").forEach(select => {
+    statusUpdates.push({
+    recordID: select.getAttribute("data-record-id"),
+    isTreated: select.value
+});
+});
+
+    fetch("/api/medicalRecords/updateStatus", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(statusUpdates)
+})
+    .then(response => response.text())
+    .then(message => {
+    alert(message);
+    closeMedicalHistoryModal();
+})
+    .catch(error => console.error("Error updating status:", error));
+}
+
+    function closeMedicalHistoryModal() {
+    document.getElementById("medicalHistoryModal").style.display = "none";
+}
