@@ -63,15 +63,28 @@ button{
     width:fit-content;
     height:fit-content;
     background-color: transparent;
-
+    border: none;
+    transition: all 0.3s ease;
 
     svg path, svg g {
         stroke: #07104E;
-
-
     }
 
+}
+.icon:hover{
+    background-color: rgba(255, 194, 223, 0.68);
+    border: transparent;
+    svg path, svg g {
+        stroke: rgb( 255, 52, 147) ;
+    }
 
+}
+.icon:active{
+    background-color: rgba(255, 194, 223, 0.68);
+    border: rgb( 255, 52, 147) 1px solid ;
+    svg path, svg g {
+        stroke: rgb( 255, 52, 147) ;
+    }
 }
 .upload{
     color: #07104e;
@@ -120,8 +133,7 @@ button{
 
 
 
-.form-field input,
-.form-field select {
+input,select, textarea, option {
     padding: 0.5vw 0.8vw;
     background-color: rgb(238, 239, 248);
     border: 1px solid rgb(245, 20, 125);

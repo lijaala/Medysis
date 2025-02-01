@@ -1,0 +1,57 @@
+<section xmlns:th="http://www.thymeleaf.org" th:fragment="prescription">
+    <!-- Prescription Modal -->
+    <div id="prescriptionModal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <span class="close" onclick="closePrescriptionModal()">&times;</span>
+            <h3>Prescription</h3>
+
+            <!-- Prescription Form -->
+            <form id="prescriptionForm" action="api/prescriptions/save" method="POST">
+                <input type="hidden" id="appointmentId" name="appointmentID">
+                <input type="hidden" id="userId" name="userID">
+                <input type="hidden" id="staffId" name="staffID">
+
+                <!-- Multiple Medications Section -->
+                <div id="medicationsContainer">
+                    <div class="medication-entry">
+                        <!-- Medication Selection -->
+                        <label for="medication">Select Medication:</label>
+                        <select name="medicationID[]" id="medication" class="medication" required>
+                            <option value="">Select Medication</option>
+                            <!-- Dynamically populate the medication list -->
+                        </select>
+
+                        <!-- Dosage Input -->
+                        <label for="dosage">Dosage:</label>
+                        <input type="text" name="dosage[]" id="dosage"required placeholder="e.g., 500mg">
+
+                        <!-- Intake Instruction -->
+                        <label for="intake">Intake:</label>
+                        <input type="text" name="intake[]" id="intake"required placeholder="e.g., Oral">
+
+                        <!-- Frequency Input -->
+                        <label for="frequency">Frequency:</label>
+                        <input type="text" name="frequency[]" id="frequency"required placeholder="e.g., Every 6 hours">
+
+                        <!-- Duration Input -->
+                        <label for="daysOfIntake">Duration (days):</label>
+                        <input type="number" name="daysOfIntake[]" id="daysOfIntake" min="1" required>
+
+                        <!-- Remove Medication Button -->
+                        <button type="button" class="remove-medication" onclick="removeMedication(this)">Remove Medication</button>
+                    </div>
+                </div>
+
+                <!-- Add Medication Button -->
+                <button type="button" id="addMedicationBtn" onclick="addMedication()">Add Medication</button>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="primary">Save Prescription</button>
+                    <button type="button" class="secondary" onclick="closePrescriptionModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

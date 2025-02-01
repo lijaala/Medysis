@@ -31,7 +31,59 @@ function startAppointment(appointmentID) {
     // Open the diagnosis modal
     openDiagnosisModal();
 }
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach event listeners to buttons after the page is loaded
+    const nextButton = document.getElementById('nextButton');
+    const doneButton = document.getElementById('doneButton');
 
+    // Save button handler
+
+
+    // Next button handler
+    nextButton.addEventListener('click', function(event) {
+        saveDiagnosisAndNext(event);
+    });
+
+    // Done button handler
+    doneButton.addEventListener('click', function(event) {
+        saveDiagnosisAndClose(event);
+    });
+});
+function saveDiagnosis(event, callback) {
+
+    event.preventDefault();
+
+    const form = document.getElementById("diagnosisForm");
+    const formData = new FormData(form);
+
+    fetch("/api/medicalRecords/saveDiagnosis", {
+        method: "POST",
+        body: formData
+    })
+        .then(response => response.text())
+        .then(message => {
+            alert("Diagnosis saved successfully!");
+            if (callback) callback();
+        })
+        .catch(error => console.error("Error saving diagnosis:", error));
+}
+
+function saveDiagnosisAndNext(event) {
+    saveDiagnosis(event,() => {
+        closeDiagnosisModal();
+        openPrescriptionModal(
+            document.getElementById("appointmentIdInput").value,
+            document.getElementById("userIdInput").value,
+            document.getElementById("doctorIdInput").value
+        );
+    });
+}
+
+function saveDiagnosisAndClose(event) {
+    saveDiagnosis(event,() => {
+        closeDiagnosisModal();
+    });
+}
 
 function openDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
@@ -120,3 +172,86 @@ function closeDiagnosisModal() {
     function closeMedicalHistoryModal() {
     document.getElementById("medicalHistoryModal").style.display = "none";
 }
+
+
+
+// Function to open the Prescription modal
+function openPrescriptionModal(appointmentId, userId, staffId) {
+    document.getElementById('appointmentId').value = appointmentId;
+    document.getElementById('userId').value = userId;
+    document.getElementById('staffId').value = staffId;
+    document.getElementById('prescriptionModal').style.display = 'flex';
+}
+
+// Function to close the Prescription modal
+function closePrescriptionModal() {
+    document.getElementById('prescriptionModal').style.display = 'none';
+}
+
+// Function to add new medication entry
+function addMedication() {
+    // Get the medications container
+    const medicationsContainer = document.getElementById('medicationsContainer');
+
+    // Create a new medication entry div
+    const medicationEntry = document.createElement('div');
+    medicationEntry.classList.add('medication-entry');
+
+    // Set the HTML for the new medication entry
+    medicationEntry.innerHTML = `
+        <label for="medication">Select Medication:</label>
+        <select name="medicationID[]" class="medication" required>
+            <option value="">Select Medication</option>
+        </select>
+
+        <label for="dosage">Dosage:</label>
+        <input type="text" name="dosage[]" required placeholder="e.g., 500mg">
+
+        <label for="intake">Intake:</label>
+        <input type="text" name="intake[]" required placeholder="e.g., Oral">
+
+        <label for="frequency">Frequency:</label>
+        <input type="text" name="frequency[]" required placeholder="e.g., Every 6 hours">
+
+        <label for="daysOfIntake">Duration (days):</label>
+        <input type="number" name="daysOfIntake[]" min="1" required>
+
+        <button type="button" class="remove-medication" onclick="removeMedication(this)">Remove Medication</button>
+    `;
+
+    // Append the new medication entry to the container
+    medicationsContainer.appendChild(medicationEntry);
+
+    // Optionally, fetch the medication options (you can skip this if already done)
+    fetchMedications();
+}
+
+// Function to remove a medication entry
+function removeMedication(button) {
+    // Find the parent medication entry
+    const medicationEntry = button.closest('.medication-entry');
+    // Remove the entry from the container
+    medicationEntry.remove();
+}
+
+// Optional: Fetch medications to populate the dropdown
+function fetchMedications() {
+    // Fetch medications from the server (AJAX, for example)
+    fetch('/api/medications')
+        .then(response => response.json())
+        .then(data => {
+            let medicationSelects = document.querySelectorAll('.medication');
+            medicationSelects.forEach(select => {
+                data.forEach(medication => {
+                    let option = document.createElement('option');
+                    option.value = medication.medicationID;
+                    option.textContent = medication.medicationName;
+                    select.appendChild(option);
+                });
+            });
+        })
+        .catch(error => console.error('Error fetching medications:', error));
+}
+
+// Call this function to load medications on page load
+fetchMedications();

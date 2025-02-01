@@ -1,8 +1,8 @@
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="diagnosisModal">
 
-
+<!--Add Diagnosis Modal-->
     <div id="diagnosisModal" class="modal" style="display: none;">
-        <div class="modal-overlay"></div> <!-- Blur background -->
+        <div class="modal-overlay"></div>
         <div class="modal-content">
             <span class="close" onclick="closeDiagnosisModal()">&times;</span>
 
@@ -23,7 +23,7 @@
             </div>
 
 
-            <form id="diagnosisForm" action="api/medicalRecords/saveDiagnosis" method="POST" enctype="multipart/form-data">
+            <form id="diagnosisForm"  >
                 <input type="hidden" id="appointmentIdInput" name="appointmentID">
                 <input type="hidden" id="userIdInput" name="userID">
                 <input type="hidden" id="doctorIdInput" name="doctorID">
@@ -41,14 +41,14 @@
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button type="submit" class="primary">Next</button>
-                    <button type="button" class="secondary" onclick="doneAppointment()">Done</button>
+                    <button type="submit" id="nextButton" class="primary" >Next</button>
+                    <button type="button" is="doneBUtton" class="secondary" >Done</button>
                 </div>
 
             </form>
         </div>
     </div>
-
+<!--View Medical History and Update the Status--->
     <div id="medicalHistoryModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div>
         <div class="modal-content">
@@ -72,4 +72,6 @@
             <button type="button" class="primary" onclick="updateMedicalHistory()">Save Changes</button>
         </div>
     </div>
+    <div class=" main " th:include="addPrecription::prescription"></div>
+
 </section>

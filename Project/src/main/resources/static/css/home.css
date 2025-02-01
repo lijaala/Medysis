@@ -256,6 +256,7 @@ td.actions button{
     justify-content: space-between;
     align-items: center;
     margin-top: 2%;
+    padding: 2%;
 
 }
 /* Close button (top-right corner) */
@@ -273,6 +274,7 @@ form {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 5%;
 }
 
 input, select, textarea, option{
@@ -287,4 +289,28 @@ input, select, textarea, option{
     flex-direction: column;
 
 }
+option {
+    background-color: white;
 
+    padding: 10px;  /* Note: Padding may not work in all browsers */
+}
+.medication-entry {
+    margin-bottom: 20px;
+}
+
+button.remove-medication {
+    background-color: #f44336;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Button styling */
+button#addMedicationBtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
