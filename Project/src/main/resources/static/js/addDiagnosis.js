@@ -35,8 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Attach event listeners to buttons after the page is loaded
     const nextButton = document.getElementById('nextButton');
     const doneButton = document.getElementById('doneButton');
+    const savePrescriptionButton = document.getElementById('savePrescriptionButton');
+    savePrescriptionButton.addEventListener('click', function (event) {
+        savePrescription(event);
 
-    // Save button handler
+
+        // Save button handler
 
 
     // Next button handler
@@ -49,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveDiagnosisAndClose(event);
     });
 });
+})
 function saveDiagnosis(event, callback) {
 
     event.preventDefault();
@@ -176,29 +181,29 @@ function closeDiagnosisModal() {
 
 
 // Function to open the Prescription modal
-function openPrescriptionModal(appointmentId, userId, staffId) {
-    document.getElementById('appointmentId').value = appointmentId;
-    document.getElementById('userId').value = userId;
-    document.getElementById('staffId').value = staffId;
-    document.getElementById('prescriptionModal').style.display = 'flex';
-}
+    function openPrescriptionModal(appointmentId, userId, staffId) {
+        document.getElementById('appointmentId').value = appointmentId;
+        document.getElementById('userId').value = userId;
+        document.getElementById('staffId').value = staffId;
+        document.getElementById('prescriptionModal').style.display = 'flex';
+    }
 
 // Function to close the Prescription modal
-function closePrescriptionModal() {
-    document.getElementById('prescriptionModal').style.display = 'none';
-}
+    function closePrescriptionModal() {
+        document.getElementById('prescriptionModal').style.display = 'none';
+    }
 
 // Function to add new medication entry
-function addMedication() {
-    // Get the medications container
-    const medicationsContainer = document.getElementById('medicationsContainer');
+    function addMedication() {
+        // Get the medications container
+        const medicationsContainer = document.getElementById('medicationsContainer');
 
-    // Create a new medication entry div
-    const medicationEntry = document.createElement('div');
-    medicationEntry.classList.add('medication-entry');
+        // Create a new medication entry div
+        const medicationEntry = document.createElement('div');
+        medicationEntry.classList.add('medication-entry');
 
-    // Set the HTML for the new medication entry
-    medicationEntry.innerHTML = `
+        // Set the HTML for the new medication entry
+        medicationEntry.innerHTML = `
         <label for="medication">Select Medication:</label>
         <select name="medicationID[]" class="medication" required>
             <option value="">Select Medication</option>
@@ -219,39 +224,38 @@ function addMedication() {
         <button type="button" class="remove-medication" onclick="removeMedication(this)">Remove Medication</button>
     `;
 
-    // Append the new medication entry to the container
-    medicationsContainer.appendChild(medicationEntry);
+        // Append the new medication entry to the container
+        medicationsContainer.appendChild(medicationEntry);
 
-    // Optionally, fetch the medication options (you can skip this if already done)
-    fetchMedications();
-}
+        // Optionally, fetch the medication options (you can skip this if already done)
+        fetchMedications();
+    }
 
 // Function to remove a medication entry
-function removeMedication(button) {
-    // Find the parent medication entry
-    const medicationEntry = button.closest('.medication-entry');
-    // Remove the entry from the container
-    medicationEntry.remove();
-}
+    function removeMedication(button) {
+        // Find the parent medication entry
+        const medicationEntry = button.closest('.medication-entry');
+        // Remove the entry from the container
+        medicationEntry.remove();
+    }
 
-// Optional: Fetch medications to populate the dropdown
-function fetchMedications() {
-    // Fetch medications from the server (AJAX, for example)
-    fetch('/api/medications')
-        .then(response => response.json())
-        .then(data => {
-            let medicationSelects = document.querySelectorAll('.medication');
-            medicationSelects.forEach(select => {
-                data.forEach(medication => {
-                    let option = document.createElement('option');
-                    option.value = medication.medicationID;
-                    option.textContent = medication.medicationName;
-                    select.appendChild(option);
+// Fetch medications and populate the select dropdown
+    function fetchMedications() {
+        fetch('/api/medications')
+            .then(response => response.json())
+            .then(data => {
+                let medicationSelects = document.querySelectorAll('.medication');
+                medicationSelects.forEach(select => {
+                    data.forEach(medication => {
+                        let option = document.createElement('option');
+                        option.value = medication.medicationID;
+                        option.textContent = medication.medicationName;
+                        select.appendChild(option);
+                    });
                 });
-            });
-        })
-        .catch(error => console.error('Error fetching medications:', error));
-}
+            })
+            .catch(error => console.error('Error fetching medications:', error));
+    }
 
 // Call this function to load medications on page load
-fetchMedications();
+    document.addEventListener('DOMContentLoaded', fetchMedications);
