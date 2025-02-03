@@ -7,20 +7,17 @@
             <h3>Prescription</h3>
 
             <!-- Prescription Form -->
-            <form id="prescriptionForm" action="api/prescriptions/save" method="POST">
+            <form id="prescriptionForm" >
                 <input type="hidden" id="appointmentId" name="appointmentID">
                 <input type="hidden" id="userId" name="userID">
-                <input type="hidden" id="staffId" name="staffID">
 
                 <!-- Multiple Medications Section -->
                 <div id="medicationsContainer">
                     <div class="medication-entry">
                         <!-- Medication Selection -->
                         <label for="medication">Select Medication:</label>
-                        <select name="medicationID[]" id="medication" class="medication" required>
-                            <option value="">Select Medication</option>
-                            <!-- Dynamically populate the medication list -->
-                        </select>
+                        <input type="text" id="medication" name="medicationName[]" required placeholder="Enter medication name">
+
 
                         <!-- Dosage Input -->
                         <label for="dosage">Dosage:</label>

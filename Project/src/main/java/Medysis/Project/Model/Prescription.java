@@ -3,6 +3,8 @@ package Medysis.Project.Model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Prescription")
@@ -26,7 +28,11 @@ public class Prescription {
         @Column(nullable = false)
         private LocalDate prescriptionDate = LocalDate.now();
 
-        // Getters and Setters
+    @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PrescribedMedications> prescribedMedications = new ArrayList<>();
+
+
+    // Getters and Setters
 
     public Long getPrescriptionID() {
         return prescriptionID;
@@ -66,6 +72,14 @@ public class Prescription {
 
     public void setPrescriptionDate(LocalDate prescriptionDate) {
         this.prescriptionDate = prescriptionDate;
+    }
+
+    public List<PrescribedMedications> getPrescribedMedications() {
+        return prescribedMedications;
+    }
+
+    public void setPrescribedMedications(List<PrescribedMedications> prescribedMedications) {
+        this.prescribedMedications = prescribedMedications;
     }
 }
 

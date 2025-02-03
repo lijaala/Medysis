@@ -3,72 +3,77 @@ package Medysis.Project.Service;
 import Medysis.Project.Model.*;
 import Medysis.Project.Repository.*;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
-@Transactional
 public class PrescriptionService {
 
-    private final PrescriptionRepository prescriptionRepository;
-    private final PrescribedMedicationRepository prescribedMedicationRepository;
-    private final MedicationRepository medicationRepository;
-    private final AppointmentRepository appointmentRepository;
-    private final UserRepository userRepository;
-    private final StaffRepository staffRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PrescriptionService.class);
 
-    // ✅ Constructor Injection to initialize repositories
-    public PrescriptionService(
-            PrescriptionRepository prescriptionRepository,
-            PrescribedMedicationRepository prescribedMedicationRepository,
-            MedicationRepository medicationRepository,
-            AppointmentRepository appointmentRepository,
-            UserRepository userRepository,
-            StaffRepository staffRepository) {
-        this.prescriptionRepository = prescriptionRepository;
-        this.prescribedMedicationRepository = prescribedMedicationRepository;
-        this.medicationRepository = medicationRepository;
-        this.appointmentRepository = appointmentRepository;
-        this.userRepository = userRepository;
-        this.staffRepository = staffRepository;
-    }
+    @Autowired
+    private PrescriptionRepository prescriptionRepository;
+    @Autowired
+    private MedicationRepository medicationRepository;
+    @Autowired
+    private PrescribedMedicationRepository prescribedMedicationsRepository;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+    @Autowired
+    private StaffRepository staffRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public Prescription addPrescription(Integer appointmentId, List<PrescribedMedications> prescribedMedications) {
+    @Transactional
+    public void addPrescription(Integer appointmentId, Prescription prescription, String staffId, Integer userId) {
+        // Step 1: Fetch the Appointment entity by appointmentId
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new RuntimeException("Appointment not found for ID: " + appointmentId));
+        logger.info("Fetched Appointment ID: " + appointmentId);
 
-        User user = appointment.getPatientID();
-        Staff doctor = appointment.getDoctorID();
+        // Step 2: Fetch the staff entity by staffId
+        Staff staff = staffRepository.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Staff not found for ID: " + staffId));
+        logger.info("Fetched Staff ID: " + staffId);
 
-        // Check if a prescription already exists
-        Prescription prescription = prescriptionRepository.findByAppointment_AppointmentID(appointmentId)
-                .orElseGet(() -> {
-                    Prescription newPrescription = new Prescription();
-                    newPrescription.setUser(user);
-                    newPrescription.setStaff(doctor);
-                    newPrescription.setAppointment(appointment);
-                    newPrescription.setPrescriptionDate(LocalDate.now());
-                    return prescriptionRepository.save(newPrescription);
-                });
+        // Step 3: Fetch the user entity by userId (from the frontend)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found for ID: " + userId));
+        logger.info("Fetched User ID: " + userId);
 
-        // Assign prescription to prescribed medications and save
-        for (PrescribedMedications prescribedMedication : prescribedMedications) {
-            prescribedMedication.setPrescription(prescription);
+        // Step 4: Save medications first
+        for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
+            // Check if the medication exists, otherwise create and save a new one
+            Medication existingMedication = medicationRepository.findByMedicationName(prescribedMedication.getMedication().getMedicationName())
+                    .orElseGet(() -> {
+                        Medication newMedication = new Medication();
+                        newMedication.setMedicationName(prescribedMedication.getMedication().getMedicationName());
+                        newMedication.setAlternative(prescribedMedication.getMedication().getAlternative());
+                        return medicationRepository.save(newMedication);
+                    });
 
-            // Fetch the actual medication entity using medicationID
-            Medication medication = medicationRepository.findById(prescribedMedication.getMedication().getMedicationID())
-                    .orElseThrow(() -> new RuntimeException("Medication not found"));
-
-            prescribedMedication.setMedication(medication);
+            // Set the medication in the prescribed medication record
+            prescribedMedication.setMedication(existingMedication);
+            logger.info("Saved Medication ID: " + existingMedication.getMedicationID());
         }
 
-        prescribedMedicationRepository.saveAll(prescribedMedications);
-        return prescription;
+        // Step 5: Set the staff and appointment in the prescription
+        prescription.setStaff(staff);
+        prescription.setAppointment(appointment);
+        prescription.setUser(user);  // Associate the user with the prescription
+        logger.info("Prescription details: " + prescription);
+
+        // Step 6: Save the Prescription entity
+        Prescription savedPrescription = prescriptionRepository.save(prescription);
+        logger.info("Saved Prescription ID: " + savedPrescription.getPrescriptionID());
+
+        // Step 7: Link prescribed medications to the saved prescription and save the prescribed medication records
+        for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
+            prescribedMedication.setPrescription(savedPrescription);
+            logger.info("Saving Prescribed Medication ID: " + prescribedMedication.getMedication().getMedicationID());
+            prescribedMedicationsRepository.save(prescribedMedication);
+        }
     }
 }
-
-
-
