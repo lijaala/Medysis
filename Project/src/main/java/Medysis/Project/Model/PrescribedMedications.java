@@ -1,5 +1,6 @@
 package Medysis.Project.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -18,15 +19,19 @@ public class PrescribedMedications {
     private Medication medication;
 
     @Column(name="dosage",nullable = false)
+    @JsonProperty ("dosage")
     private String dosage;
 
     @Column(name="intake",nullable = false)
+    @JsonProperty ("intake")
     private String intake;
 
     @Column(name = "medicationInterval", nullable = false)
+    @JsonProperty ("medicationInterval")
     private String medicationInterval;
 
     @Column(name="daysOfIntake",nullable = false)
+    @JsonProperty ("daysOfIntake")
     private int daysOfIntake;
 
     // Getters and Setters

@@ -225,16 +225,14 @@ function openPrescriptionModal(appointmentId, userId) {
         const appointmentId=document.getElementById('appointmentId').value
 
         const data = {
-            user: { userID: parseInt(userID, 10) }, // Replace with actual userID if needed
-            appointment: { appointmentId: parseInt(appointmentId,10)}, // Replace with actual appointmentID
+            user: { userID: parseInt(userID, 10) },
+            appointment: { appointmentId: parseInt(appointmentId, 10) },
             prescribedMedications: medications.map(medication => ({
-                medication: {
-                    medicationName: medication.medicationName,
-                    dosage: medication.dosage,
-                    intake: medication.intake,
-                    medicationInterval: medication.interval,
-                    daysOfIntake: medication.daysOfIntake
-                }
+                medication: { medicationName: medication.medicationName }, // Correct: Medication object with name only
+                dosage: medication.dosage,                               // Dosage directly under prescribedMedications
+                intake: medication.intake,                               // Intake directly under prescribedMedications
+                medicationInterval: medication.medicationInterval,         // Interval directly under prescribedMedications
+                daysOfIntake: medication.daysOfIntake                     // daysOfIntake directly under prescribedMedications
             }))
         };
 

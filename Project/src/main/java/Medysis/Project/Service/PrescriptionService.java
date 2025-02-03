@@ -68,50 +68,41 @@ public class PrescriptionService {
 
         // Step 6: Save the Prescription entity
         Prescription savedPrescription = prescriptionRepository.save(prescription);
-        logger.info("Saved Prescription ID: " + savedPrescription.getPrescriptionID());
+        prescriptionRepository.save(prescription);
+        prescriptionRepository.flush(); // Ensure it's immediately persisted
 
-        // Step 7: Link prescribed medications to the saved prescription and save the prescribed medication records
+
+
         for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
-            // Explicitly set all attributes
-            if (prescribedMedication.getMedication() != null) {
-                prescribedMedication.setMedication(prescribedMedication.getMedication());
-            } else {
-                logger.error("Medication is null for PrescribedMedication");
-                throw new RuntimeException("Medication cannot be null");
+            Medication medication = medicationRepository.findByMedicationName(prescribedMedication.getMedication().getMedicationName())
+                    .orElseGet(() -> {
+                        Medication newMedication = new Medication();
+                        newMedication.setMedicationName(prescribedMedication.getMedication().getMedicationName());
+                        newMedication.setAlternative(prescribedMedication.getMedication().getAlternative());
+
+                        return medicationRepository.save(newMedication);
+                    });
+
+            // *** KEY CHANGES HERE ***
+            prescribedMedication.setMedication(medication); // Set the actual Medication object!
+            prescribedMedication.setPrescription(savedPrescription); // Link to the saved prescription
+
+
+            // *** VALIDATION AND SETTING VALUES ***
+            if (prescribedMedication.getDosage() == null || prescribedMedication.getDosage().isEmpty()) {
+                throw new IllegalArgumentException("Dosage is required"); // Or handle differently
             }
-
-            if (prescribedMedication.getDosage() != null && !prescribedMedication.getDosage().isEmpty()) {
-                prescribedMedication.setDosage(prescribedMedication.getDosage());
-            } else {
-                logger.error("Dosage is null or empty for PrescribedMedication");
-                throw new RuntimeException("Dosage is required");
+            if (prescribedMedication.getIntake() == null || prescribedMedication.getIntake().isEmpty()) {
+                throw new IllegalArgumentException("Intake is required");
             }
-
-            if (prescribedMedication.getIntake() != null && !prescribedMedication.getIntake().isEmpty()) {
-                prescribedMedication.setIntake(prescribedMedication.getIntake());
-            } else {
-                logger.error("Intake is null or empty for PrescribedMedication");
-                throw new RuntimeException("Intake is required");
+            if (prescribedMedication.getMedicationInterval() == null || prescribedMedication.getMedicationInterval().isEmpty()) {
+                throw new IllegalArgumentException("Frequency is required");
             }
-
-            if (prescribedMedication.getMedicationInterval() != null && !prescribedMedication.getMedicationInterval().isEmpty()) {
-                prescribedMedication.setMedicationInterval(prescribedMedication.getMedicationInterval());
-            } else {
-                logger.error("Frequency is null or empty for PrescribedMedication");
-                throw new RuntimeException("Frequency is required");
+            if (prescribedMedication.getDaysOfIntake() == 0) {
+                throw new IllegalArgumentException("Days of intake is required");
             }
+            // No need to re-set if the values are already there in the request body.
 
-            if ( prescribedMedication.getDaysOfIntake() == 0) {
-                prescribedMedication.setDaysOfIntake(prescribedMedication.getDaysOfIntake());
-            } else {
-                logger.error("Days of intake is null for PrescribedMedication");
-                throw new RuntimeException("Days of intake is required");
-            }
-
-            // Explicitly set Prescription and other necessary fields
-            prescribedMedication.setPrescription(savedPrescription);
-
-            logger.info("Saving Prescribed Medication ID: " + prescribedMedication.getMedication().getMedicationID());
             prescribedMedicationsRepository.save(prescribedMedication);
         }
 
