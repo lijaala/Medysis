@@ -204,7 +204,7 @@ function openPrescriptionModal(appointmentId, userId) {
         const medicationNames = document.querySelectorAll('input[name="medicationName[]"]');
         const dosages = document.querySelectorAll('input[name="dosage[]"]');
         const intakes = document.querySelectorAll('input[name="intake[]"]');
-        const frequencies = document.querySelectorAll('input[name="frequency[]"]');
+        const frequencies = document.querySelectorAll('input[name="frequency[]"]');//interval
         const daysOfIntakes = document.querySelectorAll('input[name="daysOfIntake[]"]');
 
         for (let i = 0; i < medicationNames.length; i++) {
@@ -212,7 +212,7 @@ function openPrescriptionModal(appointmentId, userId) {
                 medicationName: medicationNames[i].value,
                 dosage: dosages[i].value,
                 intake: intakes[i].value,
-                frequency: frequencies[i].value,
+                medicationInterval: frequencies[i].value,
                 daysOfIntake: parseInt(daysOfIntakes[i].value, 10) // Ensure it's an integer
             };
             medications.push(medication);
@@ -221,17 +221,18 @@ function openPrescriptionModal(appointmentId, userId) {
             console.log(`Medication ${index + 1}:`, medication);
         });
 
-
+        const userID = document.getElementById('userId').value;
+        const appointmentId=document.getElementById('appointmentId').value
 
         const data = {
-            user: { userId: document.getElementById('userId').value }, // Replace with actual userID if needed
-            appointment: { appointmentId: document.getElementById('appointmentId').value }, // Replace with actual appointmentID
+            user: { userID: parseInt(userID, 10) }, // Replace with actual userID if needed
+            appointment: { appointmentId: parseInt(appointmentId,10)}, // Replace with actual appointmentID
             prescribedMedications: medications.map(medication => ({
                 medication: {
                     medicationName: medication.medicationName,
                     dosage: medication.dosage,
                     intake: medication.intake,
-                    frequency: medication.frequency,
+                    medicationInterval: medication.interval,
                     daysOfIntake: medication.daysOfIntake
                 }
             }))

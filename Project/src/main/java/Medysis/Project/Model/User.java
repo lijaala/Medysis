@@ -166,4 +166,12 @@ public class User {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public User(Integer userID) {
+        this.userID = userID;
+    }
+    public User() {
+        // This constructor is intentionally empty.  JPA needs it.
+    }
+
 }

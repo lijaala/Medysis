@@ -81,6 +81,14 @@ public class Prescription {
     public void setPrescribedMedications(List<PrescribedMedications> prescribedMedications) {
         this.prescribedMedications = prescribedMedications;
     }
+    @Override
+    public String toString() {
+        return "Prescription{" +
+                "user=" + (user != null ? user.getUserID() : "null") + ", " +
+                "prescribedMedications=" + prescribedMedications +
+                '}';
+    }
+
 }
 
 

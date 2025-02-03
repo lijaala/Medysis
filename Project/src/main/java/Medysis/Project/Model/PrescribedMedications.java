@@ -86,4 +86,15 @@ public class PrescribedMedications {
     public void setDaysOfIntake(int daysOfIntake) {
         this.daysOfIntake = daysOfIntake;
     }
+    @Override
+    public String toString() {
+        return "PrescribedMedications{" +
+                "medication=" + (medication != null ? medication.getMedicationName() : "null") +
+                ", dosage='" + dosage + '\'' +
+                ", intake='" + intake + '\'' +
+                ", interval='" + medicationInterval + '\'' +
+                ", daysOfIntake=" + daysOfIntake +
+                '}';
+    }
+
 }

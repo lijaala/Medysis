@@ -38,10 +38,11 @@ public class PrescriptionService {
                 .orElseThrow(() -> new RuntimeException("Staff not found for ID: " + staffId));
         logger.info("Fetched Staff ID: " + staffId);
 
-        // Step 3: Fetch the user entity by userId (from the frontend)
+        // Step 3: Fetch the user entity by userID (from the prescription object)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found for ID: " + userId));
         logger.info("Fetched User ID: " + userId);
+
 
         // Step 4: Save medications first
         for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
@@ -71,9 +72,49 @@ public class PrescriptionService {
 
         // Step 7: Link prescribed medications to the saved prescription and save the prescribed medication records
         for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
+            // Explicitly set all attributes
+            if (prescribedMedication.getMedication() != null) {
+                prescribedMedication.setMedication(prescribedMedication.getMedication());
+            } else {
+                logger.error("Medication is null for PrescribedMedication");
+                throw new RuntimeException("Medication cannot be null");
+            }
+
+            if (prescribedMedication.getDosage() != null && !prescribedMedication.getDosage().isEmpty()) {
+                prescribedMedication.setDosage(prescribedMedication.getDosage());
+            } else {
+                logger.error("Dosage is null or empty for PrescribedMedication");
+                throw new RuntimeException("Dosage is required");
+            }
+
+            if (prescribedMedication.getIntake() != null && !prescribedMedication.getIntake().isEmpty()) {
+                prescribedMedication.setIntake(prescribedMedication.getIntake());
+            } else {
+                logger.error("Intake is null or empty for PrescribedMedication");
+                throw new RuntimeException("Intake is required");
+            }
+
+            if (prescribedMedication.getMedicationInterval() != null && !prescribedMedication.getMedicationInterval().isEmpty()) {
+                prescribedMedication.setMedicationInterval(prescribedMedication.getMedicationInterval());
+            } else {
+                logger.error("Frequency is null or empty for PrescribedMedication");
+                throw new RuntimeException("Frequency is required");
+            }
+
+            if ( prescribedMedication.getDaysOfIntake() == 0) {
+                prescribedMedication.setDaysOfIntake(prescribedMedication.getDaysOfIntake());
+            } else {
+                logger.error("Days of intake is null for PrescribedMedication");
+                throw new RuntimeException("Days of intake is required");
+            }
+
+            // Explicitly set Prescription and other necessary fields
             prescribedMedication.setPrescription(savedPrescription);
+
             logger.info("Saving Prescribed Medication ID: " + prescribedMedication.getMedication().getMedicationID());
             prescribedMedicationsRepository.save(prescribedMedication);
         }
+
+
     }
 }
