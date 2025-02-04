@@ -5,6 +5,7 @@
         <div class="modal-content">
             <span class="close" onclick="closePrescriptionModal()">&times;</span>
             <h3>Prescription</h3>
+            <div id="prescription-message" ></div>
 
             <!-- Prescription Form -->
             <form id="prescriptionForm" >
@@ -14,26 +15,41 @@
                 <!-- Multiple Medications Section -->
                 <div id="medicationsContainer">
                     <div class="medication-entry">
-                        <!-- Medication Selection -->
-                        <label for="medication">Select Medication:</label>
-                        <input type="text" id="medication" name="medicationName[]" required placeholder="Enter medication name">
+                        <div class="form-row">
 
+                            <div class="form-row">
+                                <label for="medication">Medication:</label>
+                                <input type="text" id="medication" name="medicationName[]" required placeholder="Enter medication name">
+                            </div>
 
                         <!-- Dosage Input -->
-                        <label for="dosage">Dosage:</label>
-                        <input type="text" name="dosage[]" id="dosage" required placeholder="e.g., 500mg">
+                            <div class="form-row">
+                                <label for="dosage">Dosage:</label>
+                                <input type="text" name="dosage[]" id="dosage" required placeholder="e.g., 500mg">
+                            </div>
+                        </div>  
+                        <div class="form-row"> 
+                            <div class="form-row">
+                                <!-- Intake Instruction -->
+                                <label for="intake">Intake:</label>
+                                <input type="text" name="intake[]" id="intake" required placeholder="e.g., Oral">
+                            </div>
+                            <div class="form-row">
+                                <!-- Frequency Input -->
+                                <label for="frequency">Frequency:</label>
+                                <input type="text" name="frequency[]" id="frequency" required placeholder="e.g., Every 6 hours">
+                            </div>    
+                        </div>
+                        <div class="form-row">
 
-                        <!-- Intake Instruction -->
-                        <label for="intake">Intake:</label>
-                        <input type="text" name="intake[]" id="intake" required placeholder="e.g., Oral">
+                            <label for="alternative">Alternative:</label>
+                            <input type="text" name="alternative[]" id="alternative" min="1" required>
+                        </div>
+                        <div class="form-row">       
+                             <label for="daysOfIntake">Duration (days):</label>
+                             <input type="number" name="daysOfIntake[]" id="daysOfIntake" min="1" required>
+                        </div>     
 
-                        <!-- Frequency Input -->
-                        <label for="frequency">Frequency:</label>
-                        <input type="text" name="frequency[]" id="frequency" required placeholder="e.g., Every 6 hours">
-
-                        <!-- Duration Input -->
-                        <label for="daysOfIntake">Duration (days):</label>
-                        <input type="number" name="daysOfIntake[]" id="daysOfIntake" min="1" required>
 
                         <!-- Remove Medication Button -->
                         <button type="button" class="remove-medication" onclick="removeMedication(this)">Remove Medication</button>

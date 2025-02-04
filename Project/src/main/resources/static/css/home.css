@@ -242,8 +242,8 @@ td.actions button{
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    max-width: 500px;
-    width: 100%;
+    min-width: 40%;
+    width: fit-content;
     position: relative;
     z-index: 10000;
     display: flex;
@@ -294,8 +294,12 @@ option {
 
     padding: 10px;  /* Note: Padding may not work in all browsers */
 }
+/*Prescription*/
 .medication-entry {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap:2vh;
+
 }
 
 button.remove-medication {
@@ -314,3 +318,13 @@ button#addMedicationBtn {
     border: none;
     cursor: pointer;
 }
+/*alert box*/
+.message{
+    width:100%;
+    background-color: rgba(255, 194, 223, 0.68);
+    color: rgb( 255, 52, 147);
+    padding:2%;
+    border-radius: 8px;
+
+}
+

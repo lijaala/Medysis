@@ -38,9 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-
-
-
     // Next button handler
     nextButton.addEventListener('click', function(event) {
         saveDiagnosisAndNext(event);
@@ -51,39 +48,76 @@ document.addEventListener('DOMContentLoaded', function() {
         saveDiagnosisAndClose(event);
     });
 });
+
+
 function saveDiagnosis(event, callback) {
 
     event.preventDefault();
 
     const form = document.getElementById("diagnosisForm");
     const formData = new FormData(form);
+    const messageDiv = document.getElementById("diagnosis-message"); // Get the message div
+
 
     fetch("/api/medicalRecords/saveDiagnosis", {
         method: "POST",
         body: formData
     })
-        .then(response => response.text())
-        .then(message => {
-            alert("Diagnosis saved successfully!");
-            if (callback) callback();
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(err => {throw new Error(err)}); // Get error as text
+            }
+            return response.text(); // Get success as text
         })
-        .catch(error => console.error("Error saving diagnosis:", error));
+        .then(data => {
+
+            try {
+                const jsonData = JSON.parse(data); //try to parse as JSON
+                console.error("Server Error:", jsonData.message);
+                messageDiv.textContent = "Error: " + jsonData.message;
+                messageDiv.className = "message";
+
+            } catch (parseError) {
+                console.log("Success:", data);
+                messageDiv.textContent = data;
+                messageDiv.className = "message";
+                if (callback) {
+                callback(data);
+                } // Pass the success message to the callback
+            }
+
+
+        })
+        .catch(error => {
+            console.error("Fetch Error:", error);
+            messageDiv.textContent = "An error occurred: " + error.message; // Display error message
+            messageDiv.className = "message";
+        });
 }
 
 function saveDiagnosisAndNext(event) {
-    saveDiagnosis(event,() => {
-        closeDiagnosisModal();
-        openPrescriptionModal(
-            document.getElementById("appointmentIdInput").value,
-            document.getElementById("userIdInput").value,
-            document.getElementById("doctorIdInput").value
-        );
+    saveDiagnosis(event, (message) => {
+        if (message === "Success") {
+            // Delay closing the diagnosis modal to show the message:
+            setTimeout(() => {
+                closeDiagnosisModal();
+                setTimeout(() => { // Delay opening prescription modal
+                    openPrescriptionModal(
+                        document.getElementById("appointmentIdInput").value,
+                        document.getElementById("userIdInput").value,
+                        document.getElementById("doctorIdInput").value
+                    );
+                }, 3000); // Small delay for opening
+            }, 3500); // Delay for closing (1.5 seconds)
+        }
     });
 }
 
 function saveDiagnosisAndClose(event) {
-    saveDiagnosis(event,() => {
-        closeDiagnosisModal();
+    saveDiagnosis(event, (message) => {
+        if (message === "Success") {
+            setTimeout(closeDiagnosisModal, 3000); // Delay for closing
+        }
     });
 }
 
@@ -205,6 +239,8 @@ function openPrescriptionModal(appointmentId, userId) {
         const dosages = document.querySelectorAll('input[name="dosage[]"]');
         const intakes = document.querySelectorAll('input[name="intake[]"]');
         const frequencies = document.querySelectorAll('input[name="frequency[]"]');//interval
+        const alternative = document.querySelectorAll('input[name="alternative[]"]');//interval
+
         const daysOfIntakes = document.querySelectorAll('input[name="daysOfIntake[]"]');
 
         for (let i = 0; i < medicationNames.length; i++) {
@@ -213,6 +249,7 @@ function openPrescriptionModal(appointmentId, userId) {
                 dosage: dosages[i].value,
                 intake: intakes[i].value,
                 medicationInterval: frequencies[i].value,
+                interval:alternative[i].value,
                 daysOfIntake: parseInt(daysOfIntakes[i].value, 10) // Ensure it's an integer
             };
             medications.push(medication);
@@ -232,12 +269,14 @@ function openPrescriptionModal(appointmentId, userId) {
                 dosage: medication.dosage,                               // Dosage directly under prescribedMedications
                 intake: medication.intake,                               // Intake directly under prescribedMedications
                 medicationInterval: medication.medicationInterval,         // Interval directly under prescribedMedications
+                alternative:medication.alternative,
                 daysOfIntake: medication.daysOfIntake                     // daysOfIntake directly under prescribedMedications
             }))
         };
 
 
         console.log("Submitting prescription data:", data);
+        const messageDiv = document.getElementById('prescription-message'); // Get the message div
 
         fetch(`/api/prescriptions/add/${appointmentId}`, {
             method: "POST",
@@ -247,21 +286,35 @@ function openPrescriptionModal(appointmentId, userId) {
             },
             body: JSON.stringify(data)
         })
-            .then(response => response.json())  // Parse response as JSON
+            .then(response => {
+                if (!response.ok) { // Check for HTTP errors (status outside 200-299)
+                    return response.json().then(err => {throw new Error(err.message)}); // Throw error for catch block
+                }
+                return response.text();
+            })
             .then(data => {
-                alert("Prescription saved successfully!");
-                closePrescriptionModal();
+                try {
+                    const jsonData = JSON.parse(data); // Try to parse as JSON (error case)
+                    console.error("Server Error:", jsonData.message);
+                    messageDiv.textContent = "Error: " + jsonData.message;
+                    messageDiv.classList.add('message'); // Add a CSS class for styling (optional)
+
+
+                } catch (parseError) { // It's the success message (plain text)
+                    console.log("Success:", data);
+                    messageDiv.textContent = data; // Or a more user-friendly message
+                    messageDiv.classList.add('message'); // Add CSS class for styling
+
+                    // Optionally, close the modal after a short delay:
+                    setTimeout(closePrescriptionModal, 5000);
+                }
             })
             .catch(error => {
                 console.error("Error saving prescription:", error);
-                alert("An error occurred while saving the prescription.");
-                // Log the response error if available
-                if (error.response) {
-                    error.response.json().then(errorData => {
-                        console.error("Error details from server:", errorData);
-                    });
-                }
+                messageDiv.textContent = "An error occurred: " + error.message;
+                messageDiv.classList.add('message');
             });
+
 
 
     }, { once: true });  // Ensure the event doesn't bind multiple times
@@ -283,22 +336,45 @@ function addMedication() {
 
     // Set the HTML for the new medication entry
     medicationEntry.innerHTML = `
-        <label for="medication">Select Medication:</label>
-        <input type="text" name="medicationName[]" required placeholder="Enter medication name">
+        <div class="form-row">
 
-        <label for="dosage">Dosage:</label>
-        <input type="text" name="dosage[]" required placeholder="e.g., 500mg">
+                            <div class="form-row">
+                                <label for="medication">Select Medication:</label>
+                                <input type="text" id="medication" name="medicationName[]" required placeholder="Enter medication name">
+                            </div>
 
-        <label for="intake">Intake:</label>
-        <input type="text" name="intake[]" required placeholder="e.g., Oral">
+                        <!-- Dosage Input -->
+                            <div class="form-row">
+                                <label for="dosage">Dosage:</label>
+                                <input type="text" name="dosage[]" id="dosage" required placeholder="e.g., 500mg">
+                            </div>
+                        </div>  
+                        <div class="form-row"> 
+                            <div class="form-row">
+                                <!-- Intake Instruction -->
+                                <label for="intake">Intake:</label>
+                                <input type="text" name="intake[]" id="intake" required placeholder="e.g., Oral">
+                            </div>
+                            <div class="form-row">
+                                <!-- Frequency Input -->
+                                <label for="frequency">Frequency:</label>
+                                <input type="text" name="frequency[]" id="frequency" required placeholder="e.g., Every 6 hours">
+                            </div>    
+                        </div>
+                        <div class="form-row">
+                            <!-- Duration Input -->
+                           <label for="alternative">Alternative:</label>
+                            <input type="text" name="alternative[]" id="alternative" min="1" required>
+                        </div>
+                        <div class="form-row">       
+                             <label for="daysOfIntake">Duration (days):</label>
+                             <input type="number" name="daysOfIntake[]" id="daysOfIntake" min="1" required>
+                        </div>     
 
-        <label for="frequency">Frequency:</label>
-        <input type="text" name="frequency[]" required placeholder="e.g., Every 6 hours">
 
-        <label for="daysOfIntake">Duration (days):</label>
-        <input type="number" name="daysOfIntake[]" min="1" required>
-
-        <button type="button" class="remove-medication" onclick="removeMedication(this)">Remove Medication</button>
+                        <!-- Remove Medication Button -->
+                        <button type="button" class="remove-medication" onclick="removeMedication(this)">Remove Medication</button>
+                    
     `;
 
     // Append the new medication entry to the container
