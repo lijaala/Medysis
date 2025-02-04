@@ -28,8 +28,8 @@ public class Prescription {
         @Column(nullable = false)
         private LocalDate prescriptionDate = LocalDate.now();
 
-    @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PrescribedMedications> prescribedMedications = new ArrayList<>();
+        @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Important!
+        private List<PrescribedMedications> prescribedMedications = new ArrayList<>();
 
 
     // Getters and Setters

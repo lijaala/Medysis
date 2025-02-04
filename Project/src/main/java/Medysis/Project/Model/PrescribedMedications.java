@@ -11,7 +11,7 @@ public class PrescribedMedications {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "prescriptionID", nullable = false)
+    @JoinColumn(name = "prescriptionID", nullable=true)
     private Prescription prescription;
 
     @ManyToOne
