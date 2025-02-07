@@ -1,3 +1,5 @@
+//Start appointment flow
+
 function startAppointment(appointmentID) {
     console.log("Start Appointment triggered for ID:", appointmentID);
 
@@ -31,11 +33,15 @@ function startAppointment(appointmentID) {
     // Open the diagnosis modal
     openDiagnosisModal();
 }
+
+//event listener for buttons
 document.addEventListener('DOMContentLoaded', function() {
     // Attach event listeners to buttons after the page is loaded
     const nextButton = document.getElementById('nextButton');
     const doneButton = document.getElementById('doneButton');
 
+    const prescriptionNextButton = document.getElementById('prescriptionNext');
+    const prescriptionDoneButton = document.getElementById('prescriptionDone');
 
 
     // Next button handler
@@ -47,9 +53,27 @@ document.addEventListener('DOMContentLoaded', function() {
     doneButton.addEventListener('click', function(event) {
         saveDiagnosisAndClose(event);
     });
+
+    prescriptionNextButton.addEventListener('click', function (event){
+        setTimeout(()=>{
+            closePrescriptionModal();
+            openLabReportsModal(
+                document.getElementById("appointmentId").value,
+                document.getElementById("userId").value
+            );
+
+        }, 5000)
+    });
+
+    prescriptionDoneButton.addEventListener("click", function (event){
+        const form= document.getElementById('prescriptionForm');
+        form.dispatchEvent(new Event ('submit'));
+         setTimeout(closePrescriptionModal, 3000);
+
+    })
 });
 
-
+// open save diagnosis
 function saveDiagnosis(event, callback) {
 
     event.preventDefault();
@@ -95,6 +119,7 @@ function saveDiagnosis(event, callback) {
         });
 }
 
+//open prescription modal and save diagnosis
 function saveDiagnosisAndNext(event) {
     saveDiagnosis(event, (message) => {
         if (message === "Success") {
@@ -105,14 +130,13 @@ function saveDiagnosisAndNext(event) {
                     openPrescriptionModal(
                         document.getElementById("appointmentIdInput").value,
                         document.getElementById("userIdInput").value,
-                        document.getElementById("doctorIdInput").value
                     );
                 }, 3000); // Small delay for opening
             }, 3500); // Delay for closing (1.5 seconds)
         }
     });
 }
-
+// save diagnosis and close
 function saveDiagnosisAndClose(event) {
     saveDiagnosis(event, (message) => {
         if (message === "Success") {
@@ -121,6 +145,7 @@ function saveDiagnosisAndClose(event) {
     });
 }
 
+//open diagnosis modal
 function openDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
 
@@ -134,13 +159,13 @@ function openDiagnosisModal() {
 }
 
 
-
+// close diagnosis modal
 function closeDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
     diagnosisModal.style.display = "none";
 }
 
-
+// view past medical records
 function viewPastRecords() {
     const userID = document.getElementById("userIdInput").value;
 
@@ -183,7 +208,7 @@ function viewPastRecords() {
 }
 
 
-
+// update the status od medical condition
 
 function updateMedicalHistory() {
     const statusUpdates = [];
@@ -208,13 +233,14 @@ function updateMedicalHistory() {
     .catch(error => console.error("Error updating status:", error));
 }
 
-
+// close the medical history
 function closeMedicalHistoryModal() {
     document.getElementById("medicalHistoryModal").style.display = "none";
 }
 
 
 
+// open prescription modal
 function openPrescriptionModal(appointmentId, userId) {
     console.log("Opening prescription modal for Appointment ID:", appointmentId, "User ID:", userId);
 
@@ -325,7 +351,7 @@ function closePrescriptionModal() {
     document.getElementById('prescriptionModal').style.display = 'none';
 }
 
-// Function to add new medication entry
+// Function to add more than one medication
 function addMedication() {
     // Get the medications container
     const medicationsContainer = document.getElementById('medicationsContainer');
@@ -387,6 +413,14 @@ function removeMedication(button) {
     const medicationEntry = button.closest('.medication-entry');
     // Remove the entry from the container
     medicationEntry.remove();
+}
+function openLabReportsModal(appointmentId, userId, doctorId){
+    document.getElementById('orderLabReports').style.display = 'flex';
+
+}
+function closeLabReportsModal(){
+    document.getElementById('orderLabReports').style.display='flex';
+
 }
 
 

@@ -61,10 +61,45 @@
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button type="submit" class="primary">Save Prescription</button>
-                    <button type="button" class="secondary" onclick="closePrescriptionModal()">Cancel</button>
+                    <button type="submit" id="prescriptionNext" class="primary">NEXT</button>
+                    <button type="button" id="prescriptionDone" class="secondary" onclick="closePrescriptionModal()">DONE</button>
                 </div>
             </form>
         </div>
     </div>
+
+    <div id="orderLabReports" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeLabReportsModal()">&times;</span>
+            <h3>Prescription</h3>
+            <div class="labReport-message"></div>
+            <form id="labOrder">
+
+                <input type="hidden" id="appointmentIdInput" name="appointmentID">
+                <input type="hidden" id="userIdInput" name="userID">
+
+                <label for="testName"> Test Name </label>
+                <select class="form-select" id="testName" name="testName[]">
+                    <option value="">Select</option>
+
+                </select>
+                <label >Urgent?</label>
+                <input type="radio" id="yes" name="urgency" value="yes">
+                <label for="yes">Yes </label>
+
+                <input type="radio" id="no" name="urgency" value="no">
+                <label for="no">Yes </label>
+
+                <button type="button" id="addTestBtn" >Add Test</button>
+
+                <div class="action-buttons">
+
+                    <button type="button" id="" class="secondary" >DONE</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
 </section>
