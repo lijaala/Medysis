@@ -71,42 +71,37 @@
     <div id="orderLabReports" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close" onclick="closeLabReportsModal()">&times;</span>
-            <h3>Prescription</h3>
+            <h3>Order Lab Test</h3>
             <div class="labReport-message"></div>
             <form id="labOrder">
-
                 <input type="hidden" id="appointmentIdInput" name="appointmentID">
                 <input type="hidden" id="userIdInput" name="userID">
 
 
-<div id="labTestsContainer">
-                <div class="lab-test-entry">
-                <div class="form-row">
-                <label for="testName"> Test Name </label>
-                <select class="form-select" id="testName" name="testName[]">
-                    <option value="">Select</option>
+                <div id="labTestsContainer">
+                    <div class="lab-test-entry">
+                        <div class="form-row">
+                            <label >Urgent?</label>
+                            <input type="radio" id="yes" name="urgency" value="yes">
+                            <label for="Yes">Yes </label>
+                            <input type="radio" id="no" name="urgency" value="no">
+                            <label for="No"> No</label>
+                        </div>
+                        <div class="form-row">
+                            <label for="testName"> Test Name </label>
+                            <select class="form-select test-dropdown" id="testName" name="testName[]">
+                                <option value="">Select</option>
+                            </select>
 
-                </select>
+                        </div>
 
+
+                    </div>
                 </div>
-                 <div class="form-row">
-                <label >Urgent?</label>
-                <input type="radio" id="yes" name="urgency" value="yes">
-                <label for="yes">Yes </label>
-
-                <input type="radio" id="no" name="urgency" value="no">
-                <label for="no">Yes </label>
-                 </div>
-                </div>
-
-
-
-</div>
                 <div class="action-buttons">
                     <button type="button" class="secondary" onclick="addLabTest()"  id="addTestBtn" >Add Test</button>
-                    <button type="button" class="primary" >DONE</button>
+                    <button type="button" class="primary" onclick="submitLabOrder()">DONE</button>
                 </div>
-
             </form>
         </div>
 

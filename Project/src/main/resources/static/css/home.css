@@ -277,12 +277,7 @@ form {
     padding: 5%;
 }
 
-input, select, textarea, option{
-    padding: 8px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+
 .action-buttons{
     display: flex;
     gap:2vh;
@@ -291,7 +286,6 @@ input, select, textarea, option{
 }
 option {
     background-color: white;
-
     padding: 10px;  /* Note: Padding may not work in all browsers */
 }
 /*Prescription*/
@@ -327,4 +321,11 @@ button#addMedicationBtn {
     border-radius: 8px;
 
 }
+.lab-test-entry{
+    margin-bottom: 10%;
+    padding: 2%;
+    display: flex;
+    flex-direction: column;
+    gap: 3vw;
 
+}

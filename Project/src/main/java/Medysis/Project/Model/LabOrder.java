@@ -3,6 +3,7 @@ package Medysis.Project.Model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "Lab-Order")
@@ -21,7 +22,7 @@ public class LabOrder {
     private Staff doctorID;
 
     @OneToOne
-    @JoinColumn(name = "appoinmentID", referencedColumnName = "appointmentID", nullable = true, unique = true)
+    @JoinColumn(name = "appoinmentID", referencedColumnName = "appointmentID",  unique = true)
     private Appointment appointmentID;
 
     @ManyToOne
@@ -33,6 +34,9 @@ public class LabOrder {
 
     @Column(name = "urgency")
     private String urgency;
+
+    @OneToMany(mappedBy = "orderID", cascade = CascadeType.ALL) // One order to many results
+    private List<LabResults> labResults;
 
     public int getOrderID() {
         return orderID;
@@ -88,5 +92,13 @@ public class LabOrder {
 
     public void setUrgency(String urgency) {
         this.urgency = urgency;
+    }
+
+    public List<LabResults> getLabResults() {
+        return labResults;
+    }
+
+    public void setLabResults(List<LabResults> labResults) {
+        this.labResults = labResults;
     }
 }

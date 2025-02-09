@@ -129,8 +129,7 @@ function saveDiagnosisAndNext(event) {
                 closeDiagnosisModal();
                 setTimeout(() => { // Delay opening prescription modal
                     openPrescriptionModal(
-                        document.getElementById("appointmentIdInput").value,
-                        document.getElementById("userIdInput").value,
+
                     );
                 }, 3000); // Small delay for opening
             }, 3500); // Delay for closing (1.5 seconds)
@@ -415,10 +414,15 @@ function removeMedication(button) {
     // Remove the entry from the container
     medicationEntry.remove();
 }
-function openLabReportsModal(appointmentId, userId){
+
+function openLabReportsModal(){
     document.getElementById('orderLabReports').style.display = 'flex';
-    document.getElementById('appointmentIdInput').value = appointmentId;
-    document.getElementById('userIdInput').value = userId;
+
+    document.querySelectorAll(".test-dropdown").forEach(select => populateLabTestDropdown(select));
+
+    const existingDropdowns = document.querySelectorAll(".test-dropdown");
+    existingDropdowns.forEach(dropdown => populateLabTestDropdown(dropdown));
+
 
 }
 function closeLabReportsModal(){
@@ -427,7 +431,7 @@ function closeLabReportsModal(){
 }
 
 //addLabtest
-function addLabTest() {
+async function addLabTest() {
     const container = document.getElementById("labTestsContainer");
     const testCount = container.getElementsByClassName("lab-test-entry").length;
 
@@ -435,25 +439,97 @@ function addLabTest() {
     testEntry.classList.add("lab-test-entry");
 
     testEntry.innerHTML = `
-        <label for="testName"> Test Name </label>
-                <select class="form-select" id="testName" name="testName[]">
-                    <option value="">Select</option>
-
-                </select>
-                <label >Urgent?</label>
-                <input type="radio" id="yes${testCount}" name="urgency${testCount}" value="yes">
-                <label for="yes${testCount}">Yes </label>
-
-                <input type="radio" id="no${testCount}" name="urgency${testCount}" value="no">
-                <label for="no${testCount}">Yes </label>
-                    
+            
+                <div class="form-row">
+                    <label for="testName"> Test Name </label>
+                    <select class="form-select test-dropdown" id="testName ${testCount}" name="testName[]">
+                        <option value="">Select</option>
+                    </select>
+                </div>
+                
                     <button type="button" class="remove-medication" onclick="removeLabTest(this)">Remove</button>
+                    
+                   
     `;
 
     container.appendChild(testEntry);
+    const newDropdown = testEntry.querySelector(".test-dropdown");
+    await populateLabTestDropdown(newDropdown);
 }
+
+
 function removeLabTest(button) {
     button.parentElement.remove();
 }
+async function populateLabTestDropdown(selectElement) {
+    try {
+        const response = await fetch("/api/labTests/availableTests"); // Adjust if needed
+        if (!response.ok) {
+            throw new Error("Failed to fetch lab tests");
+        }
+        const labTests = await response.json();
+
+        // Populate options
+        selectElement.innerHTML = `<option value="">Select</option>`;
+        labTests.forEach(test => {
+            selectElement.innerHTML += `<option value="${test.testID}">${test.testName} </option>`;
+        });
+    } catch (error) {
+        console.error("Error fetching lab tests:", error);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
 
 
+    const labOrderForm = document.getElementById('labOrder');
+    labOrderForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        submitLabOrder(); // Call the new submission function
+    });
+});
+
+function submitLabOrder() {  // New function for submission
+    const appointmentId = document.getElementById('appointmentIdInput').value;
+    const userId = document.getElementById('userIdInput').value;
+    const urgency = [];
+    const testIds = [];
+
+    document.querySelectorAll('.lab-test-entry').forEach(entry => {
+        const selectedUrgency = entry.querySelector('input[name="urgency"]:checked').value;
+        urgency.push(selectedUrgency);
+        const testId = entry.querySelector('select[name="testName[]"]').value;
+        testIds.push(testId);
+    });
+
+    if (testIds.some(id => id === "")) {
+        alert("Please select a test for each entry.");
+        return;
+    }
+
+    fetch('/api/LabOrder/orderRequest', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            appointmentID: appointmentId,
+            userID: userId,
+            'urgency[]': urgency,
+            'testName[]': testIds
+        })
+    })
+        .then(response => {
+            if (response.ok) {
+                closeLabReportsModal();
+                alert("Lab order created successfully!");
+            } else {
+                console.error("Error creating lab order:", response);
+                alert("Error creating lab order. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error creating lab order:", error);
+            alert("An error occurred. Please try again later.");
+        });
+}
