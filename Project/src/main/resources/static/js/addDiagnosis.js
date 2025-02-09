@@ -31,7 +31,8 @@ function startAppointment(appointmentID) {
     console.log("UserID:", userID)
 
     // Open the diagnosis modal
-    openDiagnosisModal();
+    //openDiagnosisModal();
+    openLabReportsModal(userIdInput,appointmentIdInput);
 }
 
 //event listener for buttons
@@ -414,13 +415,45 @@ function removeMedication(button) {
     // Remove the entry from the container
     medicationEntry.remove();
 }
-function openLabReportsModal(appointmentId, userId, doctorId){
+function openLabReportsModal(appointmentId, userId){
     document.getElementById('orderLabReports').style.display = 'flex';
+    document.getElementById('appointmentIdInput').value = appointmentId;
+    document.getElementById('userIdInput').value = userId;
 
 }
 function closeLabReportsModal(){
-    document.getElementById('orderLabReports').style.display='flex';
+    document.getElementById('orderLabReports').style.display='none';
 
+}
+
+//addLabtest
+function addLabTest() {
+    const container = document.getElementById("labTestsContainer");
+    const testCount = container.getElementsByClassName("lab-test-entry").length;
+
+    const testEntry = document.createElement("div");
+    testEntry.classList.add("lab-test-entry");
+
+    testEntry.innerHTML = `
+        <label for="testName"> Test Name </label>
+                <select class="form-select" id="testName" name="testName[]">
+                    <option value="">Select</option>
+
+                </select>
+                <label >Urgent?</label>
+                <input type="radio" id="yes${testCount}" name="urgency${testCount}" value="yes">
+                <label for="yes${testCount}">Yes </label>
+
+                <input type="radio" id="no${testCount}" name="urgency${testCount}" value="no">
+                <label for="no${testCount}">Yes </label>
+                    
+                    <button type="button" class="remove-medication" onclick="removeLabTest(this)">Remove</button>
+    `;
+
+    container.appendChild(testEntry);
+}
+function removeLabTest(button) {
+    button.parentElement.remove();
 }
 
 

@@ -78,27 +78,38 @@
                 <input type="hidden" id="appointmentIdInput" name="appointmentID">
                 <input type="hidden" id="userIdInput" name="userID">
 
+
+<div id="labTestsContainer">
+                <div class="lab-test-entry">
+                <div class="form-row">
                 <label for="testName"> Test Name </label>
                 <select class="form-select" id="testName" name="testName[]">
                     <option value="">Select</option>
 
                 </select>
+
+                </div>
+                 <div class="form-row">
                 <label >Urgent?</label>
                 <input type="radio" id="yes" name="urgency" value="yes">
                 <label for="yes">Yes </label>
 
                 <input type="radio" id="no" name="urgency" value="no">
                 <label for="no">Yes </label>
+                 </div>
+                </div>
 
-                <button type="button" id="addTestBtn" >Add Test</button>
 
+
+</div>
                 <div class="action-buttons">
-
-                    <button type="button" id="" class="secondary" >DONE</button>
+                    <button type="button" class="secondary" onclick="addLabTest()"  id="addTestBtn" >Add Test</button>
+                    <button type="button" class="primary" >DONE</button>
                 </div>
 
             </form>
         </div>
+
     </div>
 
 

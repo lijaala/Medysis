@@ -148,7 +148,7 @@ input,select, textarea, option {
 .form-row{
     display: flex;
     gap: 2vw;
-    align-item: center;
+    align-items: center;
     justify-content: center;
 }
 .form-row input {
