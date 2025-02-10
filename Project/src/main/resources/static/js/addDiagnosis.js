@@ -492,12 +492,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 function submitLabOrder() {  // New function for submission
     const appointmentId = document.getElementById('appointmentIdInput').value;
     const userId = document.getElementById('userIdInput').value;
-    const urgency = [];
+    let urgency = document.querySelector('input[name="urgency"]:checked')?.value; // Get urgency or undefined
+
     const testIds = [];
 
     document.querySelectorAll('.lab-test-entry').forEach(entry => {
-        const selectedUrgency = entry.querySelector('input[name="urgency"]:checked').value;
-        urgency.push(selectedUrgency);
+
         const testId = entry.querySelector('select[name="testName[]"]').value;
         testIds.push(testId);
     });
@@ -506,6 +506,10 @@ function submitLabOrder() {  // New function for submission
         alert("Please select a test for each entry.");
         return;
     }
+    if (urgency === undefined) {
+        urgency = "no"; // Or a default value like "no"
+    }
+
 
     fetch('/api/LabOrder/orderRequest', {
         method: 'POST',

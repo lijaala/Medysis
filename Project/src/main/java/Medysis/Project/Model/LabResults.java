@@ -19,7 +19,7 @@ public class LabResults {
     private Staff doctorID;
 
     @ManyToOne
-    @JoinColumn(name = "appoinmentID", referencedColumnName = "appointmentID", nullable = true, unique = true)
+    @JoinColumn(name = "appoinmentID", referencedColumnName = "appointmentID", nullable = true)
     private Appointment appointmentID;
 
     @ManyToOne
