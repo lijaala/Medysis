@@ -97,4 +97,21 @@ public class AppointmentController {
         return "Appointment updated successfully";
 
     }
+
+    @PostMapping("/complete")  // New endpoint
+    public String completeAppointment(@RequestParam("appointmentID") Integer appointmentID, HttpSession session) {
+        String staffId = (String) session.getAttribute("userId"); // Get staff ID from session
+
+        if (staffId == null) {
+            return "Staff ID is not available in the session.";
+        }
+
+        try {
+            appointmentService.completeAppointment(appointmentID, staffId); // Call the service method
+            return "Appointment status updated to Completed.";
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the error for debugging
+            return "Error updating appointment status: " + e.getMessage(); // Return an error message
+        }
+    }
 }

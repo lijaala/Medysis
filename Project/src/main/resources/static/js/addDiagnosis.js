@@ -31,12 +31,12 @@ function startAppointment(appointmentID) {
     console.log("UserID:", userID)
 
     // Open the diagnosis modal
-    //openDiagnosisModal();
-    openLabReportsModal(userIdInput,appointmentIdInput);
+    openDiagnosisModal();
+    //openLabReportsModal(userIdInput,appointmentIdInput);
 }
 
 //event listener for buttons
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async () =>  {
     // Attach event listeners to buttons after the page is loaded
     const nextButton = document.getElementById('nextButton');
     const doneButton = document.getElementById('doneButton');
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const prescriptionNextButton = document.getElementById('prescriptionNext');
     const prescriptionDoneButton = document.getElementById('prescriptionDone');
 
-
+    const labOrderForm = document.getElementById('labOrder');
     // Next button handler
     nextButton.addEventListener('click', function(event) {
         saveDiagnosisAndNext(event);
@@ -52,7 +52,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Done button handler
     doneButton.addEventListener('click', function(event) {
-        saveDiagnosisAndClose(event);
+        saveDiagnosisAndClose(event, () => { // Callback after diagnosis is saved
+            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
+        });
     });
 
     prescriptionNextButton.addEventListener('click', function (event){
@@ -69,9 +71,20 @@ document.addEventListener('DOMContentLoaded', function() {
     prescriptionDoneButton.addEventListener("click", function (event){
         const form= document.getElementById('prescriptionForm');
         form.dispatchEvent(new Event ('submit'));
-         setTimeout(closePrescriptionModal, 3000);
+        setTimeout(() => {
+            closePrescriptionModal();
+            completeAppointment(document.getElementById("appointmentId").value); // Complete appointment
+        }, 3000);
 
     })
+
+
+    labOrderForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        submitLabOrder(() => {  // Callback after lab order is submitted
+            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
+        });
+    });
 });
 
 // open save diagnosis
@@ -128,9 +141,10 @@ function saveDiagnosisAndNext(event) {
             setTimeout(() => {
                 closeDiagnosisModal();
                 setTimeout(() => { // Delay opening prescription modal
-                    openPrescriptionModal(
+                    const appointmentId = document.getElementById("appointmentIdInput").value;
+                    const userId = document.getElementById("userIdInput").value;
 
-                    );
+                    openPrescriptionModal(appointmentId,userId);
                 }, 3000); // Small delay for opening
             }, 3500); // Delay for closing (1.5 seconds)
         }
@@ -482,11 +496,7 @@ async function populateLabTestDropdown(selectElement) {
 document.addEventListener("DOMContentLoaded", async () => {
 
 
-    const labOrderForm = document.getElementById('labOrder');
-    labOrderForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        submitLabOrder(); // Call the new submission function
-    });
+
 });
 
 function submitLabOrder() {  // New function for submission
@@ -535,5 +545,26 @@ function submitLabOrder() {  // New function for submission
         .catch(error => {
             console.error("Error creating lab order:", error);
             alert("An error occurred. Please try again later.");
+        });
+}
+function completeAppointment(appointmentId) {
+    fetch('/appointment/complete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            appointmentID: appointmentId
+        })
+    })
+        .then(response => response.text())
+        .then(message => {
+            alert(message); // Or a better way to display the message
+            // Optionally, refresh the appointment list
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error("Error completing appointment:", error);
+            alert("An error occurred. Please try again.");
         });
 }

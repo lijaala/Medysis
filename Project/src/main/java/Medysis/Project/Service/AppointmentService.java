@@ -81,4 +81,19 @@ public class AppointmentService {
         // Save the updated appointment
         return appointmentRepository.save(appointment);
     }
+
+    public void completeAppointment(Integer appointmentID, String staffId) {
+        Appointment appointment = appointmentRepository.findById(appointmentID)
+                .orElseThrow(() -> new RuntimeException("Appointment not found for ID: " + appointmentID));
+
+        Staff staff = staffRepository.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Staff not found for ID: " + staffId));
+
+        if (!appointment.getDoctorID().getStaffID().equals(staff.getStaffID())) {
+            throw new RuntimeException("You are not authorized to complete this appointment.");
+        }
+
+        appointment.setStatus("Completed"); // Update the status
+        appointmentRepository.save(appointment); // Save the changes
+    }
 }
