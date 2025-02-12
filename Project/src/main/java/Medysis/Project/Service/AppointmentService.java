@@ -1,5 +1,6 @@
 package Medysis.Project.Service;
 
+import Medysis.Project.DTO.AppointmentDTO;
 import Medysis.Project.Model.Appointment;
 import Medysis.Project.Model.Staff;
 import Medysis.Project.Model.User;
@@ -22,6 +23,12 @@ public class AppointmentService {
     private StaffRepository staffRepository;
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private StaffService staffService;
 
     public Appointment bookAppointment(Integer patientID, String doctorID, LocalDate appDate, LocalTime appTime) {
         User patient = userRepository.findById(patientID)
@@ -96,4 +103,20 @@ public class AppointmentService {
         appointment.setStatus("Completed"); // Update the status
         appointmentRepository.save(appointment); // Save the changes
     }
+
+    public AppointmentDTO convertToDTO(Appointment appointment) {
+        AppointmentDTO dto = new AppointmentDTO();
+        dto.appointmentID = appointment.getAppointmentID();
+        dto.patientID = userService.convertToDTO(appointment.getPatientID()); // Convert User to UserDTO
+        dto.doctorID = staffService.convertToDTO(appointment.getDoctorID()); // Convert Staff to StaffDTO
+        dto.appDate = appointment.getAppDate();
+        dto.appTime = appointment.getAppTime();
+        dto.status = appointment.getStatus();
+        dto.followUpDate = appointment.getFollowUpDate();
+        return dto;
+    }
+     public List<Appointment> getAllAppointments(){
+        return appointmentRepository.findAll();
+     }
+
 }

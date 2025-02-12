@@ -35,57 +35,7 @@ function startAppointment(appointmentID) {
     //openLabReportsModal(userIdInput,appointmentIdInput);
 }
 
-//event listener for buttons
-document.addEventListener('DOMContentLoaded', async () =>  {
-    // Attach event listeners to buttons after the page is loaded
-    const nextButton = document.getElementById('nextButton');
-    const doneButton = document.getElementById('doneButton');
 
-    const prescriptionNextButton = document.getElementById('prescriptionNext');
-    const prescriptionDoneButton = document.getElementById('prescriptionDone');
-
-    const labOrderForm = document.getElementById('labOrder');
-    // Next button handler
-    nextButton.addEventListener('click', function(event) {
-        saveDiagnosisAndNext(event);
-    });
-
-    // Done button handler
-    doneButton.addEventListener('click', function(event) {
-        saveDiagnosisAndClose(event, () => { // Callback after diagnosis is saved
-            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
-        });
-    });
-
-    prescriptionNextButton.addEventListener('click', function (event){
-        setTimeout(()=>{
-            closePrescriptionModal();
-            openLabReportsModal(
-                document.getElementById("appointmentId").value,
-                document.getElementById("userId").value
-            );
-
-        }, 5000)
-    });
-
-    prescriptionDoneButton.addEventListener("click", function (event){
-        const form= document.getElementById('prescriptionForm');
-        form.dispatchEvent(new Event ('submit'));
-        setTimeout(() => {
-            closePrescriptionModal();
-            completeAppointment(document.getElementById("appointmentId").value); // Complete appointment
-        }, 3000);
-
-    })
-
-
-    labOrderForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        submitLabOrder(() => {  // Callback after lab order is submitted
-            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
-        });
-    });
-});
 
 // open save diagnosis
 function saveDiagnosis(event, callback) {
@@ -163,6 +113,9 @@ function saveDiagnosisAndClose(event) {
 function openDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
 
+    const nextButton = document.getElementById('nextButton');
+    const doneButton = document.getElementById('doneButton');
+
     if (!diagnosisModal) {
         console.error("Diagnosis modal not found!");
         return;
@@ -170,6 +123,17 @@ function openDiagnosisModal() {
 
     // Simply open the modal
     diagnosisModal.style.display = "flex";
+
+    nextButton.addEventListener('click', function(event) {
+        saveDiagnosisAndNext(event);
+    });
+
+    // Done button handler
+    doneButton.addEventListener('click', function(event) {
+        saveDiagnosisAndClose(event, () => { // Callback after diagnosis is saved
+            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
+        });
+    });
 }
 
 
@@ -258,11 +222,36 @@ function closeMedicalHistoryModal() {
 function openPrescriptionModal(appointmentId, userId) {
     console.log("Opening prescription modal for Appointment ID:", appointmentId, "User ID:", userId);
 
+
     // Ensure that appointmentId and userId are set
     if (!appointmentId || !userId) {
         alert("Appointment ID and User ID are required!");
         return;
     }
+
+    const prescriptionNextButton = document.getElementById('prescriptionNext');
+    const prescriptionDoneButton = document.getElementById('prescriptionDone');
+
+    prescriptionNextButton.addEventListener('click', function (event){
+        setTimeout(()=>{
+            closePrescriptionModal();
+            openLabReportsModal(
+                document.getElementById("appointmentId").value,
+                document.getElementById("userId").value
+            );
+
+        }, 5000)
+    });
+
+    prescriptionDoneButton.addEventListener("click", function (event){
+        const form= document.getElementById('prescriptionForm');
+        form.dispatchEvent(new Event ('submit'));
+        setTimeout(() => {
+            closePrescriptionModal();
+            completeAppointment(document.getElementById("appointmentId").value); // Complete appointment
+        }, 3000);
+
+    })
 
     document.getElementById('appointmentId').value = appointmentId;
     document.getElementById('userId').value = userId;
@@ -279,18 +268,34 @@ function openPrescriptionModal(appointmentId, userId) {
         const dosages = document.querySelectorAll('input[name="dosage[]"]');
         const intakes = document.querySelectorAll('input[name="intake[]"]');
         const frequencies = document.querySelectorAll('input[name="frequency[]"]');//interval
-        const alternative = document.querySelectorAll('input[name="alternative[]"]');//interval
-
+        const alternatives = document.querySelectorAll('input[name="alternative[]"]');//interval
         const daysOfIntakes = document.querySelectorAll('input[name="daysOfIntake[]"]');
 
         for (let i = 0; i < medicationNames.length; i++) {
+            const medicationName = medicationNames[i].value.trim(); // Trim whitespace
+            const dosage = dosages[i].value.trim();
+            const intake = intakes[i].value.trim();
+            const frequency = frequencies[i].value.trim();
+            const alternative = alternatives[i].value.trim();
+            const daysOfIntake = parseInt(daysOfIntakes[i].value, 10);
+
+            if (medicationName === "") { // Frontend validation: Skip empty entries
+                console.warn("Skipping empty medication entry.");
+                continue; // Go to the next iteration of the loop
+            }
+
+            if (isNaN(daysOfIntake) || daysOfIntake <= 0) {
+                alert("Days of intake must be a positive number for " + medicationName);
+                return; // Stop submission
+            }
+
             const medication = {
-                medicationName: medicationNames[i].value,
-                dosage: dosages[i].value,
-                intake: intakes[i].value,
-                medicationInterval: frequencies[i].value,
-                interval:alternative[i].value,
-                daysOfIntake: parseInt(daysOfIntakes[i].value, 10) // Ensure it's an integer
+                medicationName: medicationName,
+                dosage: dosage,
+                intake: intake,
+                medicationInterval: frequency,
+                alternative: alternative,
+                daysOfIntake: daysOfIntake
             };
             medications.push(medication);
         }
@@ -364,9 +369,11 @@ function openPrescriptionModal(appointmentId, userId) {
 function closePrescriptionModal() {
     document.getElementById('prescriptionModal').style.display = 'none';
 }
-
+let medicationCount = 0;
 // Function to add more than one medication
 function addMedication() {
+    console.log("Adding medication entry. Current count:", medicationCount);  // Log for debugging
+
     // Get the medications container
     const medicationsContainer = document.getElementById('medicationsContainer');
 
@@ -380,35 +387,35 @@ function addMedication() {
 
                             <div class="form-row">
                                 <label for="medication">Select Medication:</label>
-                                <input type="text" id="medication" name="medicationName[]" required placeholder="Enter medication name">
+                                <input type="text" id="medication${medicationCount}" name="medicationName[]" required placeholder="Enter medication name">
                             </div>
 
                         <!-- Dosage Input -->
                             <div class="form-row">
                                 <label for="dosage">Dosage:</label>
-                                <input type="text" name="dosage[]" id="dosage" required placeholder="e.g., 500mg">
+                                <input type="text" name="dosage[]" id="dosage${medicationCount}" required placeholder="e.g., 500mg">
                             </div>
                         </div>  
                         <div class="form-row"> 
                             <div class="form-row">
                                 <!-- Intake Instruction -->
                                 <label for="intake">Intake:</label>
-                                <input type="text" name="intake[]" id="intake" required placeholder="e.g., Oral">
+                                <input type="text" name="intake[]" id="intake${medicationCount}" required placeholder="e.g., Oral">
                             </div>
                             <div class="form-row">
                                 <!-- Frequency Input -->
                                 <label for="frequency">Frequency:</label>
-                                <input type="text" name="frequency[]" id="frequency" required placeholder="e.g., Every 6 hours">
+                                <input type="text" name="frequency[]" id="frequency${medicationCount}" required placeholder="e.g., Every 6 hours">
                             </div>    
                         </div>
                         <div class="form-row">
                             <!-- Duration Input -->
                            <label for="alternative">Alternative:</label>
-                            <input type="text" name="alternative[]" id="alternative" min="1" required>
+                            <input type="text" name="alternative[]" id="alternative${medicationCount}" min="1" required>
                         </div>
                         <div class="form-row">       
                              <label for="daysOfIntake">Duration (days):</label>
-                             <input type="number" name="daysOfIntake[]" id="daysOfIntake" min="1" required>
+                             <input type="number" name="daysOfIntake[]" id="daysOfIntake${medicationCount}" min="1" required>
                         </div>     
 
 
@@ -419,6 +426,7 @@ function addMedication() {
 
     // Append the new medication entry to the container
     medicationsContainer.appendChild(medicationEntry);
+    medicationCount ++;
 }
 
 // Function to remove a medication entry
@@ -437,6 +445,17 @@ function openLabReportsModal(){
     const existingDropdowns = document.querySelectorAll(".test-dropdown");
     existingDropdowns.forEach(dropdown => populateLabTestDropdown(dropdown));
 
+    const labOrderForm = document.getElementById('labOrder');
+
+
+
+    labOrderForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        submitLabOrder(() => {  // Callback after lab order is submitted
+            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
+        });
+    });
+
 
 }
 function closeLabReportsModal(){
@@ -445,36 +464,34 @@ function closeLabReportsModal(){
 }
 
 //addLabtest
+let testCount = 1; // Start from 1 since the initial entry is already there
+
 async function addLabTest() {
     const container = document.getElementById("labTestsContainer");
-    const testCount = container.getElementsByClassName("lab-test-entry").length;
-
     const testEntry = document.createElement("div");
     testEntry.classList.add("lab-test-entry");
 
     testEntry.innerHTML = `
-            
-                <div class="form-row">
-                    <label for="testName"> Test Name </label>
-                    <select class="form-select test-dropdown" id="testName ${testCount}" name="testName[]">
-                        <option value="">Select</option>
-                    </select>
-                </div>
-                
-                    <button type="button" class="remove-medication" onclick="removeLabTest(this)">Remove</button>
-                    
-                   
+        <div class="form-row">
+            <label for="testName"> Test Name </label>
+            <select class="form-select test-dropdown" id="testName${testCount}" name="testName[]">
+                <option value="">Select</option>
+            </select>
+        </div>
+        <button type="button" class="remove-medication" onclick="removeLabTest(this)">Remove</button>
     `;
 
     container.appendChild(testEntry);
     const newDropdown = testEntry.querySelector(".test-dropdown");
     await populateLabTestDropdown(newDropdown);
+    console.log(`🆕 New test added. Total dropdowns now: ${document.querySelectorAll('.test-dropdown').length}`);
+    testCount++;
 }
-
 
 function removeLabTest(button) {
     button.parentElement.remove();
 }
+
 async function populateLabTestDropdown(selectElement) {
     try {
         const response = await fetch("/api/labTests/availableTests"); // Adjust if needed
@@ -485,42 +502,62 @@ async function populateLabTestDropdown(selectElement) {
 
         // Populate options
         selectElement.innerHTML = `<option value="">Select</option>`;
+
         labTests.forEach(test => {
             selectElement.innerHTML += `<option value="${test.testID}">${test.testName} </option>`;
         });
+        console.log("Dropdown updated:", selectElement, "Options count:", selectElement.options.length);
+
     } catch (error) {
         console.error("Error fetching lab tests:", error);
     }
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
 
+function submitLabOrder(callback) {
+    console.log("🚀 Submitting lab order...");
 
-
-});
-
-function submitLabOrder() {  // New function for submission
-    const appointmentId = document.getElementById('appointmentIdInput').value;
-    const userId = document.getElementById('userIdInput').value;
-    let urgency = document.querySelector('input[name="urgency"]:checked')?.value; // Get urgency or undefined
+    const appointmentId = document.getElementById('appointmentId').value;
+    const userId = document.getElementById('userId').value;
+    let urgency = document.querySelector('input[name="urgency"]:checked')?.value || "no";
 
     const testIds = [];
-
+    let allTestsSelected = true; // Assume true initially
     document.querySelectorAll('.lab-test-entry').forEach(entry => {
+        const selectElement = entry.querySelector('.test-dropdown');
+        if (selectElement && selectElement.value === "") {
+            console.warn("🗑️ Removing empty dropdown before submission...");
+            entry.remove();
+        }
+    });
+    // Loop through all test dropdowns
+    document.querySelectorAll('.lab-test-entry').forEach((entry, index) => {
+        const selectElement = entry.querySelector('.test-dropdown');
+        if (!selectElement) {
+            console.error(`❌ Dropdown ${index + 1}: Not found!`);
+            allTestsSelected = false;
+            return;
+        }
 
-        const testId = entry.querySelector('select[name="testName[]"]').value;
+        const testId = selectElement.value;
+        console.log(`✅ Dropdown ${index + 1}: Selected testID -> "${testId}"`);
+
         testIds.push(testId);
+
+        if (testId === "") {
+            console.error(`⚠️ Dropdown ${index + 1}: Empty selection detected.`);
+            allTestsSelected = false;
+        }
     });
 
-    if (testIds.some(id => id === "")) {
+    console.log("📋 Final selected test IDs:", testIds);
+
+    if (!allTestsSelected) {
         alert("Please select a test for each entry.");
         return;
     }
-    if (urgency === undefined) {
-        urgency = "no"; // Or a default value like "no"
-    }
 
-
+    // Continue with form submission
     fetch('/api/LabOrder/orderRequest', {
         method: 'POST',
         headers: {
@@ -547,6 +584,8 @@ function submitLabOrder() {  // New function for submission
             alert("An error occurred. Please try again later.");
         });
 }
+
+
 function completeAppointment(appointmentId) {
     fetch('/appointment/complete', {
         method: 'POST',
@@ -561,7 +600,7 @@ function completeAppointment(appointmentId) {
         .then(message => {
             alert(message); // Or a better way to display the message
             // Optionally, refresh the appointment list
-            window.location.reload();
+
         })
         .catch(error => {
             console.error("Error completing appointment:", error);

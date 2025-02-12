@@ -38,6 +38,10 @@ public class LabOrder {
     @OneToMany(mappedBy = "orderID", cascade = CascadeType.ALL) // One order to many results
     private List<LabResults> labResults;
 
+    @Column(name="labStatus", columnDefinition = "VARCHAR(255) DEFAULT 'Pending'")
+    private String labStatus;
+
+
     public int getOrderID() {
         return orderID;
     }
@@ -100,5 +104,13 @@ public class LabOrder {
 
     public void setLabResults(List<LabResults> labResults) {
         this.labResults = labResults;
+    }
+
+    public String getLabStatus() {
+        return labStatus;
+    }
+
+    public void setLabStatus(String labStatus) {
+        this.labStatus = labStatus;
     }
 }

@@ -44,15 +44,26 @@ public class PrescriptionService {
         List<Medication> medicationsToSave = new ArrayList<>();
         for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
             String medicationName = prescribedMedication.getMedication().getMedicationName();
-            Medication medication = medicationRepository.findByMedicationName(medicationName)
-                    .orElseGet(() -> {
-                        Medication newMedication = new Medication();
-                        newMedication.setMedicationName(medicationName);
-                        newMedication.setAlternative(prescribedMedication.getMedication().getAlternative());
-                        medicationsToSave.add(newMedication);
-                        return newMedication;
-                    });
+            String alternative = prescribedMedication.getMedication().getAlternative(); // Get alternative value
+
+            if (medicationName == null || medicationName.isEmpty()) { // Check for empty medication name
+                throw new IllegalArgumentException("Medication name cannot be empty.");
+            }
+            Medication medication = medicationRepository.findByMedicationName(medicationName).orElse(null);
+            if (medication == null) {
+                medication = new Medication();
+
+
+                medication.setMedicationName(medicationName);
+                medication.setAlternative(prescribedMedication.getMedication().getAlternative());
+                medicationRepository.saveAndFlush(medication); // Save immediately to get the ID
+
+
+
+            }
+
             prescribedMedication.setMedication(medication); // Set the medication (existing or new)
+            medicationsToSave.add(medication);
         }
 
         // Save ALL medications in one go *before* processing PrescribedMedications

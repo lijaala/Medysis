@@ -38,9 +38,22 @@
     </section>
     <section id="appointments" class="section">
         <div class=" main " th:include="viewAppointments::appointments"></div>
-
-
     </section>
+
+    <section id="testRequests" class="section">
+        <div class=" main " th:include="labRequest::labRequets"></div>
+    </section>
+
+    <section id="labTests" class="section">
+        <div class=" main " th:include="viewAppointments::appointments"></div>
+    </section>
+
+    <section id="labReports" class="section">
+        <div class=" main " th:include="viewAppointments::appointments"></div>
+    </section>
+
+
+
 
     <section id="settings" class="section" >Settings</section>
 
@@ -51,6 +64,8 @@
 <script src="js/populateRoles.js"></script>
 <script src="js/viewAppointment.js"></script>
 <script src="js/addDiagnosis.js"></script>
+<script src="js/lab.js"></script>
+
 <script>
     document.getElementById('role').addEventListener('change', function() {
         var role = this.value;

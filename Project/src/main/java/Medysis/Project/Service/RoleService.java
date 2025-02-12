@@ -1,5 +1,6 @@
 package Medysis.Project.Service;
 
+import Medysis.Project.DTO.RoleDTO;
 import Medysis.Project.Model.Role;
 import Medysis.Project.Repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,20 @@ public class RoleService {
             3,"Lab Technician",
             4,"Patients"
     );
+
     public String getRoleNameById(Integer roleID)
     {return "ROLE_"+roleMap.get(roleID);
+    }
+
+    public RoleDTO convertRoleToDTO(Role role) {
+        if (role == null) {
+            return null;
+        }
+
+        RoleDTO dto = new RoleDTO();
+        dto.roleID = role.getRoleID();
+        dto.role = role.getRole();
+        return dto;
     }
 
 }

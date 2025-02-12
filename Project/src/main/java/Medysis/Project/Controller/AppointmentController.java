@@ -114,4 +114,9 @@ public class AppointmentController {
             return "Error updating appointment status: " + e.getMessage(); // Return an error message
         }
     }
+
+    @GetMapping("/appointments")
+    public List<Appointment> getAllAppointments() { // Returns List<Appointment> (no change)
+        return appointmentService.getAllAppointments();
+    }
 }

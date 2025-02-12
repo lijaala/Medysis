@@ -1,6 +1,9 @@
 package Medysis.Project.Service;
 
 
+import Medysis.Project.DTO.RoleDTO;
+import Medysis.Project.DTO.StaffDTO;
+import Medysis.Project.Model.Role;
 import Medysis.Project.Model.Staff;
 import Medysis.Project.Model.User;
 import Medysis.Project.Repository.StaffRepository;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -84,6 +88,44 @@ public class StaffService {
     public Optional<Staff> findByEmail(String email) {
         return staffRepository.findByStaffEmail(email);
     }
+
+    public StaffDTO convertToDTO(Staff staff) {
+        if (staff == null) return null;
+        StaffDTO dto = new StaffDTO();
+        dto.staffID = staff.getStaffID();
+        dto.staffName = staff.getStaffName();
+        dto.staffEmail = staff.getStaffEmail();
+        dto.staffPhone = staff.getStaffPhone();
+        dto.staffAddress = staff.getStaffAddress();
+        dto.gender = staff.getGender();
+        dto.age = staff.getAge();
+        dto.image = staff.getImage();
+
+        if (staff.getRole() != null) {
+            dto.role = convertRoleToRoleDTO(staff.getRole());
+        } else {
+            dto.role = null;
+        }
+
+        dto.addedOn = staff.getAddedOn();
+        dto.lastActive = staff.getLastActive();
+        dto.lastUpdated = staff.getLastUpdated();
+        dto.startTime = staff.getStartTime();
+        dto.endTime = staff.getEndTime();
+
+        return dto;
     }
+    private RoleDTO convertRoleToRoleDTO(Role role) {
+        if (role == null) return null;
+        RoleDTO dto = new RoleDTO();
+        dto.roleID = role.getRoleID();
+        dto.role = role.getRole();
+        return dto;
+    }
+
+    public List<Staff> getAllStaff(){
+        return staffRepository.findAll();
+    }
+}
 
 
