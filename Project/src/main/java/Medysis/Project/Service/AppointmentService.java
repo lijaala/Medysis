@@ -104,6 +104,9 @@ public class AppointmentService {
         appointmentRepository.save(appointment); // Save the changes
     }
 
+
+    //DTO conversion
+
     public AppointmentDTO convertToDTO(Appointment appointment) {
         AppointmentDTO dto = new AppointmentDTO();
         dto.appointmentID = appointment.getAppointmentID();

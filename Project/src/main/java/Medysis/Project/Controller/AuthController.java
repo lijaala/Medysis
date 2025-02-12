@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -113,21 +112,6 @@ public class AuthController {
     public String getUserRole(HttpSession session) {
         return (String) session.getAttribute("userRole");
     }
-
-
-    @GetMapping("/users")
-    public List<User> getAllUsers() { // Returns List<User> (no change)
-        return userService.getAllusers();
-    }
-    @GetMapping("/staff")
-    public List<Staff> getAllStaff() { // Returns List<Staff> (no change)
-        return staffService.getAllStaff();
-    }
-
-
-
-
-
 
 }
 

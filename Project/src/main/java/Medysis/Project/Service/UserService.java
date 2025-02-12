@@ -82,37 +82,16 @@ public class UserService {
 
     public UserDTO convertToDTO(User user) {
         if (user == null) return null;
+
         UserDTO dto = new UserDTO();
-        dto.userID = user.getUserID();
-        dto.name = user.getName();
-        dto.email = user.getEmail();
-        dto.phone = user.getPhone();
-        dto.address = user.getAddress();
-        dto.gender = user.getGender();
-        dto.age = user.getAge();
-        dto.image = user.getImage();
+        dto.userID = user.getUserID();  // Only userID
+        dto.name = user.getName();      // Only name
 
-        if (user.getRole() != null) {
-            dto.role = convertRoleToRoleDTO(user.getRole());
-        } else {
-            dto.role = null;
-        }
-
-        dto.verified = user.isVerified();
-        dto.created_at = user.getCreated_at();
-        dto.updated_at = user.getUpdated_at();
-        return dto;
+        return dto; // That's it! No role or other fields
     }
 
-    private RoleDTO convertRoleToRoleDTO(Role role) {
-        if (role == null) return null;
-        RoleDTO dto = new RoleDTO();
-        dto.roleID = role.getRoleID();
-        dto.role = role.getRole();
-        return dto;
-    }
-    public List<User> getAllusers(){
-        return userRepository.findAll();
+    public User findUserById(Integer userId) { // New: Service method to find user by ID
+        return userRepository.findById(userId).orElse(null);
     }
 
     }

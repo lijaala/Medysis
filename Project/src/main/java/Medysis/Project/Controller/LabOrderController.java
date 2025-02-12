@@ -8,6 +8,7 @@ import Medysis.Project.Service.LabOrderService;
 import Medysis.Project.Service.LabResultService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,8 +44,12 @@ public class LabOrderController {
 //    }
 
     @GetMapping("/details/{orderID}")
-    public LabOrder getLabOrderDetails(@PathVariable int orderID) {
-        return labOrderService.getLabOrderDetails(orderID); // Call the service
+    public ResponseEntity<LabOrderDTO> getLabOrderDetails(@PathVariable int orderID) {
+        LabOrderDTO labOrderDTO = labOrderService.getLabOrderDetails(orderID);
+        if (labOrderDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(labOrderDTO);
     }
 
     @GetMapping("/all")

@@ -149,8 +149,10 @@
 
 /*Table styling*/
 .Table {
+    table-layout: auto;
     width: 100%;
     border-collapse: collapse;
+    color: #07104e;
 
 
     tbody {
@@ -163,17 +165,34 @@
 thead{
     background-color: rgb(240, 242, 249);
     border-radius: 8px;
+    width: max-content;
 
 
 
 }
 th,td {
     padding: 1%;
-    width: 20vw;
-    margin-top:3vh;
+    margin:2vh;
     text-align: center;
+    align-items: center;
+    width:15vw;
+    text-wrap: nowrap;
+
 
 }
+
+
+#labRequestTable td button{
+    width: fit-content !important;
+    text-transform: none;
+}
+#labRequestTable .actions{
+    width: 19vw;
+}
+#labRequestTable td:nth-child(2){
+    width:20vw;
+}
+
 tr{
     margin-top: 2%;
 }
@@ -328,4 +347,45 @@ button#addMedicationBtn {
     flex-direction: column;
     gap: 3vw;
 
+}
+
+#labDetailsModal {
+    display: none;
+    position: relative; /* Position relative to .actions */
+    background-color: #F0F2F9;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: fit-content;
+}
+
+#labDetailsModal div {
+    margin-bottom: 5%;
+}
+
+#labDetailsModal button {
+    margin-top: 10px;
+}
+.modal-body{
+    margin: 15% 2%;
+}
+.modal-body div{
+    padding: 1%;
+    border-bottom: 1px rgb( 255, 52, 147) solid;
+}
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    display: none; /* Initially hidden */
+    background-color: rgba(0, 0, 0, 0.2); /* Optional semi-transparent background */
+}
+
+.blur {
+    backdrop-filter: blur(5px); /* Use backdrop-filter for better performance */
 }

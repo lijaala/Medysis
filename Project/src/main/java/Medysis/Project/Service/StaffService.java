@@ -91,40 +91,18 @@ public class StaffService {
 
     public StaffDTO convertToDTO(Staff staff) {
         if (staff == null) return null;
+
         StaffDTO dto = new StaffDTO();
-        dto.staffID = staff.getStaffID();
-        dto.staffName = staff.getStaffName();
-        dto.staffEmail = staff.getStaffEmail();
-        dto.staffPhone = staff.getStaffPhone();
-        dto.staffAddress = staff.getStaffAddress();
-        dto.gender = staff.getGender();
-        dto.age = staff.getAge();
-        dto.image = staff.getImage();
+        dto.staffID = staff.getStaffID();    // Only staffID
+        dto.staffName = staff.getStaffName();  // Only staffName
 
-        if (staff.getRole() != null) {
-            dto.role = convertRoleToRoleDTO(staff.getRole());
-        } else {
-            dto.role = null;
-        }
-
-        dto.addedOn = staff.getAddedOn();
-        dto.lastActive = staff.getLastActive();
-        dto.lastUpdated = staff.getLastUpdated();
         dto.startTime = staff.getStartTime();
         dto.endTime = staff.getEndTime();
 
-        return dto;
+        return dto; // That's it! No role or other fields
     }
-    private RoleDTO convertRoleToRoleDTO(Role role) {
-        if (role == null) return null;
-        RoleDTO dto = new RoleDTO();
-        dto.roleID = role.getRoleID();
-        dto.role = role.getRole();
-        return dto;
-    }
-
-    public List<Staff> getAllStaff(){
-        return staffRepository.findAll();
+    public Staff findStaffById(String staffId) { // New: Service method to find staff by ID
+        return staffRepository.findById(staffId).orElse(null);
     }
 }
 

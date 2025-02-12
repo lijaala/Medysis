@@ -35,39 +35,21 @@ public class LabResultService {
     public List<LabResultDTO> getAllLabResults() {
         List<LabResults> labResults = labResultRepository.findAll();
         return labResults.stream()
-                .map(labResult -> {
-                    LabOrder labOrder = labResult.getOrderID(); // Get LabOrder directly
-                    LabOrderDTO labOrderDTO = convertLabOrderToDTO(labOrder); // Convert to DTO
-                    return convertToDTO(labResult, labOrderDTO); // Use DTO in conversion
-                })
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-
-    private LabOrderDTO convertLabOrderToDTO(LabOrder labOrder) {
-        if (labOrder == null) return null;
-
-        LabOrderDTO dto = new LabOrderDTO();
-        dto.orderID = labOrder.getOrderID();
-        dto.userID = userService.convertToDTO(labOrder.getUserID());
-        dto.doctorID = staffService.convertToDTO(labOrder.getDoctorID());
-        dto.appointmentID = appointmentService.convertToDTO(labOrder.getAppointmentID());
-        dto.urgency = labOrder.getUrgency();
-        dto.orderDate = labOrder.getOrderDate();
-        return dto;
-    }
-
-    public LabResultDTO convertToDTO(LabResults labResults, LabOrderDTO labOrderDTO) {
+    public LabResultDTO convertToDTO(LabResults labResults) {  // Correct signature
         if (labResults == null) return null;
 
         LabResultDTO dto = new LabResultDTO();
         dto.reportId = labResults.getReportId();
-        dto.userID = userService.convertToDTO(labResults.getUserID());
-        dto.doctorID = staffService.convertToDTO(labResults.getDoctorID());
-        dto.appointmentID = appointmentService.convertToDTO(labResults.getAppointmentID());
-        dto.orderID = labOrderDTO; // Use the provided LabOrderDTO
-        dto.testID = labTestsService.convertToDTO(labResults.getTestID());
+        dto.userID = labResults.getUserID().getUserID();
+        dto.doctorID = labResults.getDoctorID().getStaffID();
+        dto.appointmentID = labResults.getAppointmentID().getAppointmentID();
+        dto.orderID = labResults.getOrderID().getOrderID();
+        dto.testID = labResults.getTestID().getTestID();
+        dto.testName=labResults.getTestID().getTestName();
         return dto;
     }
-
 }

@@ -30,6 +30,12 @@ public class LabResults {
     @JoinColumn(name = "testID", referencedColumnName = "testID")
     private LabTests testID;
 
+    @Column(name = "resultValue", nullable = true)
+    private Integer resultValue;
+
+    @Column(name = "notes", nullable = true)
+    private String notes;
+
     public int getReportId() {
         return reportId;
     }
