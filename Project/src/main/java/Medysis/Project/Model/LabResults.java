@@ -31,7 +31,7 @@ public class LabResults {
     private LabTests testID;
 
     @Column(name = "resultValue", nullable = true)
-    private Integer resultValue;
+    private Double resultValue;
 
     @Column(name = "notes", nullable = true)
     private String notes;
@@ -82,5 +82,21 @@ public class LabResults {
 
     public void setTestID(LabTests testID) {
         this.testID = testID;
+    }
+
+    public Double getResultValue() {
+        return resultValue;
+    }
+
+    public void setResultValue(Double resultValue) {
+        this.resultValue = resultValue;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

@@ -8,5 +8,9 @@ public class LabResultDTO {
     public int orderID;
     public int testID;
     public String testName;
+    public String measurementUnit;
+    public String normalRange;
+    public Double resultValue;
+    public String notes;
 }
 

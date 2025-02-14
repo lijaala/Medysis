@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const labRequestTable = document.getElementById('labRequestTable');
     const modal = document.getElementById('labDetailsModal');
+    const labResultsModal = document.getElementById('labResults');
+    const closeLabResults= labResultsModal.querySelector('.closeLabResults');
+    const submitButton = document.getElementById('submitSingleResult'); // Assuming a global submit button for all
+
 
     const closeSpan = document.createElement('span'); // Create a span element
     closeSpan.innerHTML = '&times;';
@@ -41,15 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${(order.urgency || 'N/A').toUpperCase()}</td>
                             <td class="actions">
                                 <button type="button" class="secondary view-details" data-order-id="${order.orderID}">View Details</button>
-                                <button type="button" class="primary" data-order-id="${order.orderID}">Add Results</button>
+                                <button type="button" class="primary add-results" data-order-id="${order.orderID}">Add Results</button>
                                 
                             </td>
                         `;
 
                         // Add event listener after the row is created (more efficient)
-                        const viewButton = row.querySelector('.view-details'); // Select the button in the current row
-                        viewButton.addEventListener('click', handleViewDetailsClick);
-
+                        row.querySelector('.view-details').addEventListener('click', handleViewDetailsClick);
+                        row.querySelector('.add-results').addEventListener('click', handleAddResultsClick);
                     });
                 } else {
                     labRequestTable.innerHTML = '<tr><td colspan="7">No lab orders found</td></tr>';
@@ -105,7 +108,161 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    function handleAddResultsClick(event) {
+        const orderId = event.target.dataset.orderId;
 
+        fetch(`/api/LabOrder/details/${orderId}`)
+            .then(response => response.json())
+            .then(labOrderDetails => {
+                populateLabResultsModal(labOrderDetails);
+                showLabResultsModal(); // Ensure modal is visible
+            })
+            .catch(error => {
+                console.error("Error fetching lab order details:", error);
+            });
+    }
+
+    function populateLabResultsModal(labOrderDetails) {
+        if (!labOrderDetails) return;
+
+        // Populate patient and doctor details
+        document.getElementById("patientDoc").innerHTML = `
+            <span>Patient: ${labOrderDetails.userName || 'Unknown'}</span> <br> <br>
+            <span>Doctor: ${labOrderDetails.doctorName || 'Unknown'}</span>
+        `;
+
+        // Populate lab test results table
+        const labResultTable = document.getElementById("labResultTable");
+        labResultTable.innerHTML = ""; // Clear previous entries
+
+        if (labOrderDetails.labResults && labOrderDetails.labResults.length > 0) {
+            labOrderDetails.labResults.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${result.reportId}</td>
+                    <td>${result.testName}</td>
+                    <td>${result.measurementUnit || 'N/A'}</td>
+                    <td>${result.normalRange || 'N/A'}</td>
+                    <td><input type="number" class="result-value" data-test-id="${result.testID}" placeholder="Enter result"></td>
+                    <td><input type="text" class="result-notes" placeholder="Notes"></td>
+                `;
+                labResultTable.appendChild(row);
+
+                row.querySelector('.result-value').addEventListener('input', function() {
+                    enableSubmitForEnteredResults(); // Enable submission when a result is entered
+                });
+            });
+        } else {
+            labResultTable.innerHTML = '<tr><td colspan="6">No tests available.</td></tr>';
+        }
+    }
+
+    function showLabResultsModal() {
+        labResultsModal.style.display = "flex";
+    }
+
+    //Close modal when 'x' button is clicked
+    closeLabResults.addEventListener('click', () => {
+        labResultsModal.style.display = "none";
+    });
+
+
+    function submitLabResults(orderId) {
+        const labResults = [];
+        const message=document.querySelector(".labResult-message");
+        message.innerHTML='';
+
+        // Collect results from inputs (only for tests that have entered data)
+        document.querySelectorAll('.result-value').forEach((input, index) => {
+            const resultValue = input.value;
+            const resultNotes = input.closest('tr').querySelector('.result-notes').value;
+            const testId = input.dataset.testId;
+
+            if (resultValue.trim() !== '') { // Only collect results that are not empty
+                labResults.push({ orderId, resultValue, resultNotes, testId });
+            }
+        });
+
+        if (labResults.length === 0) {
+            alert('Please enter at least one result before submitting.');
+            return;
+        }
+        let updateCount = 0; // To track the number of successful updates
+        let errorCount = 0; // To track errors
+
+        // Send the lab results to the backend as query parameters
+        labResults.forEach(result => {
+            const { orderId, resultValue, resultNotes, testId } = result;
+
+            // Construct the URL with query parameters
+            const url = `/labResult/update/${orderId}/${testId}?resultValue=${resultValue}&notes=${resultNotes}`;
+
+            // Send the PUT request
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.text())
+                .then(data => {
+                    updateCount++;
+                    if (updateCount === labResults.length) {
+                        message.innerHTML = 'Lab results updated successfully!';
+
+                        // Delay before closing the modal
+                        setTimeout(() => {
+                            document.getElementById('labResults').style.display = 'none';
+                            displayLabOrders(); // Reload the orders
+                        }, 2000); // 2-second delay for readability
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating lab results:', error);
+                    errorCount++;
+
+                    // Display error message only once
+                    if (errorCount === 1) {
+                        message.innerHTML = '<span style="color: red;">Failed to update some lab results. Please try again.</span>';
+                    }
+                });
+        });
+    }
+
+
+
+    function enableSubmitForEnteredResults() {
+        const resultInputs = document.querySelectorAll('.result-value');
+        const submitButton = document.getElementById('submitSingleResult');  // Assuming there's a global submit button
+
+        // Enable submit button only if any result is entered
+        const anyTestEntered = Array.from(resultInputs).some(input => input.value.trim() !== '');
+
+        // Only submit filled tests
+        if (anyTestEntered) {
+            submitButton.style.display = 'inline-block';  // Show the submit button when a result is entered
+        } else {
+            submitButton.style.display = 'none'; // Hide if no result is entered
+        }
+    }
+
+
+
+    if (submitButton) {
+        submitButton.addEventListener('click', function () {
+            const orderId = document.querySelector('.add-results').dataset.orderId;  // Get the order ID from the button
+
+            if (!orderId) {
+                console.error('Order ID not found!');
+                return;
+            }
+
+            submitLabResults(orderId);  // Pass the orderId directly to the function
+            displayLabOrders();  // Reload lab orders
+        });
+    } else {
+        console.error('submitSingleResult button not found!');
+    }
 
 
     displayLabOrders();

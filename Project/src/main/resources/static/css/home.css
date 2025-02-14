@@ -193,6 +193,13 @@ th,td {
     width:20vw;
 }
 
+#labResultTable td:first-child{
+    width: 1vw !important;
+}
+#labResultTable input{
+    width: 10vw;
+    overflow-y:scroll ;
+}
 tr{
     margin-top: 2%;
 }
@@ -389,3 +396,5 @@ button#addMedicationBtn {
 .blur {
     backdrop-filter: blur(5px); /* Use backdrop-filter for better performance */
 }
+
+
