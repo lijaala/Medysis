@@ -45,28 +45,6 @@
     </div>
     <div id="messageBox" style="display: none; padding: 10px; text-align: center; font-weight: bold;"></div>
     <div class=" main " th:include="diagnose::diagnosisModal"></div>
-
-
-
 </section>
 
 
-<script>
-
-
-    function editAppointment(id) {
-        console.log(`Editing appointment ${id}`);
-    }
-
-    function deleteAppointment(id) {
-        console.log(`Deleting appointment ${id}`);
-        document.querySelector(`tr[data-id='${id}']`).remove();
-    }
-
-    function startAppointment(row) {
-        console.log(`Starting appointment for row:`, row);
-        // Logic to start the appointment
-    }
-
-
-</script>

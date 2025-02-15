@@ -42,4 +42,8 @@ public class LabTestService {
         }
         labTestRepository.deleteById(id);
     }
+
+    public LabTests addLabTest(LabTests labTest) {
+        return labTestRepository.save(labTest);
+    }
 }

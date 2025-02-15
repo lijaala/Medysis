@@ -24,7 +24,7 @@
 .adminBody {
     display: flex;
     flex-direction: column;
-    width: fit-content;
+    width: 100%;
     gap: 10%;
     height: fit-content;
 
@@ -37,7 +37,6 @@
     align-content: center;
     justify-content: center;
     gap: 10%;
-    display: flex;
     flex-direction: row;
     /* Hide all sections by default */
 }
@@ -286,6 +285,10 @@ td.actions button{
     flex-direction: column;
     gap:2vh;
 }
+.modal-content h3{
+    color: rgb( 255, 52, 147);
+
+}
 .modal-header{
     display: flex;
     flex-direction: row;
@@ -309,7 +312,7 @@ td.actions button{
 form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 3vh;
     padding: 5%;
 }
 
@@ -350,11 +353,12 @@ button#addMedicationBtn {
 }
 /*alert box*/
 .message{
-    width:100%;
+    width:80%;
     background-color: rgba(255, 194, 223, 0.68);
     color: rgb( 255, 52, 147);
     padding:2%;
     border-radius: 8px;
+    align-self: center;
 
 }
 .lab-test-entry{
@@ -407,4 +411,13 @@ button#addMedicationBtn {
     backdrop-filter: blur(5px); /* Use backdrop-filter for better performance */
 }
 
-
+#labTestTable input{
+    width: 80%;
+}
+#labTest .form-row label{
+    flex:2;
+    text-wrap: nowrap;
+}
+#labTest .form-row input{
+    flex:2;
+}

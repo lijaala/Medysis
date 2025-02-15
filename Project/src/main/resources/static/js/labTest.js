@@ -117,6 +117,48 @@ function cancelEdit(testID, oldName, oldUnit, oldRange) {
 
     `;
 }
+
+function openTest() {
+    document.getElementById('addTest').style.display = 'flex';
+}
+
+function closeTest() {
+    document.getElementById('addTest').style.display = 'none';
+}
+
+
+document.getElementById('labTest').addEventListener('submit', function(event) {
+    event.preventDefault();  // Prevent the default form submission
+
+    // Create a new FormData object from the form
+    const formData = new FormData(event.target);
+
+    // Send the form data via a fetch request
+    fetch(event.target.action, {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => {
+            if (!response.ok) {
+                // Display error message if response is not OK
+                document.querySelector('.labTest-message').innerHTML = 'Error: Unable to add lab test.';
+            } else {
+                // Display success message
+                const message= document.querySelector('.labTest-message');
+                message.innerHTML = 'Lab test added successfully!';
+                message.className="message";
+
+                // Delay the closing of the modal to ensure user can read the message
+                setTimeout(() => {
+                    closeTest();  // Close the modal after 2 seconds
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            // Handle network or other errors
+            document.querySelector('.labTest-message').innerHTML = 'Network error, please try again.';
+        });
+});
 /**function deleteTest(testID) {
     if (confirm("Are you sure you want to delete this test?")) {
     fetch(`/api/labTests/delete/${testID}`, {

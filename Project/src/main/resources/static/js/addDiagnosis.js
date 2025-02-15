@@ -515,7 +515,7 @@ async function populateLabTestDropdown(selectElement) {
 
 
 function submitLabOrder(callback) {
-    console.log("🚀 Submitting lab order...");
+    console.log(" Submitting lab order...");
 
     const appointmentId = document.getElementById('appointmentId').value;
     const userId = document.getElementById('userId').value;
@@ -526,7 +526,7 @@ function submitLabOrder(callback) {
     document.querySelectorAll('.lab-test-entry').forEach(entry => {
         const selectElement = entry.querySelector('.test-dropdown');
         if (selectElement && selectElement.value === "") {
-            console.warn("🗑️ Removing empty dropdown before submission...");
+            console.warn("🗑 Removing empty dropdown before submission...");
             entry.remove();
         }
     });
@@ -534,18 +534,18 @@ function submitLabOrder(callback) {
     document.querySelectorAll('.lab-test-entry').forEach((entry, index) => {
         const selectElement = entry.querySelector('.test-dropdown');
         if (!selectElement) {
-            console.error(`❌ Dropdown ${index + 1}: Not found!`);
+            console.error(` Dropdown ${index + 1}: Not found!`);
             allTestsSelected = false;
             return;
         }
 
         const testId = selectElement.value;
-        console.log(`✅ Dropdown ${index + 1}: Selected testID -> "${testId}"`);
+        console.log(` Dropdown ${index + 1}: Selected testID -> "${testId}"`);
 
         testIds.push(testId);
 
         if (testId === "") {
-            console.error(`⚠️ Dropdown ${index + 1}: Empty selection detected.`);
+            console.error(`⚠ Dropdown ${index + 1}: Empty selection detected.`);
             allTestsSelected = false;
         }
     });

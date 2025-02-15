@@ -28,7 +28,7 @@
 
     <div id="labResults" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="closeLabResults" onclick="closeLabResultsModal()">&times</span>
+            <span class="closeLabResults close" onclick="closeLabResultsModal()">&times</span>
             <h3>Add Lab Results</h3>
             <div id="patientDoc">
 
@@ -60,20 +60,17 @@
 
 
 </section>
+
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="addLabTests">
 
     <div class="search2">
-        <button class="primary" id=""> Add Test</button>
+        <button class="primary" onclick="openTest()"> Add Test</button>
 
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 3H2l8 9.46V19l4 2v-8.54z" />
         </svg>
-
-
-
     </div>
     <div>
-
         <table class="Table" >
             <thead>
             <tr>
@@ -82,17 +79,38 @@
                 <td>Measurement Unit</td>
                 <td>Normal Range</td>
                 <td>Actions</td>
-
             </tr>
             </thead>
             <tbody id="labTestTable">
-
-
             </tbody>
         </table>
     </div>
 
+    <div id="addTest" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeTest()">&times;</span>
+            <h3>Add Lab Test</h3>
 
+            <div class="labTest-message"></div>
 
+            <form id="labTest" action="api/labTests/add" method="post">
+                <div class="form-row">
+                    <label for="testName">Test Name</label>
+                    <input type="text" id="testName" name="testName">
+                </div>
+                <div class="form-row">
+                    <label for="measurementUnit"> Measurement Unit </label>
+                    <input type="text" id="measurementUnit" name="measurementUnit">
+                </div>
+                <div class="form-row">
+                    <label for="normalRange"> Normal Range </label>
+                    <input type="text" id="normalRange" name="normalRange">
+                </div>
+                <div class="form-row">
+                    <button class="primary">Add Test</button>
+                </div>
+            </form>
+        </div>
 
+    </div>
 </section>
