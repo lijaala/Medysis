@@ -45,7 +45,7 @@
     </section>
 
     <section id="labTests" class="section">
-        <div class=" main " th:include="viewAppointments::appointments"></div>
+        <div class=" main " th:include="labRequest::addLabTests"></div>
     </section>
 
     <section id="labReports" class="section">
@@ -65,7 +65,7 @@
 <script src="js/viewAppointment.js"></script>
 <script src="js/addDiagnosis.js"></script>
 <script src="js/lab.js"></script>
-
+<script src="js/labTest.js"></script>
 <script>
     document.getElementById('role').addEventListener('change', function() {
         var role = this.value;

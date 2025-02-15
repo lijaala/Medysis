@@ -26,4 +26,20 @@ public class LabTestService {
         dto.measurementUnit = labTests.getMeasurementUnit();
         return dto;
     }
+
+    public LabTests updateLabTest(Integer id, LabTests updatedTest) {
+        return labTestRepository.findById(id).map(test -> {
+            test.setTestName(updatedTest.getTestName());
+            test.setMeasurementUnit(updatedTest.getMeasurementUnit());
+            test.setNormalRange(updatedTest.getNormalRange());
+            return labTestRepository.save(test);
+        }).orElseThrow(() -> new RuntimeException("Test not found with id: " + id));
+    }
+
+    public void deleteLabTest(Integer id) {
+        if (!labTestRepository.existsById(id)) {
+            throw new RuntimeException("Test not found with id: " + id);
+        }
+        labTestRepository.deleteById(id);
+    }
 }

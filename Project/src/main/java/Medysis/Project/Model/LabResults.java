@@ -3,7 +3,7 @@ package Medysis.Project.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Lab-Results")
+@Table(name = "LabResults")
 
 public class LabResults {
     @Id
