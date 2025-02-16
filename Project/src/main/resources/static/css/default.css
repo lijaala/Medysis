@@ -155,3 +155,12 @@ input,select, textarea, option {
     max-width: 100%; /* Adjust this based on your design */
     box-sizing: border-box; /* Ensures padding doesn't affect width */
 }
+footer{
+    width:100%;
+    position:fixed;
+    bottom:-1%;
+    background: url("../image/footer.svg");
+    height:25%;
+    background-size: cover;
+    z-index: -2;
+}
