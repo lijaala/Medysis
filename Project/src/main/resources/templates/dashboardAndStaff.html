@@ -1,20 +1,27 @@
-<section  xmlns:th="http://www.thymeleaf.org" th:fragment="admindashboard">
+<section  xmlns:th="http://www.thymeleaf.org" th:fragment="adminDashboard">
     <section class="stats">
-
-        <div> Total Patients</div>
-        <div>New Patients</div>
-        <div> Total Appointments</div>
+        <div>Total Patients: <span id="totalPatients">0</span></div>
+        <div>New Patients: <span id="newPatients">0</span></div>
+        <div>Total Appointments: <span id="totalAppointments">0</span></div>
     </section>
+
     <section class="calChart">
         <div class="calendar">
-
+            <div class="calendar-header">
+                <span class="calendar-month" id="currentMonth"></span>
+                <div class="calendar-controls">
+                    <button id="prevMonth">&lt;</button>
+                    <button id="nextMonth">&gt;</button>
+                </div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+            </div>
         </div>
-        <div class="barchart"></div>
-
-
+        <div class="barchart-container">
+        <canvas class="barchart" ></canvas>
+        </div>
     </section>
 </section>
-
 
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="staff">
     <div class="search2">

@@ -13,11 +13,8 @@
 
 }
 .headerContainer {
-
     width: 90%;
     padding-left: 5%;
-
-
 }
 
 .adminBody {
@@ -37,7 +34,6 @@
     justify-content: center;
     gap: 10%;
     flex-direction: row;
-    /* Hide all sections by default */
 }
 
 .section.active {
@@ -70,7 +66,6 @@
     height: 30vh;
     padding: 2%;
     align-items: center;
-
     box-shadow: 0 2px 5px rgba(87, 86, 86, 0.499);
 
 }
@@ -102,24 +97,95 @@
 
 .calChart div {
     justify-content: center;
-    height: 50vh;
     background-color: rgb(240, 242, 249);
     border-radius: 8px;
-
-
 }
 
 
-.barchart {
-    flex: 2;
+.barchart-container, .calendar {
+    width: 65%;
+    height: 100%;
+    padding: 10px;
 
 }
 
 .calendar {
-    flex: 1;
+    width: fit-content; /* Set a fixed width for the calendar */
+    height: fit-content;
+    font-size:.5em;
+
+}
+.calendar-header {
+    display: flex;
+    margin-bottom: 2vh;
+    align-items: center;
+    width: 100%;
+    gap:35%;
+}
+.calendar-month{
+    font-weight: normal;
+}
+.calendar-controls {
+    display: flex;
+}
+.calendar-controls button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    border: none;
+    cursor: pointer;
+    color: #07104e;
+    background-color: transparent;
+    border-radius: 50%;
+    transition: all 0.3s ease-in;
+}
+.calendar-controls button:hover {
+    color: rgb( 255, 52, 147);
+    text-shadow: 5px 5px 2px rgba(244, 148, 193, 0.49);
 
 
 }
+
+.calendar-grid {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr); /* Ensure equal row heights */
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for the week */
+    gap: 5px;
+
+}
+
+.calendar-day {
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #eee;
+    display: flex; /* Use flexbox for vertical alignment */
+    flex-direction: column; /* Align items vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    height: 62px;
+    width: 40px;
+
+}
+
+.calendar-day div {  /* Style the divs inside calendar-day */
+    margin-bottom: 2px; /* Add some spacing between the lines */
+    font-size: 12px; /* Adjust font size as needed */
+}
+.calendar-day div:first-child{
+    font-size: 16px; /* Adjust font size as needed */
+    font-weight: bold;
+}
+
+
+/* Optional: Add hover effect */
+.calendar-day:hover {
+    background-color: #f0f0f0;
+}
+
+/* Optional: Style for days with appointments */
+.calendar-day.has-appointments { /* Add this class in your JS when you add the data */
+    background-color: #e0f0e0; /* Example color */
+}
+
 /* add staff*/
 .search2 {
     width: 100%;

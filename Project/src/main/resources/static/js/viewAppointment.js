@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const userRole = await roleResponse.text();
         console.log("User Role:", userRole);
 
-        const appointmentResponse = await fetch('/appointment/list', { method: 'GET', credentials: 'same-origin' });
+        const appointmentResponse = await fetch('/appointment/list', { method: 'GET' });
         if (!appointmentResponse.ok) {
             console.error("Failed to fetch appointments:", appointmentResponse.status);
             return;

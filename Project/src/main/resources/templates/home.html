@@ -26,8 +26,8 @@
 
 </div>
 <main class="adminBody">
-    <section id="dashboard" class="section">
-        <div class="main" th:include="dashboardAndStaff::admindashboard"></div>
+    <section id="adminDashboard" class="section">
+        <div class="main" th:include="dashboardAndStaff::adminDashboard"></div>
     </section>
     <section id="staff" class="section" > 
         <div class="main" th:include="dashboardAndStaff::staff"></div>
@@ -67,6 +67,8 @@
 <script src="js/addDiagnosis.js"></script>
 <script src="js/lab.js"></script>
 <script src="js/labTest.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/dashboard.js"></script>
 <script>
     document.getElementById('role').addEventListener('change', function() {
         var role = this.value;

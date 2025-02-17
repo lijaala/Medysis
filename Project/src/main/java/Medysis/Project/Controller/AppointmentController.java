@@ -57,7 +57,8 @@ public class AppointmentController {
     @GetMapping("/list")
     public List<Appointment> getAppointments(HttpSession session) {
         String userRole = (String) session.getAttribute("userRole");
-        String userId = (String) session.getAttribute("userId");
+        Object userIdObj = session.getAttribute("userId");
+        String userId = (userIdObj instanceof String) ? (String) userIdObj : String.valueOf(userIdObj);
 
 
         return appointmentService.getAppointmentsByRole(userRole, userId);
