@@ -5,8 +5,9 @@ html,
 body {
     margin: 0;
     padding: 0;
-
     font-size:1rem;
+    font-family: "Montserrat", Serif;
+
 }
 
 h3{
@@ -15,18 +16,8 @@ h3{
     border-bottom: 2vh;
 }
 
-.roboto-regular {
-    font-family: "Roboto", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-}
 
-.karla {
-    font-family: "Karla", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-}
+
 button{
     padding: 1% 5%;
     border-radius: .6vw;

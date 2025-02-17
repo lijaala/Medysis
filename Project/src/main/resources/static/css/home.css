@@ -4,12 +4,12 @@
     width: 70%;
     height: fit-content;
     gap: 5vh;
-    box-shadow: 2px 2px 10px rgba(140, 137, 137, 0.6);
+    box-shadow: 2px 1px 1px rgba(140, 137, 137, 0.4) inset;
     align-content: center;
     padding:1% 5%;
     border-radius:  20px 20px 0 0;
-    margin: 2% 0 0 17%;
-    background-color: white;
+    margin: 2% 0 0 18%;
+    background-color: transparent;
 
 }
 .headerContainer {
@@ -63,16 +63,30 @@
 .stats div {
     border-radius: 8px;
     flex: 1;
+    gap:3vh;
     height: 30vh;
     padding: 2%;
+
     align-items: center;
     box-shadow: 0 2px 5px rgba(87, 86, 86, 0.499);
+
+    h6{
+        font-weight: normal;
+    }
+
+    p{
+        width: 100%;
+        align-items: center;
+        font-size: 4em !important;
+        padding: 15% 5%;
+    }
 
 }
 
 .stats div:nth-child(1) {
     background: linear-gradient(180deg, rgba(153, 249, 118, 0.623) 15%, rgba(236, 251, 230, 0.912) 80%);
     color: #0F5E1B;
+
 
 }
 
@@ -102,17 +116,25 @@
 }
 
 
-.barchart-container, .calendar {
-    width: 65%;
+.barchart-container {
+    flex:2;
     height: 100%;
-    padding: 10px;
+    padding:1%;
+    align-content: center;
 
+}
+canvas{
+    height: 100% !important;
+    width:90% !important;
 }
 
 .calendar {
-    width: fit-content; /* Set a fixed width for the calendar */
-    height: fit-content;
+    flex:1;
+    height: 100%;
     font-size:.5em;
+    padding:1%;
+    cursor: pointer;
+    color:#07104e;
 
 }
 .calendar-header {
@@ -120,7 +142,10 @@
     margin-bottom: 2vh;
     align-items: center;
     width: 100%;
-    gap:35%;
+    gap:8vw;
+    padding: 2% 0;
+    border-bottom: 1px solid #07104e;
+    border-radius: 0 !important;
 }
 .calendar-month{
     font-weight: normal;
@@ -139,9 +164,8 @@
     transition: all 0.3s ease-in;
 }
 .calendar-controls button:hover {
-    color: rgb( 255, 52, 147);
+    color: rgb( 255, 52, 147) !important;
     text-shadow: 5px 5px 2px rgba(244, 148, 193, 0.49);
-
 
 }
 
@@ -158,33 +182,42 @@
     text-align: center;
     border: 1px solid #eee;
     display: flex; /* Use flexbox for vertical alignment */
-    flex-direction: column; /* Align items vertically */
     align-items: center; /* Center horizontally */
     justify-content: center; /* Center vertically */
-    height: 62px;
-    width: 40px;
+    color: rgba(2, 2, 68, 0.59) !important;
 
 }
-
-.calendar-day div {  /* Style the divs inside calendar-day */
-    margin-bottom: 2px; /* Add some spacing between the lines */
-    font-size: 12px; /* Adjust font size as needed */
-}
-.calendar-day div:first-child{
-    font-size: 16px; /* Adjust font size as needed */
-    font-weight: bold;
-}
+.today{
+    color: rgb( 255, 52, 147) !important;
 
 
-/* Optional: Add hover effect */
-.calendar-day:hover {
-    background-color: #f0f0f0;
+}
+.selected {
+    background-color: rgba(244, 148, 193, 0.49) !important; /* Or any style you prefer */
+    color: #07104e;
 }
 
-/* Optional: Style for days with appointments */
-.calendar-day.has-appointments { /* Add this class in your JS when you add the data */
-    background-color: #e0f0e0; /* Example color */
+.event-details {
+    display: flex;
+    flex-direction: column;
+    gap:1vh;
+    border: 1px solid rgb( 255, 52, 147);
+    box-shadow: 1px 2px 5px rgba(244, 148, 193, 0.49);
+    padding: 10px;
+    margin-top: 10px;
+
+
 }
+.event-details p{
+    font-size: .6em !important;
+}
+
+.event-details h3 {
+    margin-top: 0;
+    color:rgb( 255, 52, 147);
+    font-size: .8em;
+}
+
 
 /* add staff*/
 .search2 {
