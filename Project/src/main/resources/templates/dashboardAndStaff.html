@@ -32,6 +32,40 @@
     </section>
 </section>
 
+<section  xmlns:th="http://www.thymeleaf.org" th:fragment="doctorDashboard">
+    <section class="stats">
+        <div>
+            <h6>Total Patients</h6>
+            <p id="totalPatientsDoc">0</p>
+        </div>
+        <div>
+            <h6>Appointments Today</h6>
+            <p id="appToday">0</p>
+        </div>
+        <div>
+            <h6>Total Appointments</h6>
+            <p id="totalAppointmentsDoc">0</p>
+        </div>
+    </section>
+
+    <section class="calChart">
+        <div class="calendar doctor-calendar">
+            <div class="calendar-header">
+                <span class="calendar-month" id="currentMonthDoc"></span>
+                <div class="calendar-controls">
+                    <button id="prevMonthDoc">&lt;</button>
+                    <button id="nextMonthDoc">&gt;</button>
+                </div>
+            </div>
+            <div class="calendar-grid" id="calendarGridDoc">
+            </div>
+        </div>
+        <div class="barchart-container">
+            <canvas id="doctorAgeGroupChart" class="barchartDoc" ></canvas>
+        </div>
+    </section>
+</section>
+
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="staff">
     <div class="search2">
         <button class="primary" id="openStaffFrom"> Add Staff</button>

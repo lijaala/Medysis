@@ -33,6 +33,92 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .catch(error => console.error("Error fetching dashboard data:", error));
+// Fetch Doctor Dashboard Data
+    fetch('/api/dashboard/doctor')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Fetched Doctor Dashboard Data:", data);
+
+            const staticChartData = {
+                "18-35 Years": 45,
+                "35-45 Years": 30,
+                "45-60 Years": 20,
+                "60+ Years": 5
+            };// Debugging
+
+            if (data.totalAppointments !== undefined) {
+                document.getElementById('totalAppointmentsDoc').textContent = data.totalAppointments;
+            } else {
+                console.error("totalAppointments is missing in API response.");
+            }
+
+            if (data.appointmentsToday !== undefined) {
+                document.getElementById('appToday').textContent = data.appointmentsToday;
+            } else {
+                console.error("appointmentsToday is missing in API response.");
+            }
+            if (data.ageGroupDistribution) {
+                renderAgeGroupBubbleChart(data.ageGroupDistribution, 'doctorAgeGroupChart');
+            } else {
+                console.error("ageGroupDistribution data is missing in the API response.");
+            }
+
+
+
+            let doctorCalendarData = [];
+            if (data.appointmentsPerDay) {
+                doctorCalendarData = Object.entries(data.appointmentsPerDay).map(([date, appointments]) => [date, appointments, 0]);
+            }
+
+            // Correctly call the doctor's render function
+            if (doctorCalendarData.length > 0) {
+                renderDoctorCalendar(  // Call the correct function
+                    doctorCalendarData,
+                    'calendarGridDoc',
+                    'currentMonthDoc',
+                    'prevMonthDoc',
+                    'nextMonthDoc',
+                    '.calendar.doctor-calendar .event-details'
+                );
+            } else {
+                console.warn("No appointments data to display.");
+                const calendarGrid = document.getElementById('calendarGridDoc'); // Use the doctor's ID
+                if (calendarGrid) {
+                    calendarGrid.innerHTML = "<p>No appointments scheduled.</p>";
+                }
+            }
+
+        })
+        .catch(error => console.error("Error fetching Doctor dashboard data:", error));
+
+    // Function to render the chart
+    function renderChart(appointmentsByStaff) {
+        const ctx = document.querySelector('.barchart').getContext('2d');
+
+        const chartData = {
+            labels: Object.keys(appointmentsByStaff),
+            datasets: [{
+                label: 'Appointments by Staff',
+                data: Object.values(appointmentsByStaff),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
 
 
     // Function to render calendar
@@ -157,32 +243,234 @@ document.addEventListener("DOMContentLoaded", function () {
             updateCalendar(currentMonth, currentYear);
         });
     }
+
+
+    function renderDoctorCalendar(calendarData, calendarGridId, currentMonthSpanId, prevMonthButtonId, nextMonthButtonId, eventDetailsContainerSelector) {
+        const calendarGrid = document.getElementById(calendarGridId);
+        const currentMonthSpan = document.getElementById(currentMonthSpanId);
+        const prevMonthButton = document.getElementById(prevMonthButtonId);
+        const nextMonthButton = document.getElementById(nextMonthButtonId);
+        let eventDetails = document.querySelector(eventDetailsContainerSelector);
+        if (!eventDetails) {
+            eventDetails = document.createElement('div');
+            eventDetails.classList.add('event-details');
+            document.querySelector(eventDetailsContainerSelector.split(" ")[0]).appendChild(eventDetails);
+        }
+
+        let currentDate = new Date(); // Correctly scoped within renderCalendar
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let today = currentDate.getDate();
+        let selectedDate = null;
+
+        updateCalendar(currentMonth, currentYear); // Initial call
+
+        function updateCalendar(month, year) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startDay = firstDay.getDay();
+
+            currentMonthSpan.textContent = new Date(year, month).toLocaleString('default', { month: 'long' }) + ' ' + year;
+            calendarGrid.innerHTML = ''; // Clear the grid!
+
+            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            weekdays.forEach(weekday => {
+                const dayHeader = document.createElement('div');
+                dayHeader.classList.add('calendar-day', 'weekday-header');
+                dayHeader.textContent = weekday;
+                calendarGrid.appendChild(dayHeader);
+            });
+
+            let dayCounter = 1;
+            let todayHighlighted = false;
+
+            for (let i = 0; i < 6; i++) {
+                for (let j = 0; j < 7; j++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.classList.add('calendar-day');
+
+                    if (i === 0 && j < startDay) {
+                        // Empty cells
+                    } else if (dayCounter > daysInMonth) {
+                        // Empty cells
+                    } else {
+                        const date = new Date(year, month, dayCounter);
+                        const dateStr = date.toISOString().slice(0, 10);
+                        dayDiv.textContent = dayCounter;
+
+                        if (dayCounter === today && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                            dayDiv.classList.add('today', 'selected');
+                            selectedDate = dateStr;
+                            todayHighlighted = true;
+                            displayEvents(dateStr);
+                        }
+
+                        const dataForDate = calendarData.find(entry => entry && entry.length === 3 && entry[0] === dateStr);
+
+                        dayDiv.addEventListener('click', () => {
+                            const allDayDivs = calendarGrid.querySelectorAll('.calendar-day');
+                            allDayDivs.forEach(div => div.classList.remove('selected'));
+
+                            dayDiv.classList.add('selected');
+                            selectedDate = dateStr;
+
+                            if (dataForDate) {
+                                const totalAppointments = dataForDate[1];
+                                const urgentCount = dataForDate[2];
+                                displayEvents(dateStr, totalAppointments);
+                            } else {
+                                displayEvents(dateStr);
+                            }
+                        });
+
+                        dayCounter++;
+                    }
+                    calendarGrid.appendChild(dayDiv);
+                }
+            }
+        }
+
+        function displayEvents(dateStr, totalAppointments = 0) {
+            eventDetails.innerHTML = "";
+            if (totalAppointments > 0) {
+                eventDetails.innerHTML = `
+                    <h3>Appointments for ${dateStr}</h3>
+                    <p>Total: ${totalAppointments}</p>
+                    
+                `;
+            } else {
+                eventDetails.innerHTML = '<h3>No events for this day</h3>';
+            }
+        }
+
+
+        prevMonthButton.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateCalendar(currentMonth, currentYear);
+        });
+
+        nextMonthButton.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendar(currentMonth, currentYear);
+        });
+    }
+
     // Function to render the chart
-    function renderChart(appointmentsByStaff) {
-        const ctx = document.querySelector('.barchart').getContext('2d');
+    function renderAgeGroupBubbleChart(ageGroupData, canvasId) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
 
-        const chartData = {
-            labels: Object.keys(appointmentsByStaff),
-            datasets: [{
-                label: 'Appointments by Staff',
-                data: Object.values(appointmentsByStaff),
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        };
+        const labels = Object.keys(ageGroupData);
+        const percentages = Object.values(ageGroupData);
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
+        const dataPoints = labels.map((label, index) => ({
+            x: index,
+            y: 1,
+            r: percentages[index] * 10 // Adjust scaling factor as needed
+        }));
+
+        const colors = generateColors(labels.length);
+
+        const chart = new Chart(ctx, { // Store the chart instance
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Age Group Distribution',
+                    data: dataPoints,
+                    backgroundColor: colors,
+                    borderColor: '#fff',
+                    borderWidth: 1,
+                    hoverRadius: 10
+                }]
+            },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Age Group'
+                        },
+                        ticks: {
+                            callback: function (value, index, values) {
+                                return labels[value];
+                            }
+                        }
+                    },
                     y: {
-                        beginAtZero: true
+                        type: 'linear',
+                        display: false
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                const label = labels[context.dataIndex];
+                                const percentage = percentages[context.dataIndex];
+                                return `${label}: ${percentage}%`;
+                            }
+                        }
                     }
                 }
             }
         });
+
+        // Plugin to draw labels inside bubbles (after chart is drawn)
+        Chart.register({
+            id: 'bubbleLabelPlugin',
+            afterDraw: chart => {
+                const data = chart.data.datasets[0].data;
+                const meta = chart.getDatasetMeta(0);
+
+                ctx.font = '12px Arial'; // Adjust font size
+                ctx.fillStyle = 'black'; // Adjust color
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                data.forEach((dataPoint, index) => {
+                    const arc = meta.data[index];
+                    const centerX = arc.x;
+                    const centerY = arc.y;
+                    const radius = arc.r;
+
+                    if (centerX && centerY && radius > 0) { // Check for valid coordinates
+                        const label = labels[index];
+                        const percentage = percentages[index];
+                        const verticalOffset = 0; // Adjust vertical offset if needed
+                        ctx.fillText(`${label}\n${percentage}%`, centerX, centerY + verticalOffset);
+                    }
+                });
+            }
+        });
     }
+
+
+
+    // Function to generate distinct colors (you can customize this)
+    function generateColors(numColors) {
+        const colors = [];
+        for (let i = 0; i < numColors; i++) {
+            const hue = (i * 360) / numColors; // Distribute hues evenly
+            colors.push(`hsl(${hue}, 70%, 60%)`); // Adjust saturation and lightness as needed
+        }
+        return colors;
+    }
+
+
+
+
+
 });
+
+

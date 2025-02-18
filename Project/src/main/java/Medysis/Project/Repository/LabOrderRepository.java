@@ -2,6 +2,7 @@ package Medysis.Project.Repository;
 
 import Medysis.Project.Model.Appointment;
 import Medysis.Project.Model.LabOrder;
+import Medysis.Project.Model.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +19,7 @@ public interface LabOrderRepository extends JpaRepository<LabOrder, Integer> {
             "SUM(CASE WHEN l.urgency = 'yes' THEN 1 ELSE 0 END) AS urgentReports " +
             "FROM LabOrder l GROUP BY l.orderDate")
     List<Object[]> getLabScheduleStats();
+
+    long countByDoctorID(Staff doctor);
+
 }

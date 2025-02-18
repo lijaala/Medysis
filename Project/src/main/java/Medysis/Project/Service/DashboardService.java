@@ -1,17 +1,21 @@
 package Medysis.Project.Service;
 
+import Medysis.Project.DTO.AppointmentDTO;
+import Medysis.Project.DTO.DoctorDashboardDTO;
 import Medysis.Project.Model.Appointment;
+import Medysis.Project.Model.LabOrder;
+import Medysis.Project.Model.LabResults;
 import Medysis.Project.Model.Staff;
-import Medysis.Project.Repository.AppointmentRepository;
-import Medysis.Project.Repository.LabOrderRepository;
-import Medysis.Project.Repository.UserRepository;
-import Medysis.Project.Repository.StaffRepository;
+import Medysis.Project.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DashboardService {
@@ -24,6 +28,9 @@ public class DashboardService {
     private LabOrderRepository labOrderRepository;  // Add the LabReportRepository
     @Autowired
     private StaffRepository staffRepository;  // Add the StaffRepository
+
+    @Autowired
+    private LabOrderService labOrderService;
 
     public int getTotalPatients() {
         return (int) userRepository.count();  // Assuming all users are patients
@@ -61,4 +68,90 @@ public class DashboardService {
         }
         return chartData;
     }
+
+    //for doctor
+
+    public DoctorDashboardDTO getDoctorDashboardData(String doctorID) {
+        DoctorDashboardDTO dashboard = new DoctorDashboardDTO();
+
+
+        Optional<Staff> staffOptional = staffRepository.findById(doctorID);
+        if (staffOptional.isEmpty()) {
+            return dashboard; // Return empty dashboard if staff not found
+        }
+        Staff staff = staffOptional.get();
+
+        // Get total appointments for the doctor
+        dashboard.totalAppointments = appointmentRepository.countByDoctorID(staff);
+
+        // Get upcoming appointments
+        LocalDate today = LocalDate.now();
+        dashboard.appointmentsToday = appointmentRepository.countByDoctorIDAndAppDate(staff, today);
+
+        // Get the number of lab reports (total count)
+        dashboard.totalLabReports = labOrderRepository.countByDoctorID(staff);
+
+        dashboard.ageGroupDistribution = getAgeGroupDistribution(staff);
+
+
+        return dashboard;
+    }
+    private Map<String, Integer> getAgeGroupDistribution(Staff doctor) {
+        // Define age groups
+        Map<String, Integer> ageGroups = new HashMap<>();
+        ageGroups.put("0-18", 0);
+        ageGroups.put("19-35", 0);
+        ageGroups.put("36-50", 0);
+        ageGroups.put("51-65", 0);
+        ageGroups.put("66+", 0);
+
+        // Get all patients associated with the doctor
+        List<Appointment> appointments = appointmentRepository.findByDoctorID(doctor);
+
+        for (Appointment appointment : appointments) {
+            // Fetch the patient's age
+            int age = appointment.getPatientID().getAge(); // Adjust this based on your actual structure
+            if (age >= 0 && age <= 18) {
+                ageGroups.put("0-18", ageGroups.get("0-18") + 1);
+            } else if (age >= 19 && age <= 35) {
+                ageGroups.put("19-35", ageGroups.get("19-35") + 1);
+            } else if (age >= 36 && age <= 50) {
+                ageGroups.put("36-50", ageGroups.get("36-50") + 1);
+            } else if (age >= 51 && age <= 65) {
+                ageGroups.put("51-65", ageGroups.get("51-65") + 1);
+            } else {
+                ageGroups.put("66+", ageGroups.get("66+") + 1);
+            }
+        }
+
+        return ageGroups;
+    }
+    public Map<LocalDate, Integer> getDoctorCalendarData(String doctorID) {
+        Map<LocalDate, Integer> calendarData = new HashMap<>();
+
+        // Fetch the doctor based on the doctorID
+        Optional<Staff> staffOptional = staffRepository.findById(doctorID);
+        if (staffOptional.isEmpty()) {
+            return calendarData; // Return empty map if staff not found
+        }
+        Staff staff = staffOptional.get();
+
+        // Fetch the appointments for the doctor using the custom query in the repository
+        List<Object[]> results = appointmentRepository.getDoctorCalendarStats(staff);
+
+        // Map the results to a more usable format (LocalDate -> appointment count)
+        for (Object[] result : results) {
+            LocalDate appDate = (LocalDate) result[0]; // Assuming the date is at index 0
+            Integer count = ((Long) result[1]).intValue(); // Count is at index 1
+            calendarData.put(appDate, count);
+        }
+
+        return calendarData;
+    }
+
+
+
 }
+
+
+

@@ -107,17 +107,17 @@ public class AppointmentService {
 
     //DTO conversion
 
-    public AppointmentDTO convertToDTO(Appointment appointment) {
-        AppointmentDTO dto = new AppointmentDTO();
-        dto.appointmentID = appointment.getAppointmentID();
-        dto.patientID = userService.convertToDTO(appointment.getPatientID()); // Convert User to UserDTO
-        dto.doctorID = staffService.convertToDTO(appointment.getDoctorID()); // Convert Staff to StaffDTO
-        dto.appDate = appointment.getAppDate();
-        dto.appTime = appointment.getAppTime();
-        dto.status = appointment.getStatus();
-        dto.followUpDate = appointment.getFollowUpDate();
-        return dto;
-    }
+//    public AppointmentDTO convertToDTO(Appointment appointment) {
+//        AppointmentDTO dto = new AppointmentDTO();
+//        dto.appointmentID = appointment.getAppointmentID();
+//        dto.patientID = user; // Convert User to UserDTO
+//        dto.doctorID = staffService.convertToDTO(appointment.getDoctorID()); // Convert Staff to StaffDTO
+//        dto.appDate = appointment.getAppDate();
+//        dto.appTime = appointment.getAppTime();
+//        dto.status = appointment.getStatus();
+//        dto.followUpDate = appointment.getFollowUpDate();
+//        return dto;
+//    }
      public List<Appointment> getAllAppointments(){
         return appointmentRepository.findAll();
      }

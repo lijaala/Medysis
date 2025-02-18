@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -27,5 +28,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query("SELECT a.appDate, COUNT(a), SUM(CASE WHEN a.status = 'Pending' THEN 1 ELSE 0 END) " +
             "FROM Appointment a GROUP BY a.appDate")
     List<Object[]> getCalendarStats();
+
+
+    @Query("SELECT a.appDate, COUNT(a), SUM(CASE WHEN a.status = 'Pending' THEN 1 ELSE 0 END) " +
+            "FROM Appointment a WHERE a.doctorID = :doctor GROUP BY a.appDate")
+    List<Object[]> getDoctorCalendarStats(@Param("doctor") Staff doctor);
+
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.doctorID.staffID = :doctorID AND a.appDate >= CURRENT_DATE")
+    long countUpcomingAppointmentsForDoctor(@Param("doctorID") String doctorID);
+
+    long countByDoctorIDAndAppDate(Staff doctor, LocalDate date);
+
 
 }

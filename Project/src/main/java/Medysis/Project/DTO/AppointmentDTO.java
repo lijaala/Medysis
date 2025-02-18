@@ -13,6 +13,6 @@ public class AppointmentDTO {
     public LocalTime appTime;
     public String status;
     public LocalDate followUpDate;
-
+    public String patientName;
     // No constructors needed (usually)
 }
