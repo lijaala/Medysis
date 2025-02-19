@@ -22,4 +22,7 @@ public interface LabOrderRepository extends JpaRepository<LabOrder, Integer> {
 
     long countByDoctorID(Staff doctor);
 
+    long countByLabStatus(String status);
+    long countByLabStatusAndUrgency(String status, String urgency);
+
 }

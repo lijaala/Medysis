@@ -31,6 +31,8 @@ public class DashboardService {
 
     @Autowired
     private LabOrderService labOrderService;
+    @Autowired
+    private LabTestRepository labTestRepository;
 
     public int getTotalPatients() {
         return (int) userRepository.count();  // Assuming all users are patients
@@ -148,6 +150,20 @@ public class DashboardService {
 
         return calendarData;
     }
+
+    //for lab tech
+    public long getTotalLabTests() {
+        return labTestRepository.count(); // Count total lab tests
+    }
+
+    public long getPendingLabRequests() {
+        return labOrderRepository.countByLabStatus("Pending"); // Assuming 'Pending' is the status for pending requests
+    }
+
+    public long getUrgentPendingLabRequests() {
+        return labOrderRepository.countByLabStatusAndUrgency("Pending", "High"); // Fetch urgent pending lab requests
+    }
+
 
 
 

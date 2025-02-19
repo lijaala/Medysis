@@ -44,4 +44,15 @@ public class DashboardController {
 
         return ResponseEntity.ok(dashboardData);
     }
+
+    @GetMapping("/lab-tech")
+    public ResponseEntity<Map<String, Object>> getLabTechnicianDashboard() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalLabTests", dashboardService.getTotalLabTests());
+        response.put("pendingLabRequests", dashboardService.getPendingLabRequests());
+        response.put("urgentPendingLabRequests", dashboardService.getUrgentPendingLabRequests());
+
+        return ResponseEntity.ok(response);
+    }
+
 }
