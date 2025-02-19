@@ -36,14 +36,16 @@
     <section id="labDashboard" class="section">
         <div class="main" th:include="dashboardAndStaff::labTech"></div>
     </section>
-
+    <!--Add Staff-->
     <section id="staff" class="section" > 
         <div class="main" th:include="dashboardAndStaff::staff"></div>
     </section>
+    <!-- ADD user Admin-->
     <section id="patients" class="section" >
         <div class="main" th:include="register::user"></div>
 
     </section>
+    <!--ADD Appointments-->
     <section id="appointments" class="section">
         <div class=" main " th:include="viewAppointments::appointments"></div>
     </section>
@@ -59,9 +61,6 @@
     <section id="labReports" class="section">
         <div class=" main " th:include="viewAppointments::appointments"></div>
     </section>
-
-
-
 
     <section id="settings" class="section" >Settings</section>
 
@@ -79,7 +78,7 @@
 <script src="js/dashboard.js"></script>
 
 <script>
-    document.getElementById('role').addEventListener('change', function() {
+    document.querySelector('.role').addEventListener('change', function() {
         var role = this.value;
         console.log("Selected Role:", role);
 

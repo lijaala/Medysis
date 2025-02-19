@@ -101,9 +101,26 @@ public class StaffService {
 
         return dto; // That's it! No role or other fields
     }
-    public Staff findStaffById(String staffId) { // New: Service method to find staff by ID
-        return staffRepository.findById(staffId).orElse(null);
+    public List<Staff> getAllStaff() {
+        return staffRepository.findAll();
     }
+
+    public Staff updateStaffAvailability(String staffID, Staff updatedStaff) {
+        Optional<Staff> existingStaffOpt = staffRepository.findById(staffID);
+
+        if (existingStaffOpt.isPresent()) {
+            Staff existingStaff = existingStaffOpt.get();
+
+            // Ensure only start time and end time are updated
+            existingStaff.setStartTime(updatedStaff.getStartTime());
+            existingStaff.setEndTime(updatedStaff.getEndTime());
+
+            return staffRepository.save(existingStaff);
+        } else {
+            throw new RuntimeException("Staff with ID " + staffID + " not found.");
+        }
+    }
+
 }
 
 

@@ -356,6 +356,7 @@ td.actions button{
     align-items: center; /* Center horizontally */
     justify-content: center; /* Center vertically */
     transition: all 0.3s ease;
+    overflow-y: scroll;
 }
 
 /* Blur the background */
@@ -377,11 +378,13 @@ td.actions button{
     border-radius: 8px;
     min-width: 40%;
     width: fit-content;
+    height: fit-content;
     position: relative;
     z-index: 10000;
     display: flex;
     flex-direction: column;
     gap:2vh;
+    overflow-y: scroll;
 }
 .modal-content h3{
     color: rgb( 255, 52, 147);

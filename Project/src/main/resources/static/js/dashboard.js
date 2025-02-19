@@ -64,7 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-
             let doctorCalendarData = [];
             if (data.appointmentsPerDay) {
                 doctorCalendarData = Object.entries(data.appointmentsPerDay).map(([date, appointments]) => [date, appointments, 0]);
@@ -130,9 +129,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const eventDetails = document.createElement('div'); // Create a div for event details
         eventDetails.classList.add('event-details'); // Add a class for styling
         document.querySelector('.calendar').appendChild(eventDetails); // Append it to the calendar container
-
-
-
 
         let currentDate = new Date();
         let currentMonth = currentDate.getMonth();
@@ -307,7 +303,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
 
                         const dataForDate = calendarData.find(entry => entry && entry.length === 3 && entry[0] === dateStr);
-
                         dayDiv.addEventListener('click', () => {
                             const allDayDivs = calendarGrid.querySelectorAll('.calendar-day');
                             allDayDivs.forEach(div => div.classList.remove('selected'));
@@ -336,15 +331,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (totalAppointments > 0) {
                 eventDetails.innerHTML = `
                     <h3>Appointments for ${dateStr}</h3>
-                    <p>Total: ${totalAppointments}</p>
-                    
+                    <p>Total: ${totalAppointments}</p>              
                 `;
             } else {
                 eventDetails.innerHTML = '<h3>No events for this day</h3>';
             }
         }
-
-
         prevMonthButton.addEventListener('click', () => {
             currentMonth--;
             if (currentMonth < 0) {
@@ -454,10 +446,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-
-
-
-    // Function to generate distinct colors (you can customize this)
+    // Function to generate distinct colors
     function generateColors(numColors) {
         const colors = [];
         for (let i = 0; i < numColors; i++) {
@@ -467,14 +456,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return colors;
     }
 
-
-
-
+//Lab Tech stats
     fetch('/api/dashboard/lab-tech')
         .then(response => response.json())
         .then(data => {
             console.log("Fetched data:", data); // Debugging step
-
             if (data.totalLabTests != undefined) {
                 document.getElementById('totalTests').textContent = data.totalLabTests;
 
@@ -492,11 +478,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Pending Requests  is missing in API response.");
             }
         })
-
-
-
-
-
 });
 
 

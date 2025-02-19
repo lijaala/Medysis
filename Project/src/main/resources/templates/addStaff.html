@@ -2,8 +2,14 @@
 
 
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="addStaffForm">
+<div id="addStaffModal" class="modal" style="display: none;">
 
-<form action="api/admin/addStaff" method="POST" class="form"  enctype="multipart/form-data">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+
+        <span class="close" onclick="closeStaffModal()">&times;</span>
+        <h3>Add Staff</h3>
+    <form action="api/admin/addStaff" method="POST"  enctype="multipart/form-data">
     <div class="form-row">
         <div class="form-field">
             <label for="staffName" >Full Name</label>
@@ -44,12 +50,12 @@
     </div>
     <div class="form-row">
         <div class="form-field">
-            <label for="image" >Add Profil Picture</label>
+            <label for="image" >Add Profile Picture</label>
             <input type="file" id="image" name="image" >
         </div>
         <div class="form-field">
             <label for="role" >Role</label>
-            <select id="role" name="role" required>
+            <select id="role" name="role" class="role"required>
                 <option value=""> Select Roles</option>
 
             </select>
@@ -76,8 +82,42 @@
     <button type="submit" class="primary"> Add Staff</button>
 
 </form>
+    </div>
+
+</div>
 
 
+
+    <div id="editStaffModal" class="modal" style="display: none;">
+
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+
+            <span class="close" onclick="closeEditStaffModal()">&times;</span>
+            <h3>Edit Availability</h3>
+            <form >
+
+
+                <div  class="form-row">
+                    <input type="hidden" id="editStaffID">
+
+                    <div class="form-field">
+
+                        <label for="editStartTime" >Start Time</label>
+                        <input type="time" id="editStartTime" name="startTime" >
+                    </div>
+                    <div class="form-field">
+                        <label for="editEndTime" >End Time</label>
+                        <input type="time" id="editEndTime" name="endTime" >
+                    </div>
+
+                </div>
+                <button type="submit" class="primary"> Save</button>
+
+            </form>
+        </div>
+
+    </div>
 
 </section>
 
