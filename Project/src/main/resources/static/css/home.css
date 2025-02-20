@@ -271,7 +271,7 @@ th,td {
     margin:2vh;
     text-align: center;
     align-items: center;
-    width:15vw;
+    width:fit-content;
     text-wrap: nowrap;
 
 
@@ -521,4 +521,9 @@ button#addMedicationBtn {
 }
 #labTest .form-row input{
     flex:2;
+}
+
+.Table input, .Table select{
+    width:80%;
+    height:5vh;
 }

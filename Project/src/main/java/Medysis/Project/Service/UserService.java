@@ -33,10 +33,14 @@ public class UserService {
     @Autowired
     private RoleService roleService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       EmailService emailService, AvailabilityRepository availabilityRepository,
+                       RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = new EmailService();
+        this.emailService = emailService;
+        this.availabilityRepository = availabilityRepository;
+        this.roleService = roleService;
     }
 
     public void registerUser(User user) {
@@ -90,8 +94,27 @@ public class UserService {
         return dto; // That's it! No role or other fields
     }
 
-    public User findUserById(Integer userId) { // New: Service method to find user by ID
-        return userRepository.findById(userId).orElse(null);
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public boolean updateUser(Integer userID, User updatedUser) {
+        Optional<User> existingUserOpt = userRepository.findById(userID);
+
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+
+            // Update the relevant fields
+            existingUser.setName(updatedUser.getName());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setVerified(updatedUser.isVerified());
+
+            // Save the updated user
+            userRepository.save(existingUser);
+            return true;
+        }
+        return false; // User not found
     }
 
     }

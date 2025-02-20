@@ -20,11 +20,37 @@
             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10.268 21a2 2 0 0 0 3.464 0m-10.47-5.674A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
         </svg>
         <div class="loggedProfile">
-            <div class="profile-picture">
-                
-            </div>
-            <span>Logged User Name</span>
+
+            <img id="profilePic" src="" alt="Profile Picture" style="display: none; width: 60px; height: 60px; border-radius: 50%;" />
+            <p id="staffName">Loading...</p>
         </div>
+
     </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/api/staff/current")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Staff not logged in");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Fetched Data:", data);
+
+                document.getElementById("staffName").textContent = data.name || "Guest Staff";
+
+                if (data.profilePicture) {
+                    document.getElementById("profilePic").src = data.profilePicture;
+                    document.getElementById("profilePic").style.display = "block";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching session data:", error);
+                document.getElementById("staffName").textContent = "Guest Staff";
+            });
+    });
+</script>
 </header>

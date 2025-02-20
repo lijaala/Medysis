@@ -95,14 +95,14 @@ function fetchStaffData() {
             return response.json();
         })
         .then(data => {
-            populateTable(data);
+            populateStaffTable(data);
         })
         .catch(error => {
             console.error("Error fetching staff data:", error);
         });
 }
 
-function populateTable(staffList) {
+function populateStaffTable(staffList) {
     const tableBody = document.getElementById("staffTableBody");
     tableBody.innerHTML = ""; // Clear existing table data
 
@@ -136,11 +136,28 @@ function populateTable(staffList) {
             </button>
         `;
 
+        let simplifiedRole = "N/A"; // Default role if none found
+        if (staff.role.role) {
+            switch (staff.role.role) {
+                case "ROLE_ADMIN":
+                    simplifiedRole = "Admin";
+                    break;
+                case "ROLE_DOCTOR":
+                    simplifiedRole = "Doctor";
+                    break;
+                case "ROLE_LAB TECHNICIAN":
+                    simplifiedRole = "Lab Technician";
+                    break;
+                default:
+                    simplifiedRole = "N/A";
+            }
+        }
+
         row.innerHTML = `
             <td>${staff.staffName}</td>
-            <td>${staff.role ? staff.role.role : "N/A"}</td>
-            <td>${staff.lastActive ? formatDateTime(staff.lastActive) : "Never"}</td>
-            <td>${formatDateTime(staff.addedOn)}</td>
+            <td>${simplifiedRole}</td>
+            <td>${staff.staffEmail}</td>
+            <td>${staff.staffPhone}</td>
             <td class="actions">
                 
                 ${deleteButton}
@@ -154,17 +171,7 @@ function populateTable(staffList) {
     });
 }
 
-function formatDateTime(dateTimeString) {
-    if (!dateTimeString) return "N/A";
-    const date = new Date(dateTimeString);
-    return date.toLocaleString();
-}
-// Open the edit staff modal and populate it with existing data
 
-
-
-
-// Function to submit updated staff data
 
 
 

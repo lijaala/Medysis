@@ -19,9 +19,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const tbody = document.getElementById('appointmentTableBody');
         const doctorColumnIndex = 1;
 
-        if (userRole === 'ROLE_DOCTOR') {
-            const headers = document.querySelectorAll('.Table thead tr td');
-            headers[doctorColumnIndex].style.display = 'none';
+        tbody.innerHTML = ''; // Clear the table before adding new rows
+
+        if (userRole.includes("DOCTOR")) {
+            // Remove doctor column from the table header
+            const headerCells = document.querySelectorAll('.appTable thead tr td.doctor-column');
+            headerCells.forEach(cell => cell.remove());
         }
 
         if (Array.isArray(appointments)) {
@@ -32,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 row.innerHTML = `
                         <td>${appointment.patientID?.name || 'Unknown Patient'}</td>
-                        <td>${appointment.doctorID?.staffName || 'Unknown Doctor'}</td>
+                        <td class="doctor-column">${appointment.doctorID?.staffName || 'Unknown Doctor'}</td>
                         <td>${appointment.appDate || 'N/A'}</td>
                         <td>${appointment.appTime || 'N/A'}</td>
                         <td>${appointment.status || 'N/A'}</td>
@@ -48,17 +51,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                         </td>
                     `;
                 tbody.appendChild(row);
+
             });
 
-            if (userRole === 'ROLE_DOCTOR') {
-                const rows = tbody.querySelectorAll('tr');
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length > doctorColumnIndex) {
-                        cells[doctorColumnIndex].style.display = 'none';
-                    }
-                });
+            if (userRole.includes("DOCTOR")) {
+                const bodyCells = document.querySelectorAll('.appTable tbody tr td.doctor-column');
+                bodyCells.forEach(cell => cell.style.display = 'none');
             }
+
+
+
+
         } else {
             tbody.innerHTML = `<tr><td colspan="6">No appointments found</td></tr>`;
         }

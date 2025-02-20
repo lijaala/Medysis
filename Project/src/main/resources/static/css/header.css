@@ -47,10 +47,9 @@
 }
 
 .profile-picture {
-    border: 1px black solid;
-    width: 24px;
-    height: 24px;
+    width: fit-content;
+    height: fit-content;
     border-radius: 50%;
-    background-color: rgb(240, 242, 249);
-
+    display: flex;
+    gap: 3vh;
 }

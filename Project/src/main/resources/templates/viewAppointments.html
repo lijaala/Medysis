@@ -2,11 +2,11 @@
 
     <div>
 
-        <table class="Table" >
+        <table class="Table appTable" >
             <thead>
             <tr>
                 <td>Patient</td>
-                <td>Doctor</td>
+                <td class="doctor-column">Doctor</td>
                 <td>Date</td>
                 <td>Time</td>
                 <td>Status</td>
@@ -43,8 +43,40 @@
             </form>
         </div>
     </div>
+    <div id="addAppModal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div> <!-- Blur background -->
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h3>Edit Appointment</h3>
+            <form id="addAppointmentForm" action="appointment/edit" method="post">
+                <label for="doctor">Choose Doctor</label>
+                <input type="date" id="doctor" name="doctor">
+
+                <label for="patient">Select Patient:</label>
+                <input type="time" id="patient" name="patient">
+
+                <label for="appDate">Date:</label>
+                <select id="appDate" name="appDate">
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <label for="appTime">Time</label>
+                <select id="appTime" name="appTime">
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+
+                <button type="button" class="primary " onclick="saveAppointmentChanges()">Save Changes</button>
+            </form>
+        </div>
+    </div>
     <div id="messageBox" style="display: none; padding: 10px; text-align: center; font-weight: bold;"></div>
     <div class=" main " th:include="diagnose::diagnosisModal"></div>
+
+    <script src="js/viewAppointment.js"></script>
+
 </section>
 
 
