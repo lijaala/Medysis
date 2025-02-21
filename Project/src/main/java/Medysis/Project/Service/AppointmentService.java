@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AppointmentService {
@@ -24,11 +25,7 @@ public class AppointmentService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private StaffService staffService;
 
     public Appointment bookAppointment(Integer patientID, String doctorID, LocalDate appDate, LocalTime appTime) {
         User patient = userRepository.findById(patientID)
@@ -103,6 +100,13 @@ public class AppointmentService {
         appointment.setStatus("Completed"); // Update the status
         appointmentRepository.save(appointment); // Save the changes
     }
+    public boolean appointmentExists(Integer patientID, String doctorID, LocalDate appDate, LocalTime appTime) {
+        User patient = userRepository.findById(patientID)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+        Staff doctor = staffRepository.findById(doctorID)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+        return appointmentRepository.existsByPatientIDAndDoctorIDAndAppDateAndAppTime(patient, doctor, appDate, appTime);
+    }
 
 
     //DTO conversion
@@ -121,5 +125,17 @@ public class AppointmentService {
      public List<Appointment> getAllAppointments(){
         return appointmentRepository.findAll();
      }
+
+    public List<Appointment> getAppointmentsByDoctorAndDate(String doctorID, LocalDate date) {
+        // Fetch the Staff entity from the repository
+        Optional<Staff> staffOpt = staffRepository.findById(doctorID);
+
+        if (staffOpt.isPresent()) {
+            Staff doctor = staffOpt.get();
+            return appointmentRepository.findByDoctorIDAndAppDate(doctor, date);
+        } else {
+            throw new RuntimeException("Doctor with ID " + doctorID + " not found.");
+        }
+    }
 
 }

@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/appointment")
@@ -120,4 +123,81 @@ public class AppointmentController {
     public List<Appointment> getAllAppointments() { // Returns List<Appointment> (no change)
         return appointmentService.getAllAppointments();
     }
+
+
+    @GetMapping("/availableSlots")
+    public List<String> getAvailableSlots(@RequestParam("doctorID") String doctorID,
+                                          @RequestParam("date") String dateStr) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(dateStr, dateFormatter);
+
+
+
+        // Fetch the doctor's availability from the repository
+        Optional<Staff> doctorOpt = staffRepository.findById(doctorID);
+        if (doctorOpt.isEmpty()) {
+            System.out.println("Doctor not found in database: " + doctorID);
+            return List.of("Doctor not found");
+        }
+        System.out.println("Received doctorID: " + doctorID);
+        System.out.println("Received date: " + dateStr);
+
+
+        Staff doctor = doctorOpt.get();
+        LocalTime startTime = doctor.getStartTime();
+        LocalTime endTime = doctor.getEndTime();
+        System.out.println("Doctor found: " + doctor.getStaffName());
+        System.out.println("Start Time: " + doctor.getStartTime());
+        System.out.println("End Time: " + doctor.getEndTime());
+
+
+        if (startTime == null || endTime == null) {
+            return List.of("Doctor's availability not set");
+        }
+
+        // Generate time slots (e.g., every 30 minutes)
+        List<String> timeSlots = new ArrayList<>();
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
+
+        LocalTime slot = startTime;
+        while (slot.isBefore(endTime)) {
+            timeSlots.add(slot.format(timeFormatter));
+            slot = slot.plusMinutes(8); // Adjust slot duration as needed
+        }
+
+        // Fetch existing appointments for the doctor on the given date
+        List<Appointment> bookedAppointments = appointmentService.getAppointmentsByDoctorAndDate(doctorID, date);
+
+        // Remove already booked slots
+        timeSlots.removeIf(slotTime -> bookedAppointments.stream()
+                .anyMatch(appt -> appt.getAppTime().format(timeFormatter).equals(slotTime)));
+
+        return timeSlots;
+    }
+
+
+    @PostMapping("/admin/book")
+    public String bookAppointmentForPatient(
+            @RequestParam("patientID") Integer patientID,  // Admin will provide patientID
+            @RequestParam("doctor") String doctor,
+            @RequestParam("date") String appDateStr,
+            @RequestParam("time") String appTimeStr) {
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH); // 12-hour format with AM/PM
+
+
+        // Parse date & time
+        LocalDate appDate = LocalDate.parse(appDateStr, dateFormatter);
+        LocalTime appTime = LocalTime.parse(appTimeStr, timeFormatter);
+        if (appointmentService.appointmentExists(patientID, doctor, appDate, appTime)) {
+            return "Appointment already exists."; // Return error message
+        }
+
+        // Call service to book appointment
+        Appointment appointment = appointmentService.bookAppointment(patientID, doctor, appDate, appTime);
+
+        return "Appointment added successfully by Admin.";
+    }
+
 }

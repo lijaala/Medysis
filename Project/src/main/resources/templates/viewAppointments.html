@@ -1,5 +1,14 @@
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="appointments">
+    <div class="search2">
+        <button class="primary"  onclick="openAddAppointment()"> Add Appointments</button>
 
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 3H2l8 9.46V19l4 2v-8.54z" />
+        </svg>
+
+
+
+    </div>
     <div>
 
         <table class="Table appTable" >
@@ -24,6 +33,8 @@
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h3>Edit Appointment</h3>
+            <div id="editApp-message" ></div>
+
             <form id="editAppointmentForm" action="appointment/edit" method="post">
                 <label for="editAppDate">Appointment Date:</label>
                 <input type="date" id="editAppDate" name="appDate">
@@ -43,36 +54,38 @@
             </form>
         </div>
     </div>
+
     <div id="addAppModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div> <!-- Blur background -->
         <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
-            <h3>Edit Appointment</h3>
-            <form id="addAppointmentForm" action="appointment/edit" method="post">
-                <label for="doctor">Choose Doctor</label>
-                <input type="date" id="doctor" name="doctor">
+            <span class="close" onclick="closeAddAppointment()">&times;</span>
+            <h3>Add Appointment</h3>
+            <div id="addApp-message" ></div>
+            <form id="addAppointmentForm">
+                <label for="doctorDropdown">Choose Doctor</label>
+                <select id="doctorDropdown" name="doctor">
+                    <option value=""> Select Doctor</option>
+                </select>
 
-                <label for="patient">Select Patient:</label>
-                <input type="time" id="patient" name="patient">
+                <label for="patientDropdown">Choose Doctor</label>
+                <select id="patientDropdown" name="doctor">
+                    <option value=""> Select Patient</option>
+                </select>
 
                 <label for="appDate">Date:</label>
-                <select id="appDate" name="appDate">
-                    <option value="Pending">Pending</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
+                <input type="date" id="appDate" name="appDate">
+
                 <label for="appTime">Time</label>
                 <select id="appTime" name="appTime">
-                    <option value="Pending">Pending</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="">Select Time Slot</option>
                 </select>
 
-                <button type="button" class="primary " onclick="saveAppointmentChanges()">Save Changes</button>
+
+                <button type="submit" class="primary " >Book Appointment</button>
+
             </form>
         </div>
     </div>
-    <div id="messageBox" style="display: none; padding: 10px; text-align: center; font-weight: bold;"></div>
     <div class=" main " th:include="diagnose::diagnosisModal"></div>
 
     <script src="js/viewAppointment.js"></script>

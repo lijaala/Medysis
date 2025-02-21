@@ -42,12 +42,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td class="actions">
                             <button type="button" class="edit" onclick="openEditModal('${appointment.appointmentID}', '${appointment.appDate}', '${appointment.appTime}', '${appointment.status}')">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-\t<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-\t\t<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-\t\t<path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
-\t</g>
-</svg></button>
-                            ${userRole === 'ROLE_DOCTOR' ? `<button type="submit" class="primary" onclick="startAppointment('${appointment.appointmentID}')">Start</button>` : ''}
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                    <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                    <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+                                </g>
+                            </svg>
+                            </button>
+                            ${userRole === 'ROLE_DOCTOR' ? `
+<button type="submit" class="primary" onclick="startAppointment('${appointment.appointmentID}')">Start</button>` : ''}
                         </td>
                     `;
                 tbody.appendChild(row);
@@ -90,6 +92,7 @@ function saveAppointmentChanges() {
     const appTime = document.getElementById("editAppTime").value;
     const status = document.getElementById("editStatus").value;
     const modalContent= document.querySelector(".modal-content");
+    const messageBox=document.getElementById("editApp-message");
 
     // Prepare the form data
     const data = new URLSearchParams();
@@ -121,9 +124,12 @@ function saveAppointmentChanges() {
             <h3>${status === "Cancelled" ? "Appointment Cancelled" : "Appointment Updated"}</h3>
             <p>${status === "Cancelled" ? "This appointment has been successfully cancelled." : "The appointment details have been updated successfully."}</p>
         `;
+            messageBox.textContent = "Appointment Edited Successfully!";
+            messageBox.classList.add('message');
 
             // Hide modal after 3 seconds
             setTimeout(() => {
+
                 closeEditModal();
 
             }, 5000);
@@ -132,3 +138,184 @@ function saveAppointmentChanges() {
             console.error("Error editing appointment:", error);
         });
 }
+
+function openAddAppointment(){
+    const addApp=document.getElementById("addAppModal");
+    addApp.style.display="flex";
+    populateDropdowns();
+}
+
+function closeAddAppointment(){
+    const addApp=document.getElementById("addAppModal");
+    addApp.style.display="none";}
+
+
+async function populateDropdowns() {
+    try {
+        // Fetch patients
+        const patientResponse = await fetch('/api/user/all', { method: 'GET' });
+        if (!patientResponse.ok) {
+            console.error("Failed to fetch patients:", patientResponse.status);
+            return;
+        }
+        const patients = await patientResponse.json();
+        const patientDropdown = document.getElementById("patientDropdown");
+        patientDropdown.innerHTML = '<option value="">Select Patient</option>';
+
+        patients.forEach(patient => {
+            const option = document.createElement("option");
+            option.value = patient.userID;
+            option.textContent = patient.name;
+            patientDropdown.appendChild(option);
+        });
+
+        // Fetch doctors
+        const doctorResponse = await fetch('/appointment/fetchDoctors', { method: 'POST' });
+        if (!doctorResponse.ok) {
+            console.error("Failed to fetch doctors:", doctorResponse.status);
+            return;
+        }
+        const doctors = await doctorResponse.json();
+        const doctorDropdown = document.getElementById("doctorDropdown");
+        doctorDropdown.innerHTML = '<option value="">Select Doctor</option>';
+
+        doctors.forEach(doctor => {
+            const option = document.createElement("option");
+            option.value = doctor.staffID;
+            option.textContent = doctor.staffName;
+            doctorDropdown.appendChild(option);
+        });
+
+
+    } catch (error) {
+        console.error("Error fetching dropdown data:", error);
+    }
+
+    async function generateTimeSlots(doctorID) {
+        if (!doctorID) return;
+
+        const date = document.getElementById("appDate").value;
+        if (!date) return;
+
+        const encodedDoctorID = encodeURIComponent(doctorID); // Properly encode doctorID
+        console.log("Fetching slots for:", encodedDoctorID, "on", date);
+
+        try {
+            const response = await fetch(`/appointment/availableSlots?doctorID=${encodedDoctorID}&date=${date}`);
+
+            if (!response.ok) {
+                console.error("Failed to fetch available slots:", response.status);
+                return;
+            }
+
+            const availableSlots = await response.json();
+            console.log("Slots received:", availableSlots);
+
+            const timeDropdown = document.getElementById("appTime");
+            timeDropdown.innerHTML = '<option value="">Select Time Slot</option>';
+
+            if (Array.isArray(availableSlots) && availableSlots.length > 0) {
+                availableSlots.forEach(slot => {
+                    const option = document.createElement("option");
+                    option.value = slot;
+                    option.textContent = slot;
+                    timeDropdown.appendChild(option);
+                });
+            } else {
+                timeDropdown.innerHTML = '<option value="">No Slots Available</option>';
+            }
+        } catch (error) {
+            console.error("Error fetching slots:", error);
+        }
+    }
+
+
+// Event listeners to trigger slot generation
+    document.getElementById("doctorDropdown").addEventListener("change", function () {
+        generateTimeSlots(this.value);
+    });
+
+    document.getElementById("appDate").addEventListener("change", function () {
+        const doctorID = document.getElementById("doctorDropdown").value;
+        if (doctorID) {
+            generateTimeSlots(doctorID);
+        }
+    });
+
+}
+
+const addAppointmentForm = document.getElementById("addAppointmentForm");
+
+async function handleAddAppointmentSubmit(event) {
+    event.preventDefault();
+
+    addAppointmentForm.removeEventListener("submit", handleAddAppointmentSubmit); // Remove the listener
+
+    const submitButton = addAppointmentForm.querySelector("button[type='submit']");
+    submitButton.disabled = true; // Disable the button
+
+    const doctorId = document.getElementById("doctorDropdown").value;
+    const patientId = document.getElementById("patientDropdown").value;
+    const appointmentDate = document.getElementById("appDate").value;
+    const appointmentTime = document.getElementById("appTime").value;
+    const messageBox = document.getElementById("addApp-message");
+
+    if (!messageBox) {
+        console.error("Error: messageBox element not found.");
+        return;
+    }
+
+    if (!doctorId ||!patientId ||!appointmentDate ||!appointmentTime) {
+        messageBox.textContent = "Please fill in all fields before submitting.";
+        messageBox.classList.add('message');
+        messageBox.style.display = 'block';
+        submitButton.disabled = false;
+        //Re-add the event listener.
+        addAppointmentForm.addEventListener("submit", handleAddAppointmentSubmit);
+        return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("patientID", patientId);
+    formData.append("doctor", doctorId);
+    formData.append("date", appointmentDate);
+    formData.append("time", appointmentTime);
+
+    try {
+        const response = await fetch('/appointment/admin/book', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            credentials: 'same-origin',
+            body: formData.toString()
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to book appointment.");
+        } else {
+            messageBox.textContent = "Appointment booked successfully!";
+            messageBox.classList.add('message');
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                closeAddAppointment();
+                location.reload();
+            }, 3000);
+        }
+    } catch (error) {
+        console.error("Error booking appointment:", error);
+        messageBox.textContent = "An error occurred while booking the appointment. Please try again.";
+        messageBox.classList.add('message');
+        messageBox.style.display = 'block';
+    } finally {
+        submitButton.disabled = false;
+        //Re-add the event listener.
+        addAppointmentForm.addEventListener("submit", handleAddAppointmentSubmit);
+    }
+}
+
+addAppointmentForm.addEventListener("submit", handleAddAppointmentSubmit);
+
+
+
+
