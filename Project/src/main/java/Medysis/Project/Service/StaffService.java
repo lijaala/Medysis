@@ -120,6 +120,51 @@ public class StaffService {
             throw new RuntimeException("Staff with ID " + staffID + " not found.");
         }
     }
+    public Staff getProfile(String staffId) {
+        return staffRepository.findById(staffId).orElse(null);
+    }
+
+    public Staff updateProfile(String staffId, Staff updatedStaff) {
+        Optional<Staff> optionalStaff = staffRepository.findById(staffId);
+
+        if (optionalStaff.isEmpty()) {
+            throw new RuntimeException("Staff not found");
+        }
+
+        Staff existingStaff = optionalStaff.get();
+
+        // Update only non-null and non-empty fields
+        if (updatedStaff.getStaffName() != null) {
+            existingStaff.setStaffName(updatedStaff.getStaffName());
+        }
+        if (updatedStaff.getStaffEmail() != null) {
+            existingStaff.setStaffEmail(updatedStaff.getStaffEmail());
+        }
+        if (updatedStaff.getStaffPhone() != null) {
+            existingStaff.setStaffPhone(updatedStaff.getStaffPhone());
+        }
+        if (updatedStaff.getStaffAddress() != null) {
+            existingStaff.setStaffAddress(updatedStaff.getStaffAddress());
+        }
+        if (updatedStaff.getGender() != null) {
+            existingStaff.setGender(updatedStaff.getGender());
+        }
+        if (updatedStaff.getAge() != null) {
+            existingStaff.setAge(updatedStaff.getAge());
+        }
+
+        // Only update availability if the staff is a doctor
+        if ("DOCTOR_DOCTOR".equals(existingStaff.getRole().getRole())) {
+            if (updatedStaff.getStartTime() != null) {
+                existingStaff.setStartTime(updatedStaff.getStartTime());
+            }
+            if (updatedStaff.getEndTime() != null) {
+                existingStaff.setEndTime(updatedStaff.getEndTime());
+            }
+        }
+
+        return staffRepository.save(existingStaff);
+    }
 
 }
 

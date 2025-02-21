@@ -6,6 +6,7 @@ import Medysis.Project.Repository.StaffRepository;
 import Medysis.Project.Service.StaffService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,6 +67,28 @@ public class StaffController {
         response.put("profilePicture", profilePicturePath);
 
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("getProfile")
+    public ResponseEntity<Staff> getProfile(HttpSession session) {
+        String staffId = (String) session.getAttribute("userId");
+
+        if (staffId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Staff staff = staffService.getProfile(staffId);
+        return ResponseEntity.ok(staff);
+    }
+    @PutMapping("/update")
+    public ResponseEntity<Staff> updateProfile(@RequestBody Staff updatedStaff, HttpSession session) {
+        String staffId = (String) session.getAttribute("userId");
+
+        if (staffId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Staff savedStaff = staffService.updateProfile(staffId, updatedStaff);
+        return ResponseEntity.ok(savedStaff);
     }
 
 

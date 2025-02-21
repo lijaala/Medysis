@@ -1,46 +1,53 @@
-document.addEventListener("DOMContentLoaded",function(){
+document.addEventListener("DOMContentLoaded", function () {
+
+
+
     fetchRoles();
     fetchStaffData();
+    loadProfileData();
+    setupProfileFormSubmission();
+    loadProfilePicture();
+
 })
 
-async function fetchRoles(){
-    try{
-        const response=await fetch('api/roles');
+async function fetchRoles() {
+    try {
+        const response = await fetch('api/roles');
         console.log(response);
-        if(!response.ok){
-            throw new Error ("Failed to fetch roles");
+        if (!response.ok) {
+            throw new Error("Failed to fetch roles");
 
         }
-        const roles=await response.json();
+        const roles = await response.json();
         populateRolesDropdown(roles);
 
 
-    }
-    catch(error){
+    } catch (error) {
         console.log('Error fetching roles:', error)
     }
 }
 
-function populateRolesDropdown(roles){
-    const roleSelect=document.querySelector('.role');
+function populateRolesDropdown(roles) {
+    const roleSelect = document.querySelector('.role');
 
-    roles.forEach(role=>{
+    roles.forEach(role => {
         console.log(roles);
-        const option=document.createElement('option');
-        option.value=role.roleID;
-        option.textContent=role.role;
+        const option = document.createElement('option');
+        option.value = role.roleID;
+        option.textContent = role.role;
         roleSelect.appendChild(option);
     })
 }
 
-function openAddStaffForm(){
-    const staffForm=document.getElementById("addStaffModal");
-    staffForm.style.display="flex";
+function openAddStaffForm() {
+    const staffForm = document.getElementById("addStaffModal");
+    staffForm.style.display = "flex";
 
 }
-function closeStaffModal(){
-    const staffForm=document.getElementById("addStaffModal");
-    staffForm.style.display="none";
+
+function closeStaffModal() {
+    const staffForm = document.getElementById("addStaffModal");
+    staffForm.style.display = "none";
 
 }
 
@@ -78,11 +85,9 @@ function openEditStaffModal(staffID) {
 }
 
 
-
-
-function closeEditStaffModal(){
-    const staffForm=document.getElementById("editStaffModal");
-    staffForm.style.display="none";
+function closeEditStaffModal() {
+    const staffForm = document.getElementById("editStaffModal");
+    staffForm.style.display = "none";
 
 }
 
@@ -107,12 +112,11 @@ function populateStaffTable(staffList) {
     tableBody.innerHTML = ""; // Clear existing table data
 
 
-
     staffList.forEach(staff => {
         const row = document.createElement("tr");
         row.setAttribute('data-id', staff.staffID);
 
-        let editButton="";
+        let editButton = "";
 
         if (staff.role && staff.role.role === "ROLE_DOCTOR") {
             editButton = `
@@ -125,9 +129,8 @@ function populateStaffTable(staffList) {
                     </svg>
                 </button>
             `;
-        }
-        else{
-            editButton=`<button class="edit"></button>`
+        } else {
+            editButton = `<button class="edit"></button>`
         }
 
         let deleteButton = `
@@ -170,6 +173,81 @@ function populateStaffTable(staffList) {
         tableBody.appendChild(row);
     });
 }
+
+
+
+function loadProfileData() {
+    fetch("/api/staff/getProfile")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("setting-staffName").value = data.staffName || "";
+            document.getElementById("setting-staffEmail").value = data.staffEmail || "";
+            document.getElementById("setting-staffPhone").value = data.staffPhone || "";
+            document.getElementById("setting-staffAddress").value = data.staffAddress || "";
+            document.getElementById("setting-gender").value = data.gender || "other";
+            document.getElementById("setting-age").value = data.age || "";
+
+            function formatTime(time) {
+                return time ? time.substring(0, 5) : ""; // Extract only HH:mm
+            }
+
+            if (data.startTime) {
+                document.getElementById("setting-startTime").value = formatTime(data.startTime);
+            }
+            if (data.endTime) {
+                document.getElementById("setting-endTime").value = formatTime(data.endTime);
+            }
+        })
+        .catch(error => console.error("Error fetching profile data:", error));
+
+}
+
+function setupProfileFormSubmission() {
+    document.getElementById("updateProfileForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        console.log("Form submission triggered!");  // Debugging check
+
+        function formatTimeForAPI(time) {
+            return time ? time + ":00" : null; // Append ":00" for seconds
+        }
+
+        const formData = {
+            staffName: document.getElementById("setting-staffName").value,
+            staffEmail: document.getElementById("setting-staffEmail").value,
+            staffPhone: document.getElementById("setting-staffPhone").value,
+            staffAddress: document.getElementById("setting-staffAddress").value,
+            gender: document.getElementById("setting-gender").value,
+            age: document.getElementById("setting-age").value,
+            startTime: formatTimeForAPI(document.getElementById("setting-startTime")?.value),
+            endTime: formatTimeForAPI(document.getElementById("setting-endTime")?.value)
+        };
+
+        fetch("/api/staff/update", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => alert("Profile updated successfully!"))
+            .catch(error => alert("Error updating profile."));
+    });
+}
+function loadProfilePicture() {
+    fetch("api/staff/current")
+        .then(response => response.json())
+        .then(data => {
+            const profileImg = document.getElementById("profileImage");
+            if (data.profilePicture) {
+                profileImg.src = data.profilePicture;
+            } else {
+                profileImg.src = "/default-profile.png"; // Fallback image
+            }
+        })
+        .catch(error => console.error("Error fetching profile picture:", error));
+}
+
+
+
 
 
 

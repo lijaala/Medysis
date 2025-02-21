@@ -1,0 +1,87 @@
+    <section  xmlns:th="http://www.thymeleaf.org" th:fragment="updateProfile">
+
+        <div class="updateProfilePicture" id="dp">
+            <img id="profileImage" src="" alt="Profile Picture">
+            <button class="primary" id="updatePhoto"> Update Photo</button>
+            <button class="cancel" id="deletePhoto"> Delete Photo</button>
+
+        </div>
+
+        <form class="updateProfile" id="updateProfileForm">
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="setting-staffName" >Full Name</label>
+                    <input type="text" id="setting-staffName" name="staffName"  placeholder="Full Name" required>
+                </div>
+                <div class="form-field">
+                    <label for="setting-staffEmail" >Email</label>
+                    <input type="email" id="setting-staffEmail" name="staffEmail" placeholder="john.doe@gmail.com" required>
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="setting-staffPhone" >Phone Number</label>
+                    <input type="text" id="setting-staffPhone" name="staffPhone"  placeholder="Phone Number" >
+                </div>
+                <div class="form-field">
+                    <label for="setting-staffAddress" >Address</label>
+                    <input type="text" id="setting-staffAddress" name="staffAddress" placeholder="Address" >
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="setting-gender" >Gender</label>
+                    <select id="setting-gender" name="gender" required>
+                        <option value="female"> Female</option>
+                        <option value="male"> Male</option>
+                        <option value="other"> Other</option>
+                    </select>
+
+                </div>
+                <div class="form-field">
+                    <label for="setting-age" >Age</label>
+                    <input type="text" id="setting-age" name="age" placeholder="Enter your age">
+                </div>
+
+            </div>
+
+
+            <div id="setting-availability-section"  th:if="${session.userRole=='ROLE_DOCTOR'}">
+                <div class="form-field">
+                    <h6> Available Time</h6>
+                    <label for="setting-startTime" >Start Time</label>
+                    <input type="time" id="setting-startTime" name="startTime" >
+                </div>
+                <div class="form-field">
+                    <label for="setting-endTime" >End Time</label>
+                    <input type="time" id="setting-endTime" name="endTime" >
+                </div>
+
+            </div>
+
+
+            <button type="submit" class="primary"> Save</button>
+        </form>
+
+        <div class="updateProfile" >
+            <div class="form-field">
+                <label for="currentPassword" >Current Password</label>
+                <input type="password" id="currentPassword" name="currentPassword"  placeholder="Enter Current Password" >
+            </div>
+            <div class="form-field">
+                <label for="newPassword" >New Password</label>
+                <input type="password" id="newPassword" name="newPassword" placeholder="Enter New Password" >
+            </div>
+            <div class="form-field">
+                <label for="confirmNewPassword" > Confirm New Password</label>
+                <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="Re-enter New Password" >
+            </div>
+            <button type="button" class="primary"> Change Password</button>
+
+        </div>
+
+    </section>
+
+

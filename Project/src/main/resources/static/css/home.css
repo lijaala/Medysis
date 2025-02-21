@@ -47,7 +47,7 @@
      flex-direction: column;
      align-items: center;
      justify-items: center;
-     gap: 10vh;
+     gap: 5vh;
 
  }
 /* Dashboard*/
@@ -338,6 +338,7 @@ td.actions button{
 .delete{
     border: none !important;
     background-color: transparent !important;
+    color: red;
     svg{
         color: red;
     }
@@ -526,4 +527,28 @@ button#addMedicationBtn {
 .Table input, .Table select{
     width:80%;
     height:5vh;
+}
+.updateProfile{
+    width:90%;
+
+}
+.updateProfilePicture{
+    display: flex;
+    flex-direction: row;
+    width:70%;
+    height:10%;
+    align-items: center;
+    gap:3vw;
+    img{
+        width:100px;
+        height: 100px;
+        border-radius: 50%;
+
+    }
+    button{
+        font-size:.7em;
+        width:40%;
+        align-items: center;
+
+    }
 }
