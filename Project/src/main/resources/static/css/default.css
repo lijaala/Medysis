@@ -1,22 +1,18 @@
 @import url(https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap);
-
 *,
 html,
 body {
     margin: 0;
     padding: 0;
-    font-size:1rem;
+    font-size:.95em;
     font-family: "Montserrat", Serif;
-
 }
-
 h3{
     font-size:1.2rem;
     font-weight: normal;
     border-bottom: 2vh;
+
 }
-
-
 
 button{
     padding: 1% 5%;
@@ -26,15 +22,10 @@ button{
     font-size: 0.8em;
     width: 100%;
     color: rgb(253, 253, 255);
-
-
 }
 .primary {
     background-color: rgb(245, 20, 125);
     box-shadow: 0 2px 2px rgba(190, 72, 127, 0.53);
-
-
-
 }
 .secondary{
     background-color: #F0F2F9;
@@ -74,18 +65,14 @@ button{
     svg path, svg g {
         stroke: rgb( 255, 52, 147) ;
     }
-
 }
 .upload{
     color: #07104e;
     background-color: transparent;
     border-color: #07104e;
-
     transform: scale(95%);
     transition: all 0.3s ease;
-
 }
-
 /*form layout*/
 .form {
     display: flex;
@@ -100,9 +87,6 @@ button{
     font-style: normal;
 
 }
-
-
-
 .form-field {
     display: flex;
     width: 90%;
@@ -118,17 +102,11 @@ button{
     }
 
 }
-
-
-
-
-
 input,select, textarea, option {
     padding: 0.5vw 0.8vw;
     background-color: rgb(238, 239, 248);
     border: 1px solid rgb(245, 20, 125);
     border-radius: .4vw;
-    font-size: 14px;
     height: 4vh;
     flex: 1;
 }
@@ -148,8 +126,7 @@ input,select, textarea, option {
 }
 footer{
     width:100%;
-    position:fixed;
-    bottom:-1%;
+
     background: url("../image/footer.svg");
     height:25%;
     background-size: cover;

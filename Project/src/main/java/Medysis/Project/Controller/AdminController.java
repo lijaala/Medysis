@@ -48,7 +48,6 @@ public class AdminController {
     }
 
     @PostMapping("/addStaff")
-
     public String addStaff(@RequestParam String staffName,
                            @RequestParam String staffEmail,
                            @RequestParam String staffPhone,
@@ -81,7 +80,7 @@ public class AdminController {
 
             Role roleId = roleRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
             staff.setRole(roleId);
-            staffService.save(staff);
+
 
             if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");

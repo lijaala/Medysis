@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -111,7 +112,15 @@ public class AuthController {
     @GetMapping("/role")
     public String getUserRole(HttpSession session) {
         return (String) session.getAttribute("userRole");
+
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate(); // Invalidates the session
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
 
 }
 

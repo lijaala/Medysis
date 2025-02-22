@@ -1,10 +1,9 @@
     <section  xmlns:th="http://www.thymeleaf.org" th:fragment="updateProfile">
 
         <div class="updateProfilePicture" id="dp">
-            <img id="profileImage" src="" alt="Profile Picture">
-            <button class="primary" id="updatePhoto"> Update Photo</button>
-            <button class="cancel" id="deletePhoto"> Delete Photo</button>
-
+            <img id="profileImage" src="" alt="Profile Picture" onclick="selectProfilePicture()">
+            <input type="file" id="profileImageInput" accept="image/*" style="display: none;"> <button type="button" class="primary" id="updateProfileBtn" onclick="updateProfilePicture()">Save</button>
+            <button class="cancel" id="deletePhoto">Delete Photo</button>
         </div>
 
         <form class="updateProfile" id="updateProfileForm">
@@ -78,7 +77,8 @@
                 <label for="confirmNewPassword" > Confirm New Password</label>
                 <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="Re-enter New Password" >
             </div>
-            <button type="button" class="primary"> Change Password</button>
+            <button type="button" class="primary" id="resetPasswordBtn" onclick="resetPassword(event)">Change Password</button>
+
 
         </div>
 

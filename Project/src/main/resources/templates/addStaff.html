@@ -9,7 +9,8 @@
 
         <span class="close" onclick="closeStaffModal()">&times;</span>
         <h3>Add Staff</h3>
-    <form action="api/admin/addStaff" method="POST"  enctype="multipart/form-data">
+        <p id="responseMessage"></p>
+        <form  enctype="multipart/form-data" id="addStaffForm">
     <div class="form-row">
         <div class="form-field">
             <label for="staffName" >Full Name</label>
@@ -63,9 +64,11 @@
 
     </div>
 
-    <div id="availability-section" class="availability form-row">
+
+    <div id="availability-section" class="availability">
+        <h6> Available Time</h6>
         <div class="form-field">
-            <h6> Available Time</h6>
+
             <label for="startTime" >Start Time</label>
             <input type="time" id="startTime" name="startTime" >
         </div>
@@ -79,7 +82,7 @@
     </div>
 
 
-    <button type="submit" class="primary"> Add Staff</button>
+    <button type="submit" class="primary" onclick="addStaff(event)"> Add Staff</button>
 
 </form>
     </div>
@@ -96,7 +99,6 @@
             <span class="close" onclick="closeEditStaffModal()">&times;</span>
             <h3>Edit Availability</h3>
             <form >
-
 
                 <div  class="form-row">
                     <input type="hidden" id="editStaffID">
@@ -118,6 +120,6 @@
         </div>
 
     </div>
-
+<script src="js/staff.js"></script>
 </section>
 

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -90,9 +91,47 @@ public class StaffController {
         Staff savedStaff = staffService.updateProfile(staffId, updatedStaff);
         return ResponseEntity.ok(savedStaff);
     }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String currentPassword,
+                                           @RequestParam String newPassword,
+                                           HttpSession session) {
+        String staffId = (String) session.getAttribute("userId");
 
+        if (staffId == null) {
+            return ResponseEntity.status(401).body("User not logged in");
+        }
 
+        boolean isReset = staffService.resetPassword(staffId, currentPassword, newPassword);
 
+        if (isReset) {
+            session.invalidate(); // ✅ Logout user after password reset
+            return ResponseEntity.ok(Map.of(
+                    "message", "Password reset successful. Redirecting to login...",
+                    "redirectUrl", "/login"
+            ));        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Incorrect current password or update failed."));
+        }
+    }
+
+    @PostMapping("/update-profile-picture")
+    public ResponseEntity<?> updateProfilePicture(@RequestParam("photo") MultipartFile photo, HttpSession session) {
+        String staffId = (String) session.getAttribute("userId");
+
+        if (staffId == null) {
+            return ResponseEntity.status(401).body("User not logged in");
+        }
+
+        boolean isUpdated = staffService.updateProfilePicture(staffId, photo);
+
+        if (isUpdated) {
+            session.invalidate(); // ✅ Logout user after profile picture update
+            return ResponseEntity.ok(Map.of(
+                    "message", "Profile picture updated successfully. Redirecting to login...",
+                    "redirectUrl", "/login"
+            ));        } else {
+            return ResponseEntity.status(500).body(Map.of("message", "Profile picture update failed."));
+        }
+    }
 
 
 }
