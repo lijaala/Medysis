@@ -38,10 +38,6 @@ public class LabOrderController {
         return "redirect:/success"; // Or redirect as needed
     }
 
-//    @GetMapping("/allOrders")
-//    public List<LabOrder> getAllLabOrders() {
-//        return labOrderService.getAllLabOrders(); // Call the service
-//    }
 
     @GetMapping("/details/{orderID}")
     public ResponseEntity<LabOrderDTO> getLabOrderDetails(@PathVariable int orderID) {

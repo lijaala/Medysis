@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,7 +70,7 @@ public class AuthController {
        user.setGender(gender);
        String imageUrl= uploadImageService.saveImage(image);
        user.setImage(imageUrl);
-       user.setPassword(password);
+       user.setPassword(passwordEncoder.encode(password));
 
 
 
@@ -87,27 +88,22 @@ public class AuthController {
     @GetMapping("/verify")
     public void  verify(@RequestParam String code, HttpServletResponse response) throws IOException {
         boolean verified = userService.verifyUser(code);
-        if(verified){
-            response.sendRedirect("/login");
-        }
-        else{
-            response.sendRedirect("/login");
+        response.sendRedirect(verified ? "/login" : "/login");
 
-        }
     }
     @PostMapping("/login")
-    public void login(@RequestParam String email, @RequestParam String password,HttpSession session, HttpServletResponse response) throws IOException {
+    public void login(@RequestParam String email,
+                      @RequestParam String password,
+                      HttpSession session,
+                      HttpServletResponse response) throws IOException {
         try {
-            String redirectUrl=authService.authenticate(email,password, session);
-            System.out.println(session.getAttribute("userRole"));
-
+            String redirectUrl = authService.authenticate(email, password, session);
             response.sendRedirect(redirectUrl);
+            System.out.println("SecurityContext Authentication: " + SecurityContextHolder.getContext().getAuthentication());
+// Redirecting instead of returning JSON
+        } catch (Exception e) {
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
-        catch(Exception e){
-           response.sendError(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
-        }
-
-
     }
     @GetMapping("/role")
     public String getUserRole(HttpSession session) {

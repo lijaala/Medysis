@@ -111,9 +111,5 @@ public class AdminController {
 
 
     }
-    @GetMapping("/getRoles")
-    public List<Role> getAllRoles () {
-        return roleService.getAllRoles();
 
-    }
 }

@@ -75,7 +75,7 @@ public class AppointmentController {
             @RequestParam("status") String status,
             HttpSession session) {
 
-        // Get the doctor ID from the session (assuming it's stored as 'doctorId')
+        // Get the doctor ID from the session
         String doctorID = (String) session.getAttribute("userId");
 
         // If doctorID is not found in the session, you may want to handle this error
@@ -85,9 +85,10 @@ public class AppointmentController {
         System.out.println("Edit request received for appointment ID: " + appointmentID);
         try{
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm[:ss]");
 
-        // Parse the date and time
+
+            // Parse the date and time
         LocalDate appDate = LocalDate.parse(appDateStr, dateFormatter);
         LocalTime appTime = LocalTime.parse(appTimeStr, timeFormatter);
 
@@ -102,7 +103,7 @@ public class AppointmentController {
 
     }
 
-    @PostMapping("/complete")  // New endpoint
+    @PostMapping("/complete")
     public String completeAppointment(@RequestParam("appointmentID") Integer appointmentID, HttpSession session) {
         String staffId = (String) session.getAttribute("userId"); // Get staff ID from session
 
@@ -120,7 +121,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/appointments")
-    public List<Appointment> getAllAppointments() { // Returns List<Appointment> (no change)
+    public List<Appointment> getAllAppointments() {
         return appointmentService.getAllAppointments();
     }
 
@@ -139,16 +140,13 @@ public class AppointmentController {
             System.out.println("Doctor not found in database: " + doctorID);
             return List.of("Doctor not found");
         }
-        System.out.println("Received doctorID: " + doctorID);
-        System.out.println("Received date: " + dateStr);
+
 
 
         Staff doctor = doctorOpt.get();
         LocalTime startTime = doctor.getStartTime();
         LocalTime endTime = doctor.getEndTime();
-        System.out.println("Doctor found: " + doctor.getStaffName());
-        System.out.println("Start Time: " + doctor.getStartTime());
-        System.out.println("End Time: " + doctor.getEndTime());
+
 
 
         if (startTime == null || endTime == null) {
