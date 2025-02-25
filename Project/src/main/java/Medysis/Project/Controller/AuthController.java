@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,23 +61,23 @@ public class AuthController {
 
         try{
             User user=new User();
-       user.setName(name);
-       user.setEmail(email);
-       user.setAddress(address);
-       user.setPhone(phone);
-       user.setAge(age);
-       user.setGender(gender);
-       String imageUrl= uploadImageService.saveImage(image);
-       user.setImage(imageUrl);
-       user.setPassword(passwordEncoder.encode(password));
+            user.setName(name);
+            user.setEmail(email);
+            user.setAddress(address);
+            user.setPhone(phone);
+            user.setAge(age);
+            user.setGender(gender);
+            String imageUrl= uploadImageService.saveImage(image);
+            user.setImage(imageUrl);
+            user.setPassword(password);
 
 
 
-       userService.registerUser(user);
-       return "Registered successfully. Please check your email to verify your account";
+            userService.registerUser(user);
+            return "Registered successfully. Please check your email to verify your account";
 
-    }catch(IllegalArgumentException e){
-        return "Email already exists";
+        }catch(IllegalArgumentException e){
+            return "Email already exists";
         }
         catch (Exception e){
             e.printStackTrace();
@@ -88,22 +87,27 @@ public class AuthController {
     @GetMapping("/verify")
     public void  verify(@RequestParam String code, HttpServletResponse response) throws IOException {
         boolean verified = userService.verifyUser(code);
-        response.sendRedirect(verified ? "/login" : "/login");
+        if(verified){
+            response.sendRedirect("/login");
+        }
+        else{
+            response.sendRedirect("/login");
 
+        }
     }
     @PostMapping("/login")
-    public void login(@RequestParam String email,
-                      @RequestParam String password,
-                      HttpSession session,
-                      HttpServletResponse response) throws IOException {
+    public void login(@RequestParam String email, @RequestParam String password,HttpSession session, HttpServletResponse response) throws IOException {
         try {
-            String redirectUrl = authService.authenticate(email, password, session);
+            String redirectUrl=authService.authenticate(email,password, session);
+            System.out.println(session.getAttribute("userRole"));
+
             response.sendRedirect(redirectUrl);
-            System.out.println("SecurityContext Authentication: " + SecurityContextHolder.getContext().getAuthentication());
-// Redirecting instead of returning JSON
-        } catch (Exception e) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
         }
+        catch(Exception e){
+            response.sendError(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
+        }
+
+
     }
     @GetMapping("/role")
     public String getUserRole(HttpSession session) {
@@ -119,5 +123,4 @@ public class AuthController {
 
 
 }
-
 

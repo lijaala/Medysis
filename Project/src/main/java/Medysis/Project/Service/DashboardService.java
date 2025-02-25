@@ -2,6 +2,7 @@ package Medysis.Project.Service;
 
 import Medysis.Project.DTO.AppointmentDTO;
 import Medysis.Project.DTO.DoctorDashboardDTO;
+import Medysis.Project.DTO.LabOrderDTO;
 import Medysis.Project.Model.Appointment;
 import Medysis.Project.Model.LabOrder;
 import Medysis.Project.Model.LabResults;
@@ -160,8 +161,12 @@ public class DashboardService {
         return labOrderRepository.countByLabStatus("Pending"); // Assuming 'Pending' is the status for pending requests
     }
 
-    public long getUrgentPendingLabRequests() {
+    public long getUrgentPendingLabRequestsNumber() {
         return labOrderRepository.countByLabStatusAndUrgency("Pending", "High"); // Fetch urgent pending lab requests
+    }
+
+    public List<LabOrderDTO> getUrgentPendingLabRequests() {
+        return labOrderRepository.findByLabStatusAndUrgency("PENDING", "yes");
     }
 
 

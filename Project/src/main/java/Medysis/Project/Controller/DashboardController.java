@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
-public class DashboardController {
+public class    DashboardController {
 
     @Autowired
     private DashboardService dashboardService;
@@ -50,7 +50,10 @@ public class DashboardController {
         Map<String, Object> response = new HashMap<>();
         response.put("totalLabTests", dashboardService.getTotalLabTests());
         response.put("pendingLabRequests", dashboardService.getPendingLabRequests());
-        response.put("urgentPendingLabRequests", dashboardService.getUrgentPendingLabRequests());
+        response.put("urgentPendingLabRequestsNumber", dashboardService.getUrgentPendingLabRequestsNumber());
+
+        response.put("urgentPendingLabRequests", dashboardService.getUrgentPendingLabRequests());  // List of urgent lab orders
+
 
         return ResponseEntity.ok(response);
     }

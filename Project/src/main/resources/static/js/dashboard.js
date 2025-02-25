@@ -472,8 +472,8 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 console.error("Pending Requests  is missing in API response.");
             }
-            if (data.urgentPendingLabRequests !== undefined) {
-                document.getElementById("urgentPending").textContent = data.urgentPendingLabRequests;
+            if (data.urgentPendingLabRequestsNumber !== undefined) {
+                document.getElementById("urgentPending").textContent = data.urgentPendingLabRequestsNumber;
             } else {
                 console.error("Pending Requests  is missing in API response.");
             }

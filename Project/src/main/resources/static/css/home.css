@@ -131,7 +131,7 @@ canvas{
 .calendar {
     flex:1;
     height: 100%;
-    font-size:.5em;
+    font-size:.7em;
     padding:1%;
     cursor: pointer;
     color:#07104e;
@@ -146,6 +146,7 @@ canvas{
     padding: 2% 0;
     border-bottom: 1px solid #07104e;
     border-radius: 0 !important;
+    font-size: 1em;
 }
 .calendar-month{
     font-weight: normal;

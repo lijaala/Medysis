@@ -2,30 +2,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-<script>
-    const targetNode = document.getElementById('search');
-    const config = { attributes: true };
 
-    const callback = function(mutationsList, observer) {
-        for (let mutation of mutationsList) {
-            if (mutation.attributeName === 'value') {
-                console.log('Value attribute changed:', mutation);
-                console.log('New Value:', targetNode.value);
-            }
-        }
-    };
-
-    const observer = new MutationObserver(callback);
-
-    // Check if the element exists yet. If not, wait for it.
-    if (targetNode) {
-        observer.observe(targetNode, config);
-    } else {
-        document.addEventListener('DOMContentLoaded', () => {
-            observer.observe(document.getElementById('search'), config);
-        });
-    }
-</script>
 <header  xmlns:th="http://www.thymeleaf.org" th:fragment="header">
 
 <section class="header">
