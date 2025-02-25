@@ -50,8 +50,23 @@ h1 {
     text-align: left;
 
 }
-#errorMessage{
-    border-radius: 8px;
-    background-color: rgba(255, 0, 0, 0.2);
+.message-container {
+    text-align: center;
+    margin:2% 0;
     padding: 2%;
+    width:85%;
+    align-self: center;
+    justify-content: center;
+    border-radius: 8px;
+    display: none;
+}
+.error {
+    background-color: rgba(255, 0, 21, 0.2);
+    color: #91020e;
+    border: 1px solid #fb031d;
+}
+.success {
+    background-color: rgba(1, 255, 64, 0.2);
+    color: #024d11;
+    border: 1px solid #03db34;
 }

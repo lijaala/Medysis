@@ -14,9 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -96,19 +94,19 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public void login(@RequestParam String email, @RequestParam String password,HttpSession session, HttpServletResponse response) throws IOException {
-        try {
-            String redirectUrl=authService.authenticate(email,password, session);
-            System.out.println(session.getAttribute("userRole"));
+    public ResponseEntity<Map<String, String>> login(@RequestParam String email, @RequestParam String password, HttpSession session) {
+        String response = authService.authenticate(email, password, session);
 
-            response.sendRedirect(redirectUrl);
+        if ("success".equals(response)) {
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "Login successful");
+            responseBody.put("redirectUrl", "/home");
+            return ResponseEntity.ok(responseBody);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", response));
         }
-        catch(Exception e){
-            response.sendError(HttpStatus.UNAUTHORIZED.value(),e.getMessage());
-        }
-
-
     }
+
     @GetMapping("/role")
     public String getUserRole(HttpSession session) {
         return (String) session.getAttribute("userRole");

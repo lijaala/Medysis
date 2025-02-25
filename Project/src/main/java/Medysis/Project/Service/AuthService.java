@@ -5,6 +5,7 @@ import Medysis.Project.Model.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -38,76 +39,58 @@ public class AuthService {
 
 
 
-    public String authenticate(String email, String password, HttpSession session) throws Exception {
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+    public String authenticate(String email, String password, HttpSession session) {
         Optional<User> userOptional = userService.findByEmail(email);
         Optional<Staff> staffOptional = staffService.findByEmail(email);
 
         if (userOptional.isPresent()) {
-            return authenticateUser(userOptional.get(),userDetails, password, session);
-        }
-        else if (staffOptional.isPresent()) {
-            return authenticateStaff(staffOptional.get(), userDetails,password, session);
-
-        }
-        else {
+            return authenticateUser(userOptional.get(), password, session);
+        } else if (staffOptional.isPresent()) {
+            return authenticateStaff(staffOptional.get(), password, session);
+        } else {
             return "User not found";
         }
-
-
-
-
     }
-    private String authenticateUser(User user, UserDetails userDetails,String password, HttpSession session) throws Exception {
+
+    private String authenticateUser(User user, String password, HttpSession session) {
         if (!user.isVerified()) {
             emailService.sendVerificationEmail(user);
-            throw new Exception("User not verified. Verification email sent.");
+            return "User not verified. Verification email sent.";
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new Exception("Invalid credentials");
+            return "Invalid credentials";
         }
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userDetails.getUsername(), password)
-        );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-
-        return "/home";
-
-
+        return authenticateAndSetSession(user.getEmail(), password, String.valueOf(user.getUserID()), "ROLE_PATIENT", session);
     }
 
-    private String authenticateStaff(Staff staff, UserDetails userDetails, String password, HttpSession session) throws Exception {
+    private String authenticateStaff(Staff staff, String password, HttpSession session) {
         if (!passwordEncoder.matches(password, staff.getPassword())) {
-            throw new Exception("Invalid credentials");
+            return "Incorrect password or email";
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userDetails.getUsername(), password)
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-
-        return "/home";
+        return authenticateAndSetSession(staff.getStaffEmail(), password, staff.getStaffID(), staff.getRole().getRole(), session);
     }
 
+    private String authenticateAndSetSession(String email, String password, String userId, String role, HttpSession session) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
 
-    private void setSessionAndSecurityContext(UserDetails userDetails, String userId, String email, String role, HttpSession session) {
-        session.setAttribute("userId", userId);
-        session.setAttribute("userEmail", email);
-        session.setAttribute("userRole", role);
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authentication);
 
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            session.setAttribute("userId", userId);
+            session.setAttribute("userEmail", email);
+            session.setAttribute("userRole", role);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
 
-        // **Set the authentication in the SecurityContext**
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authentication);
-
-        // **Ensure authentication is stored in session for Spring Security**
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+            return "success";
+        } catch (BadCredentialsException e) {
+            return "Incorrect password or email";
+        }
     }
+
 }
