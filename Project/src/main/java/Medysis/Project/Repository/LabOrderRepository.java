@@ -26,9 +26,7 @@ public interface LabOrderRepository extends JpaRepository<LabOrder, Integer> {
     long countByLabStatus(String status);
     long countByLabStatusAndUrgency(String status, String urgency);
 
-    @Query("SELECT new Medysis.Project.DTO.LabOrderDTO(l.orderID, l.orderDate, l.urgency, l.labStatus) " +
-            "FROM LabOrder l WHERE l.labStatus = :labStatus AND l.urgency = :urgency")
-    List<LabOrderDTO> findByLabStatusAndUrgency(@Param("labStatus") String labStatus, @Param("urgency") String urgency);
+    List<LabOrder> findByLabStatusAndUrgency(@Param("labStatus") String labStatus, @Param("urgency") String urgency);
 
 
 

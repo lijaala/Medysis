@@ -1,27 +1,42 @@
 document.addEventListener('DOMContentLoaded', () => {
     const menuItems = document.querySelectorAll('.menu li');
     const sections = document.querySelectorAll('.section');
+    const userRole = document.querySelector('.menu').getAttribute('data-user-role'); // Get user role from the menu
 
+    // Function to activate a specific section
+    const activateSection = (target) => {
+        menuItems.forEach(menuItem => menuItem.classList.remove('active'));
+        sections.forEach(section => section.style.display = 'none');
+
+        const activeItem = document.querySelector(`.menu li[data-target="${target}"]`);
+        const activeSection = document.getElementById(target);
+
+        if (activeItem && activeSection) {
+            activeItem.classList.add('active');
+            activeSection.style.display = 'flex';
+        }
+    };
+
+    // Event listener for menu item clicks
     menuItems.forEach(item => {
         item.addEventListener('click', () => {
-            // Remove 'active' class from all menu items
-            menuItems.forEach(menuItem => menuItem.classList.remove('active'));
-
-            // Add 'active' class to the clicked menu item
-            item.classList.add('active');
-
-            // Hide all sections
-            sections.forEach(section => section.style.display = 'none');
-
-            // Display the corresponding section
             const target = item.getAttribute('data-target');
-            const activeSection = document.getElementById(target);
-            if (activeSection) {
-                activeSection.style.display = 'flex';
-
-            }
+            activateSection(target);
         });
     });
+
+    // Determine the default active section based on the user role
+    let defaultTarget = '';
+    if (userRole === 'ROLE_ADMIN') {
+        defaultTarget = 'adminDashboard';
+    } else if (userRole === 'ROLE_DOCTOR') {
+        defaultTarget = 'doctorDashboard';
+    } else if (userRole === 'ROLE_LAB TECHNICIAN') {
+        defaultTarget = 'labDashboard';
+    }
+
+    // Activate the default section
+    if (defaultTarget) {
+        activateSection(defaultTarget);
+    }
 });
-
-

@@ -3,6 +3,7 @@ package Medysis.Project.Service;
 import Medysis.Project.DTO.AppointmentDTO;
 import Medysis.Project.DTO.DoctorDashboardDTO;
 import Medysis.Project.DTO.LabOrderDTO;
+import Medysis.Project.DTO.LabResultDTO;
 import Medysis.Project.Model.Appointment;
 import Medysis.Project.Model.LabOrder;
 import Medysis.Project.Model.LabResults;
@@ -32,6 +33,9 @@ public class DashboardService {
 
     @Autowired
     private LabOrderService labOrderService;
+
+    @Autowired
+    private LabResultService labResultsService;
     @Autowired
     private LabTestRepository labTestRepository;
 
@@ -166,8 +170,35 @@ public class DashboardService {
     }
 
     public List<LabOrderDTO> getUrgentPendingLabRequests() {
-        return labOrderRepository.findByLabStatusAndUrgency("PENDING", "yes");
+        List<LabOrder> labOrders=labOrderRepository.findByLabStatusAndUrgency("Pending","yes") ;
+        return labOrders
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
+
+    public LabOrderDTO convertToDTO(LabOrder labOrder) {
+        if (labOrder == null) return null;
+
+        LabOrderDTO dto = new LabOrderDTO();
+        dto.orderID = labOrder.getOrderID();
+        dto.userID = labOrder.getUserID().getUserID();
+        dto.userName=labOrder.getUserID().getName();
+        dto.doctorID = labOrder.getDoctorID().getStaffID();
+        dto.doctorName=labOrder.getDoctorID().getStaffName();
+        dto.appointmentID = labOrder.getAppointmentID().getAppointmentID();
+        dto.urgency = labOrder.getUrgency();
+        dto.orderDate = labOrder.getOrderDate();
+
+        if (labOrder.getLabResults() != null) {
+            dto.labResults = labOrder.getLabResults().stream()
+                    .map(labResultsService::convertToDTO) // Correct call!
+                    .collect(Collectors.toList());
+        }
+
+        return dto;
+    }
+
 
 
 

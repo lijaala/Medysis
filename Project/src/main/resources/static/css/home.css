@@ -63,10 +63,9 @@
 .stats div {
     border-radius: 8px;
     flex: 1;
-    gap:3vh;
-    height: 30vh;
-    padding: 2%;
-
+    gap:2vh;
+    height: 31vh;
+    padding: 3% 2%;
     align-items: center;
     box-shadow: 0 2px 5px rgba(87, 86, 86, 0.499);
 
@@ -77,8 +76,12 @@
     p{
         width: 100%;
         align-items: center;
-        font-size: 4em !important;
+        font-size: 4rem !important;
         padding: 15% 5%;
+    }
+    span{
+        font-size: 0.8rem;
+
     }
 
 }

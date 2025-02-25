@@ -18,12 +18,7 @@ public class LabOrderDTO {
     public LabOrderDTO() {
     }
 
-    // ✅ Constructor for JPQL queries
-    public LabOrderDTO(int orderID, LocalDate orderDate, String urgency, String labStatus) {
-        this.orderID = orderID;
-        this.orderDate = orderDate;
-        this.urgency = urgency;
-    }
+
 
 
 }

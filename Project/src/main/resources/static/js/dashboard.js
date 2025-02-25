@@ -457,27 +457,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 //Lab Tech stats
-    fetch('/api/dashboard/lab-tech')
-        .then(response => response.json())
-        .then(data => {
-            console.log("Fetched data:", data); // Debugging step
-            if (data.totalLabTests != undefined) {
-                document.getElementById('totalTests').textContent = data.totalLabTests;
 
-            } else {
-                console.error("Total Tests is missing in API response.");
-            }
-            if (data.pendingLabRequests !== undefined) {
-                document.getElementById('pendingRequest').textContent = data.pendingLabRequests;
-            } else {
-                console.error("Pending Requests  is missing in API response.");
-            }
-            if (data.urgentPendingLabRequestsNumber !== undefined) {
-                document.getElementById("urgentPending").textContent = data.urgentPendingLabRequestsNumber;
-            } else {
-                console.error("Pending Requests  is missing in API response.");
-            }
-        })
+
+labTech();
 });
+
+
 
 

@@ -72,20 +72,79 @@
         <div>
             <h6>Total Tests</h6>
             <p id="totalTests">0</p>
+            <span>Total Number of Tests</span>
         </div>
         <div>
             <h6>Pending Lab Requests</h6>
             <p id="pendingRequest">0</p>
+            <span>Total Number of Pending Tests</span>
         </div>
         <div>
-            <h6>Urgent and Pending Lab Requests</h6>
+            <h6>Urgent Lab Requests </h6>
             <p id="urgentPending">0</p>
+            <span> Urgent and Pending Lab Request</span>
+        </div>
+
+    </section>
+
+    <section>
+        <table class="Table">
+            <thead>
+            <tr>
+                <td>Order No</td>
+                <td> Patient</td>
+                <td> Doctor</td>
+                <td> Order Date</td>
+                <td>Actions</td>
+            </tr>
+
+            </thead>
+            <tbody id="urgentLabOrdersTableBody">
+
+            </tbody>
+        </table>
+
+        <div class="modal" id="urgentLabDetailsModal" style="display: none;">
+            <div class="modal-content">
+                <span class="closeUrgentLabDetails close" onclick="closeUrgentDetailsModal()">&times</span>
+                <h3> Test List</h3>
+                <div id="urgentDetails">
+            </div>
+            </div>
+        </div>
+
+        <div id="urgentLabResults" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="closeUrgentLabResults close" onclick="closeUrgentResultsModal()">&times</span>
+                <h3>Add Lab Results</h3>
+                <div id="urgentPatientDoc">
+
+
+                </div>
+                <div class="labResult-message"></div>
+                <table class="Table">
+                    <thead>
+                    <tr>
+                        <td>ID</td>
+                        <td>Test Name</td>
+                        <td>Unit</td>
+                        <td>Normal Range</td>
+                        <td>Result Value</td>
+                        <td>Notes</td>
+
+
+                    </tr>
+                    </thead>
+                    <tbody id="UrgentLabResultTable">
+
+                    </tbody>
+                </table>
+                <button id="urgentSingleResult" style="display: none;" class="primary" >Submit Results</button>
+
+            </div>
         </div>
     </section>
-
-    <section class="calChart">
-
-    </section>
+    <script src="js/labTechDashboard.js"></script>
 </section>
 
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="staff">
