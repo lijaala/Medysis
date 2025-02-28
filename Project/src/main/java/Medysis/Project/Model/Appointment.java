@@ -35,6 +35,10 @@ public class Appointment {
     @Column(name = "followUpDate", nullable = true)
     private LocalDate followUpDate;
 
+    @Column(name = "appUpdatedBy")
+    private String appUpdatedBy;
+
+
     public int getAppointmentID() {
         return appointmentID;
     }
@@ -89,6 +93,14 @@ public class Appointment {
 
     public void setFollowUpDate(LocalDate followUpDate) {
         this.followUpDate = followUpDate;
+    }
+
+    public String getAppUpdatedBy() {
+        return appUpdatedBy;
+    }
+
+    public void setAppUpdatedBy(String appUpdatedBy) {
+        this.appUpdatedBy = appUpdatedBy;
     }
 }
 

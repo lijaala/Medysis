@@ -40,6 +40,8 @@ public class MedicalRecord {
     @JoinColumn(name = "appointment", referencedColumnName = "appointmentID", nullable = true)
     private Appointment appointment;  // New field linking to Appointment
 
+    @Column(name = "alteredBy")
+    private String alteredBy;
 
     public Integer getRecordID() {
         return recordID;
@@ -111,6 +113,14 @@ public class MedicalRecord {
 
     public void setTreatmentPlan(String treatmentPlan) {
         this.treatmentPlan = treatmentPlan;
+    }
+
+    public String getAlteredBy() {
+        return alteredBy;
+    }
+
+    public void setAlteredBy(String alteredBy) {
+        this.alteredBy = alteredBy;
     }
 }
 

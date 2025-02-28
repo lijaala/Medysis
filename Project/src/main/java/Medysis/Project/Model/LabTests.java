@@ -18,6 +18,9 @@ public class LabTests {
     @Column(name = "measurementUnit")
     private String measurementUnit;
 
+    @Column(name = "editedBy")
+    private String editedBy;
+
     public int getTestID() {
         return testID;
     }
@@ -48,5 +51,13 @@ public class LabTests {
 
     public void setMeasurementUnit(String measurementUnit) {
         this.measurementUnit = measurementUnit;
+    }
+
+    public String getEditedBy() {
+        return editedBy;
+    }
+
+    public void setEditedBy(String editedBy) {
+        this.editedBy = editedBy;
     }
 }

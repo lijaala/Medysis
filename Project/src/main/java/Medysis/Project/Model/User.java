@@ -53,6 +53,11 @@ public class User {
     @Column
     private LocalDateTime updated_at;
 
+    @Column(name = "updatedBy")
+    private String updatedBy;
+
+
+
     public void setId(Integer id) {
         this.userID = userID;
     }
@@ -109,6 +114,7 @@ public class User {
     }
 
     public void setUpdated_at(LocalDateTime updated_at) {
+
         this.updated_at = updated_at;
     }
 
@@ -168,11 +174,19 @@ public class User {
         this.image = image;
     }
 
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
     public User(Integer userID) {
         this.userID = userID;
     }
     public User() {
-        // This constructor is intentionally empty.  JPA needs it.
+
     }
 
 }

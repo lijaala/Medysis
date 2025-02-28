@@ -9,21 +9,22 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5%;
-    width: fit-content;
+    width: 14%;
     padding: 1vw;
     height: 100%;
     position: fixed;
     top: 0;
     left: 1%;
     font-size: 1rem;
-    justify-items: center;
+
 }
 
 .logo {
-    background: url(../image/logo.png) no-repeat;
-    background-size: cover;
-    height: 15vh;
-    width: 27vh;
+    background: url(../image/logoSmall.png) no-repeat;
+    background-size: contain;
+    margin-top: 15%;
+    height: 8vh;
+    width: 100%;
 }
 
 .menu {
@@ -40,7 +41,6 @@ body {
     align-content: center;
     gap: 10%;
     padding: 5px 15px;
-    width: 90%;
     align-items: center;
     border-radius: 8px;
     color: rgba(103, 43, 71, 0.81);
@@ -66,7 +66,7 @@ body {
     box-shadow: 0 2px 4px rgba(255, 10, 124, 0.44);
 
 
-    svg path,svg g {
+    svg path,svg g ,svg{
         stroke: rgb(255, 10, 124);
     }
 
@@ -74,6 +74,5 @@ body {
 
 }
 
-svg {
-    color: rgba(103, 43, 71, 0.81);
-}
+
+

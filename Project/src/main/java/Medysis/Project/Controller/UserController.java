@@ -6,8 +6,10 @@ import Medysis.Project.Model.User;
 import Medysis.Project.Service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,16 +28,47 @@ public class UserController {
     }
 
     @PutMapping("/update/{userID}")
-    public ResponseEntity<String> updateUser(
+    public ResponseEntity<Map<String, String>> updateUser(
             @PathVariable Integer userID,
-            @RequestBody User updatedUser) {
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) Integer age,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) MultipartFile image,
+            HttpSession session) {
 
-        boolean isUpdated = userService.updateUser(userID, updatedUser);
+        String editorId = (String) session.getAttribute("userId");
+        System.out.println(editorId + name+ phone+ age+ gender+ address+image);
 
-        if (isUpdated) {
-            return ResponseEntity.ok("User updated successfully.");
+        if (editorId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Unauthorized: Editor ID not found."));
+        }
+
+        try {
+            boolean isUpdated = userService.updateUser(userID, name, phone, age, gender, address, image, editorId);
+
+            if (isUpdated) {
+                return ResponseEntity.ok(Map.of("message", "User updated successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "User not found or update failed."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error updating user: " + e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/{userID}")
+    public ResponseEntity<User> getUserById(@PathVariable Integer userID) {
+        User user = userService.getUserById(userID);
+        if (user != null) {
+            return ResponseEntity.ok(user);
         } else {
-            return ResponseEntity.badRequest().body("User not found or update failed.");
+            return ResponseEntity.notFound().build();
         }
     }
 

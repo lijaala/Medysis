@@ -7,9 +7,11 @@ import Medysis.Project.Model.Role;
 import Medysis.Project.Model.User;
 import Medysis.Project.Repository.AvailabilityRepository;
 import Medysis.Project.Repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +34,9 @@ public class UserService {
     AvailabilityRepository availabilityRepository;
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private UploadImageService uploadImageService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        EmailService emailService, AvailabilityRepository availabilityRepository,
@@ -99,25 +104,51 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public boolean updateUser(Integer userID, User updatedUser) {
+    @Transactional
+    public boolean updateUser(Integer userID, String name, String phone, Integer age,
+                              String gender, String address, MultipartFile image, String editorId) {
         Optional<User> existingUserOpt = userRepository.findById(userID);
 
-        if (existingUserOpt.isPresent()) {
-            User existingUser = existingUserOpt.get();
-
-            // Update the relevant fields
-            existingUser.setName(updatedUser.getName());
-            existingUser.setPhone(updatedUser.getPhone());
-            existingUser.setVerified(updatedUser.isVerified());
-
-            // Save the updated user
-            userRepository.save(existingUser);
-            return true;
+        if (existingUserOpt.isEmpty()) {
+            return false; // User not found
         }
-        return false; // User not found
+
+        User existingUser = existingUserOpt.get();
+
+
+        if (name != null) existingUser.setName(name);
+        if (phone != null) existingUser.setPhone(phone);
+        if (age != null) existingUser.setAge(age);
+        if (gender != null) existingUser.setGender(gender);
+        if (address != null) existingUser.setAddress(address);
+
+        // Handle image upload
+        if (image != null && !image.isEmpty()) {
+            try {
+                String imageUrl = uploadImageService.saveImage(image);
+                existingUser.setImage(imageUrl);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload image: " + e.getMessage());
+            }
+        }
+
+        // Track update metadata
+        existingUser.setUpdated_at(LocalDateTime.now());
+        existingUser.setUpdatedBy(editorId);
+
+        userRepository.save(existingUser);
+        return true;
     }
 
+
+    public User getUserById(Integer userID) {
+        return userRepository.findById(userID).orElse(null);
     }
+
+
+}
+
+
 
 
 

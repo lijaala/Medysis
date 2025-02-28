@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/register", "/login", "/css/**", "/js/**", "appointment/availableSlots","/image/**", "api/auth/**","appointment/fetchDoctors").permitAll()
                         .requestMatchers("/home","api/staff/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_DOCTOR", "ROLE_LAB TECHNICIAN")
                         .requestMatchers("appointment/list","appointment/admin/book","appointment/edit").hasAnyAuthority("ROLE_ADMIN", "ROLE_DOCTOR")
-                        .requestMatchers("/home","api/admin/**","api/dashboard/admin").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/home","api/admin/**","api/dashboard/admin","/api/user/update/**","api/user/all").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("api/LabOrder/orderRequest","api/LabOrder/details/","api/LabOrder/labResults", "api/labTests/availableTests").hasAnyAuthority("ROLE_DOCTOR","ROLE_LAB TECHNICIAN")
                         .requestMatchers("/home","appointment/**","api/dashboard/doctor","api/medicalRecords/saveDiagnosis","api/prescriptions/**","api/staff").hasAuthority("ROLE_DOCTOR")
                         .requestMatchers("api/medicalRecords/getByUserId","api/medicalRecords/updateStatus").hasAnyAuthority("ROLE_DOCTOR", "ROLE_PATIENT")

@@ -44,10 +44,10 @@ public class Staff {
     private LocalDateTime addedOn;
 
     @Column
-    private LocalDateTime lastActive;
-
-    @Column
     private LocalDateTime lastUpdated;
+
+    @Column(name = "lastUpdatedBy")
+    private String lastUpdatedBy;
 
     @Column (name = "startTime")
     private LocalTime startTime;
@@ -143,13 +143,6 @@ public class Staff {
         this.addedOn = addedOn;
     }
 
-    public LocalDateTime getLastActive() {
-        return lastActive;
-    }
-
-    public void setLastActive(LocalDateTime lastActive) {
-        this.lastActive = lastActive;
-    }
 
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
@@ -174,5 +167,13 @@ public class Staff {
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
+    }
+
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 }
