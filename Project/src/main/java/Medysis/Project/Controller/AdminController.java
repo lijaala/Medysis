@@ -30,8 +30,6 @@ public class AdminController {
     @Autowired
     private RoleService roleService;
     @Autowired
-    private AvailabilityRepository availabilityRepository;
-    @Autowired
     public final UploadImageService uploadImageService;
     @Autowired
     private RoleRepository roleRepository;
@@ -39,10 +37,9 @@ public class AdminController {
 
 
     @Autowired
-    public AdminController(StaffService staffService, RoleService roleService, AvailabilityRepository availabilityRepository) {
+    public AdminController(StaffService staffService, RoleService roleService) {
         this.staffService = staffService;
         this.roleService = roleService;
-        this.availabilityRepository = availabilityRepository;
         this.uploadImageService = new UploadImageService();
 
     }

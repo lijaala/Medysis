@@ -76,11 +76,10 @@ public class AppointmentController {
             HttpSession session) {
 
         // Get the doctor ID from the session
-        String doctorID = (String) session.getAttribute("userId");
+        String updatedBy = (String) session.getAttribute("userId");
 
-        // If doctorID is not found in the session, you may want to handle this error
-        if (doctorID == null) {
-            return "Doctor ID is not available in the session.";
+        if (updatedBy == null) {
+            return "Error: User ID not found in session.";
         }
         System.out.println("Edit request received for appointment ID: " + appointmentID);
         try{
@@ -93,7 +92,7 @@ public class AppointmentController {
         LocalTime appTime = LocalTime.parse(appTimeStr, timeFormatter);
 
         // Call service to edit the appointment
-        Appointment appointment = appointmentService.editAppointment(appointmentID, doctorID, appDate, appTime, status);
+        Appointment appointment = appointmentService.editAppointment(appointmentID, updatedBy, appDate, appTime, status);
 
         }
         catch (Exception e) {

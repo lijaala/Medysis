@@ -44,8 +44,9 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
-    public List<Appointment> getAppointmentsByRole(String userRole, String userId) {
 
+
+    public List<Appointment> getAppointmentsByRole(String userRole, String userId) {
 
         if ("ROLE_DOCTOR".equals(userRole)) {
             Staff doctor = staffRepository.findById(userId)
@@ -58,17 +59,14 @@ public class AppointmentService {
         }
     }
 
-    public Appointment editAppointment(Integer appointmentID, String doctorID, LocalDate appDate, LocalTime appTime, String status) {
+
+
+    public Appointment editAppointment(Integer appointmentID, String updatedBy, LocalDate appDate, LocalTime appTime, String status) {
         // Fetch the appointment from the database
         Appointment appointment = appointmentRepository.findById(appointmentID)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
         // Update only the fields that are provided (not empty)
-        if (doctorID != null && !doctorID.isEmpty()) {
-            Staff doctor = staffRepository.findById(doctorID)
-                    .orElseThrow(() -> new RuntimeException("Doctor not found"));
-            appointment.setDoctorID(doctor);
-        }
 
         if (appDate != null) {
             appointment.setAppDate(appDate);
@@ -81,10 +79,12 @@ public class AppointmentService {
         if (status != null && !status.isEmpty()) {
             appointment.setStatus(status);
         }
-
+        appointment.setAppUpdatedBy(updatedBy);
         // Save the updated appointment
         return appointmentRepository.save(appointment);
     }
+
+
 
     public void completeAppointment(Integer appointmentID, String staffId) {
         Appointment appointment = appointmentRepository.findById(appointmentID)
@@ -109,19 +109,7 @@ public class AppointmentService {
     }
 
 
-    //DTO conversion
 
-//    public AppointmentDTO convertToDTO(Appointment appointment) {
-//        AppointmentDTO dto = new AppointmentDTO();
-//        dto.appointmentID = appointment.getAppointmentID();
-//        dto.patientID = user; // Convert User to UserDTO
-//        dto.doctorID = staffService.convertToDTO(appointment.getDoctorID()); // Convert Staff to StaffDTO
-//        dto.appDate = appointment.getAppDate();
-//        dto.appTime = appointment.getAppTime();
-//        dto.status = appointment.getStatus();
-//        dto.followUpDate = appointment.getFollowUpDate();
-//        return dto;
-//    }
      public List<Appointment> getAllAppointments(){
         return appointmentRepository.findAll();
      }
