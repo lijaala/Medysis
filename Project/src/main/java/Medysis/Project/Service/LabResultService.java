@@ -58,29 +58,59 @@ public class LabResultService {
         dto.resultValue=labResults.getResultValue();
         dto.notes = labResults.getNotes();
 
+
+
         return dto;
     }
 
 
     public void updateLabResult(int orderId, int testId, Double resultValue, String notes, HttpSession session) {
+        String labTechnicianId = (String) session.getAttribute("userId");
 
-        // Fetch the LabOrder and LabTest from their respective repositories
         LabOrder labOrder = labOrderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Lab order not found with ID " + orderId));
 
         LabTests labTest = labTestRepository.findById(testId)
                 .orElseThrow(() -> new IllegalArgumentException("Lab test not found with ID " + testId));
 
-        // Fetch the LabResult using LabOrder and LabTest
+        // ✅ Fix: Handle Optional<LabResults>
         LabResults labResult = labResultRepository.findByOrderIDAndTestID(labOrder, labTest)
-                .orElseThrow(() -> new IllegalArgumentException("Lab result not found for the provided order and test"));
+                .orElse(new LabResults(labOrder, labTest));
 
-        // Update the lab result
-        labResult.setResultValue(resultValue);
-        labResult.setNotes(notes);
+        labResult.setOrderID(labOrder);
+        labResult.setTestID(labTest);
 
-        // Save the updated LabResult
-        labResultRepository.save(labResult);
+        // Fetch Lab Technician
+        Staff labTechnician = staffRepository.findById(labTechnicianId)
+                .orElseThrow(() -> new IllegalArgumentException("Lab technician not found"));
+
+        boolean hasChanges = (labResult.getResultValue() == null || !labResult.getResultValue().equals(resultValue))
+                || (labResult.getNotes() == null || !labResult.getNotes().equals(notes));
+
+        if (hasChanges) {
+            labResult.setResultValue(resultValue);
+            labResult.setNotes(notes);
+            labResult.setLabTechnicianID(labTechnician);
+            labResultRepository.save(labResult);
+        }
+
+
+        List<LabResults> resultsForOrder = labResultRepository.findByOrderID(labOrder);
+
+        // Check if all results have values
+        boolean allResultsEntered = resultsForOrder.stream()
+                .allMatch(result -> result.getResultValue() != null);
+
+        // Update order status
+        String newStatus = allResultsEntered ? "Completed" : "Pending";
+        labOrder.setLabStatus(newStatus);
+        System.out.println("Updating Order Status for Order ID " + orderId + " to: " + newStatus);
+        labOrderRepository.save(labOrder);
     }
+
+
+
+
+
 
 }

@@ -14,6 +14,7 @@ public class LabOrderDTO {
     public List<LabResultDTO> labResults;
     public String urgency;
     public LocalDate orderDate;
+    public String labStatus;
 
     public LabOrderDTO() {
     }

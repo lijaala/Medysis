@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "LabResults")
 
 public class LabResults {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int reportId;
@@ -35,6 +36,10 @@ public class LabResults {
 
     @Column(name = "notes", nullable = true)
     private String notes;
+
+    @ManyToOne
+    @JoinColumn(name = "labTechnician", referencedColumnName = "staffID")
+    private Staff labTechnicianID;
 
     public int getReportId() {
         return reportId;
@@ -98,5 +103,22 @@ public class LabResults {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Staff getLabTechnicianID() {
+        return labTechnicianID;
+    }
+
+    public void setLabTechnicianID(Staff labTechnicianID) {
+        this.labTechnicianID = labTechnicianID;
+    }
+
+
+    public LabResults(){
+
+    }
+    public LabResults(LabOrder orderID, LabTests testID) {
+        this.orderID = orderID;
+        this.testID = testID;
     }
 }

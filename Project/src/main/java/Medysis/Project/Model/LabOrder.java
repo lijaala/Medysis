@@ -25,9 +25,6 @@ public class LabOrder {
     @JoinColumn(name = "appoinmentID", referencedColumnName = "appointmentID",  unique = true)
     private Appointment appointmentID;
 
-    @ManyToOne
-    @JoinColumn(name = "labTechnician", referencedColumnName = "staffID")
-    private Staff labTechnicianID;
 
     @Column(name = "orderDate")
     private LocalDate orderDate;
@@ -72,14 +69,6 @@ public class LabOrder {
 
     public void setAppointmentID(Appointment appointmentID) {
         this.appointmentID = appointmentID;
-    }
-
-    public Staff getLabTechnicianID() {
-        return labTechnicianID;
-    }
-
-    public void setLabTechnicianID(Staff labTechnicianID) {
-        this.labTechnicianID = labTechnicianID;
     }
 
     public LocalDate getOrderDate() {

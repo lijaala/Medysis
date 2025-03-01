@@ -478,30 +478,29 @@ button#addMedicationBtn {
 
 #labDetailsModal {
     display: none;
-    position: relative; /* Position relative to .actions */
-    background-color: #F0F2F9;
-    border-radius: 8px;
+    position: relative;
+    align-self: center;
+    background-color: #fcfdfe;
+    border-radius: 12px;
     border: 1px solid #ccc;
     padding: 10px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-    width: fit-content;
+    width: 45%;
 }
 
 #labDetailsModal div {
-    margin-bottom: 5%;
+    margin-bottom: 2%;
 }
 
 #labDetailsModal button {
     margin-top: 10px;
 }
 .modal-body{
-    margin: 15% 2%;
+    margin: 10% 2%;
+    width: 100%;
 }
-.modal-body div{
-    padding: 1%;
-    border-bottom: 1px rgb( 255, 52, 147) solid;
-}
+
 #overlay {
     position: fixed;
     top: 0;
@@ -516,7 +515,12 @@ button#addMedicationBtn {
 .blur {
     backdrop-filter: blur(5px); /* Use backdrop-filter for better performance */
 }
+.test-container{
+    background-color:rgb(240, 242, 249) ;
+    border-radius: 8px;
+    padding: 2%;
 
+}
 #labTestTable input{
     width: 80%;
 }

@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${order.orderDate}</td>  
                             <td>${order.labResults?.length || 0}</td>
                             <td>${(order.urgency || 'N/A').toUpperCase()}</td>
+                            <td>${(order.labStatus)}</td>
                             <td class="actions">
                                 <button type="button" class="secondary view-details" data-order-id="${order.orderID}">View Details</button>
                                 <button type="button" class="primary add-results" data-order-id="${order.orderID}">Add Results</button>
@@ -79,34 +80,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalBody = modal.querySelector('.modal-body');
         const overlay = document.getElementById('overlay'); // Get the overlay element
         overlay.style.display = 'block';
-
         overlay.classList.add('blur');
-
 
         if (!modal || !modalBody) {
             console.error("Modal or modal body element not found!");
             return;
         }
 
-        modalBody.innerHTML = '';
+        modalBody.innerHTML = ''; // Clear previous content
 
         if (labOrderDetails && labOrderDetails.labResults && labOrderDetails.labResults.length > 0) {
             labOrderDetails.labResults.forEach(test => {
+                const testContainer = document.createElement('div');
+                testContainer.classList.add('test-container'); //
+
+                // Test Name
                 const testNameDiv = document.createElement('div');
-                testNameDiv.textContent = test.testName;
-                modalBody.appendChild(testNameDiv);
+                testNameDiv.textContent = `Test Name: ${test.testName}`;
+                testContainer.appendChild(testNameDiv);
+
+                // Result Value (if available)
+                const resultDiv = document.createElement('div');
+                resultDiv.textContent = `Result: ${test.resultValue !== null ? test.resultValue : 'Pending'}`;
+                testContainer.appendChild(resultDiv);
+
+                // Notes (if available)
+                const notesDiv = document.createElement('div');
+                notesDiv.textContent = `Notes: ${test.notes ? test.notes : 'No notes available'}`;
+                testContainer.appendChild(notesDiv);
+
+                // Append to modal body
+                modalBody.appendChild(testContainer);
             });
         } else {
             modalBody.textContent = "No tests found for this lab order.";
         }
 
-
-
         modal.style.display = 'flex';
-
-
-
     }
+
 
     function handleAddResultsClick(event) {
         const orderId = event.target.dataset.orderId;
@@ -127,9 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Populate patient and doctor details
         document.getElementById("patientDoc").innerHTML = `
-            <span>Patient: ${labOrderDetails.userName || 'Unknown'}</span> <br> <br>
-            <span>Doctor: ${labOrderDetails.doctorName || 'Unknown'}</span>
-        `;
+        <span>Patient: ${labOrderDetails.userName || 'Unknown'}</span> <br> <br>
+        <span>Doctor: ${labOrderDetails.doctorName || 'Unknown'}</span>
+    `;
 
         // Populate lab test results table
         const labResultTable = document.getElementById("labResultTable");
@@ -139,23 +151,34 @@ document.addEventListener('DOMContentLoaded', () => {
             labOrderDetails.labResults.forEach(result => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${result.reportId}</td>
-                    <td>${result.testName}</td>
-                    <td>${result.measurementUnit || 'N/A'}</td>
-                    <td>${result.normalRange || 'N/A'}</td>
-                    <td><input type="number" class="result-value" data-test-id="${result.testID}" placeholder="Enter result"></td>
-                    <td><input type="text" class="result-notes" placeholder="Notes"></td>
-                `;
+                <td>${result.reportId}</td>
+                <td>${result.testName}</td>
+                <td>${result.measurementUnit || 'N/A'}</td>
+                <td>${result.normalRange || 'N/A'}</td>
+                <td>
+                    <input type="number" class="result-value" 
+                        data-test-id="${result.testID}" 
+                        value="${result.resultValue !== null ? result.resultValue : ''}" 
+                        placeholder="Enter result">
+                </td>
+                <td>
+                    <input type="text" class="result-notes" 
+                        value="${result.notes ? result.notes : ''}" 
+                        placeholder="Notes">
+                </td>
+            `;
                 labResultTable.appendChild(row);
 
+                // Enable submit button when a result is entered
                 row.querySelector('.result-value').addEventListener('input', function() {
-                    enableSubmitForEnteredResults(); // Enable submission when a result is entered
+                    enableSubmitForEnteredResults();
                 });
             });
         } else {
             labResultTable.innerHTML = '<tr><td colspan="6">No tests available.</td></tr>';
         }
     }
+
 
     function showLabResultsModal() {
         labResultsModal.style.display = "flex";

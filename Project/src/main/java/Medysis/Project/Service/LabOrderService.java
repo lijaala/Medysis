@@ -105,6 +105,7 @@ public class LabOrderService {
         dto.appointmentID = labOrder.getAppointmentID().getAppointmentID();
         dto.urgency = labOrder.getUrgency();
         dto.orderDate = labOrder.getOrderDate();
+        dto.labStatus = labOrder.getLabStatus();
 
         if (labOrder.getLabResults() != null) {
             dto.labResults = labOrder.getLabResults().stream()
