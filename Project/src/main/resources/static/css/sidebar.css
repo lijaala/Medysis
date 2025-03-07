@@ -45,6 +45,7 @@ body {
     border-radius: 8px;
     color: rgba(103, 43, 71, 0.81);
     transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
+    cursor: default;
 
     svg path, svg g {
         stroke: rgba(103, 43, 71, 0.81);

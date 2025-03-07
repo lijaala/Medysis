@@ -1,5 +1,7 @@
 package Medysis.Project.Service;
 
+import Medysis.Project.DTO.MedicationDTO;
+import Medysis.Project.DTO.PrescriptionResponse;
 import Medysis.Project.Model.*;
 import Medysis.Project.Repository.*;
 import jakarta.transaction.Transactional;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PrescriptionService {
@@ -100,5 +103,18 @@ public class PrescriptionService {
             prescribedMedicationsRepository.save(prescribedMedication);
             logger.info("Saved PrescribedMedication for Medication ID: " + prescribedMedication.getMedication().getMedicationID());
         }
+    }
+
+    public List<PrescriptionResponse> getPrescriptionsByUserId(Integer userId) {
+        List<Prescription> prescriptions = prescriptionRepository.findByUserId(userId);
+        return prescriptions.stream().map(p -> new PrescriptionResponse(
+                p.getUser().getUserID(),
+                p.getStaff().getStaffID(),
+                p.getPrescriptionDate(),
+
+                p.getPrescribedMedications().stream()
+                        .map(med -> new MedicationDTO(med.getMedication().getMedicationName(), med.getDosage(), med.getIntake(), med.getMedicationInterval(),med.getDaysOfIntake()))
+                        .collect(Collectors.toList())
+        )).collect(Collectors.toList());
     }
 }

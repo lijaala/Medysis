@@ -48,22 +48,26 @@ button{
 
     svg path, svg g {
         stroke: #07104E;
+        color:#07104E;
+
     }
 
 }
 .icon:hover{
-    background-color: rgba(255, 194, 223, 0.68);
+
     border: transparent;
     svg path, svg g {
         stroke: rgb( 255, 52, 147) ;
+        color:rgb( 255, 52, 147);
+        box-shadow: 1px 1px 1px black;
     }
 
 }
 .icon:active{
-    background-color: rgba(255, 194, 223, 0.68);
-    border: rgb( 255, 52, 147) 1px solid ;
+
     svg path, svg g {
         stroke: rgb( 255, 52, 147) ;
+        color:rgb( 255, 52, 147);
     }
 }
 .upload{

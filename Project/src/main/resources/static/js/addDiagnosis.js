@@ -95,7 +95,7 @@ function saveDiagnosisAndNext(event) {
                     const userId = document.getElementById("userIdInput").value;
 
                     openPrescriptionModal(appointmentId,userId);
-                }, 3000); // Small delay for opening
+                }, 3000);
             }, 3500); // Delay for closing (1.5 seconds)
         }
     });
@@ -186,7 +186,7 @@ function viewPastRecords() {
 }
 
 
-// update the status od medical condition
+// update the status of medical condition
 
 function updateMedicalHistory() {
     const statusUpdates = [];

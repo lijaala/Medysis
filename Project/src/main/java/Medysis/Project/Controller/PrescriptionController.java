@@ -1,5 +1,6 @@
 package Medysis.Project.Controller;
 
+import Medysis.Project.DTO.PrescriptionResponse;
 import Medysis.Project.Model.Prescription;
 import Medysis.Project.Service.PrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import jakarta.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 @RestController
@@ -82,4 +85,14 @@ public class PrescriptionController {
             this.message = message;
         }
     }
-}
+
+
+
+        @GetMapping("/getByUserId")
+        public ResponseEntity<List<PrescriptionResponse>> getPrescriptionsByUserId(@RequestParam Integer userId) {
+            List<PrescriptionResponse> prescriptions = prescriptionService.getPrescriptionsByUserId(userId);
+            return ResponseEntity.ok(prescriptions);
+        }
+    }
+
+

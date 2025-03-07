@@ -395,11 +395,22 @@ td.actions button{
 .modal-header{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
     margin-top: 2%;
     padding: 2%;
+    gap:40%;
 
+}
+.modal-header h3{
+    text-wrap: nowrap;
+}
+.modal-header div{
+
+    width:fit-content;
+    flex:6;
+    button{
+        width:30%;
+    }
 }
 /* Close button (top-right corner) */
 .close {

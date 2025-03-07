@@ -4,6 +4,7 @@ import Medysis.Project.DTO.LabOrderDTO;
 import Medysis.Project.Model.Appointment;
 import Medysis.Project.Model.LabOrder;
 import Medysis.Project.Model.Staff;
+import Medysis.Project.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,5 +30,5 @@ public interface LabOrderRepository extends JpaRepository<LabOrder, Integer> {
     List<LabOrder> findByLabStatusAndUrgency(@Param("labStatus") String labStatus, @Param("urgency") String urgency);
 
 
-
+    List<LabOrder> findByUserID(User userID);
 }

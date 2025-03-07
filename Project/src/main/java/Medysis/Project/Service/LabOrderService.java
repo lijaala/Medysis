@@ -91,6 +91,11 @@ public class LabOrderService {
                 .collect(Collectors.toList());
     }
 
+    public List<LabOrderDTO> getLabOrdersByUserId(User userId) {
+        List<LabOrder> labOrders = labOrderRepository.findByUserID(userId);
+        return labOrders.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
 
 
     public LabOrderDTO convertToDTO(LabOrder labOrder) {

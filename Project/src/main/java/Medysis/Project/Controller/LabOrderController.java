@@ -4,14 +4,18 @@ package Medysis.Project.Controller;
 import Medysis.Project.DTO.LabOrderDTO;
 import Medysis.Project.DTO.LabResultDTO;
 import Medysis.Project.Model.LabOrder;
+import Medysis.Project.Model.User;
+import Medysis.Project.Repository.UserRepository;
 import Medysis.Project.Service.LabOrderService;
 import Medysis.Project.Service.LabResultService;
+import Medysis.Project.Service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("api/LabOrder")
@@ -22,6 +26,9 @@ public class LabOrderController {
 
     @Autowired
     private LabResultService labResultService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/orderRequest")
     public String createLabOrder(@RequestParam("appointmentID") int appointmentId,
@@ -58,6 +65,14 @@ public class LabOrderController {
         return labResultService.getAllLabResults();
     }
 
+    @GetMapping("/getByUserId")
+    public ResponseEntity<List<LabOrderDTO>> getLabOrdersByUserId(@RequestParam Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + userId));
+
+        List<LabOrderDTO> labOrders = labOrderService.getLabOrdersByUserId(user);
+        return ResponseEntity.ok(labOrders);
+    }
 
 
 }
