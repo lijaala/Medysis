@@ -118,6 +118,47 @@ public class AuthController {
         session.invalidate(); // Invalidates the session
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        // Check if user or staff exists
+        Optional<User> userOptional = userService.findByEmail(email);
+        Optional<Staff> staffOptional = staffService.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            try {
+                userService.generatePasswordResetToken(userOptional.get());
+                return ResponseEntity.ok("Password reset link sent to your email.");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("An error occurred while generating reset link. Please try again.");
+            }
+        } else if (staffOptional.isPresent()) {
+            try {
+                staffService.generatePasswordResetToken(staffOptional.get());
+                return ResponseEntity.ok("Password reset link sent to your email.");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("An error occurred while generating reset link. Please try again.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User or staff with this email does not exist.");
+        }
+    }
+
+
+    // Reset Password (User & Staff)
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        boolean resetSuccessful = userService.resetPasswordWithToken(token, newPassword) ||
+                staffService.resetPasswordWithToken(token, newPassword);
+
+        if (resetSuccessful) {
+            return ResponseEntity.ok("Password reset successful.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token or password reset failed.");
+        }
+    }
 
 
 }

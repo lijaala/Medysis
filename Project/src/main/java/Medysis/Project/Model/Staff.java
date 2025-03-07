@@ -55,6 +55,12 @@ public class Staff {
     @Column(name = "endTime")
     private LocalTime endTime;
 
+    @Column(name = "resetToken", length = 64, unique = true)
+    private String resetToken;
+
+    @Column(name = "resetTokenExpiry")
+    private LocalDateTime resetTokenExpiry;
+
     public String getStaffID() {
         return staffID;
     }
@@ -175,5 +181,21 @@ public class Staff {
 
     public void setLastUpdatedBy(String lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
+
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
     }
 }

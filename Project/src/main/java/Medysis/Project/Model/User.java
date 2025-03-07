@@ -56,6 +56,12 @@ public class User {
     @Column(name = "updatedBy")
     private String updatedBy;
 
+    @Column(name = "resetToken", length = 64, unique = true)
+    private String resetToken;
+
+    @Column(name = "resetTokenExpiry")
+    private LocalDateTime resetTokenExpiry;
+
 
 
     public void setId(Integer id) {
@@ -189,4 +195,19 @@ public class User {
 
     }
 
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
+
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
+    }
 }

@@ -256,13 +256,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function enableSubmitForEnteredResults() {
         const resultInputs = document.querySelectorAll('.result-value');
+        const resultNotes=document .querySelectorAll('.result-notes');
+
+
         const submitButton = document.getElementById('submitSingleResult');  // Assuming there's a global submit button
 
         // Enable submit button only if any result is entered
         const anyTestEntered = Array.from(resultInputs).some(input => input.value.trim() !== '');
+        const anyResultEntered=Array.from(resultNotes).some(input=>input.value.trim()!=='');
 
         // Only submit filled tests
-        if (anyTestEntered) {
+        if (anyTestEntered || anyResultEntered) {
             submitButton.style.display = 'inline-block';  // Show the submit button when a result is entered
         } else {
             submitButton.style.display = 'none'; // Hide if no result is entered

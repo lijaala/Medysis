@@ -12,10 +12,7 @@
     background-color: transparent;
 
 }
-.headerContainer {
-    width: 90%;
-    padding-left: 5%;
-}
+
 
 .adminBody {
     display: flex;

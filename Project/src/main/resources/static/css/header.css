@@ -1,11 +1,13 @@
 @import url(default.css);
 
 
-
+.headerContainer {
+    width: 100%;
+}
 .header {
     margin-top: 3vh;
     display: flex;
-    gap: 15vw;
+    justify-content: space-between;
     align-items: center;
     font-family: "Inter", serif;
     color: rgba(103, 43, 71, 0.81);
@@ -17,12 +19,14 @@
     display: flex;
     gap: 40px;
     align-items: center;
+    position: relative;
 
 }
 
 .search-Header input {
     width: 100%;
-    padding: .5vw;
+    padding: 4px 12px;
+    height:50px;
     border-radius: 20px;
     outline: none;
     border: none;
@@ -31,10 +35,16 @@
 
 }
 
+.search-Header svg{
+    position: absolute;
+    right: 4px;
+    top: 25%;
+}
+
 .notification {
     display: flex;
     flex-direction: row;
-    gap: 5vw;
+    gap: 2vw;
     align-items: center;
 
 }
@@ -43,13 +53,14 @@
     display: flex;
     align-items: center;
     width: fit-content;
-    gap: 2vw;
+    gap: 4px;
 }
 
 .profile-picture {
-    width: fit-content;
-    height: fit-content;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    display: flex;
-    gap: 3vh;
+    object-fit: cover;
+    filter: brightness(.75);
+
 }

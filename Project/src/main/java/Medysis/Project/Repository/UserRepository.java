@@ -16,8 +16,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findByVerificationCode(String verificationCode);
     long count();
 
+
     // Count new patients in the last month
     @Query("SELECT COUNT(u) FROM User u WHERE u.created_at > :lastMonth")
     int countNewPatientsLastMonth(@Param("lastMonth") LocalDateTime lastMonth);
+
+    Optional<User> findByResetToken(String token);
 }
 

@@ -18,6 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class StaffService {
@@ -30,12 +31,16 @@ public class StaffService {
     @Autowired
     private final UploadImageService uploadImageService;
 
+    @Autowired
+    private final EmailService emailService;
 
 
-    public StaffService( StaffRepository staffRepository, PasswordEncoder passwordEncoder, UploadImageService uploadImageService) {
+
+    public StaffService( StaffRepository staffRepository, PasswordEncoder passwordEncoder, UploadImageService uploadImageService, EmailService emailService) {
         this.staffRepository = staffRepository;
         this.passwordEncoder = passwordEncoder;
         this.uploadImageService = uploadImageService;
+        this.emailService = emailService;
     }
 
     //staff registration method
@@ -173,24 +178,6 @@ public class StaffService {
         return staffRepository.save(existingStaff);
     }
 
-    public boolean resetPassword(String staffId, String currentPassword, String newPassword) {
-        Optional<Staff> optionalStaff = staffRepository.findById(staffId);
-
-        if (optionalStaff.isEmpty()) {
-            return false; // Staff not found
-        }
-
-        Staff staff = optionalStaff.get();
-
-        if (!passwordEncoder.matches(currentPassword, staff.getPassword())) {
-            return false; // Current password is incorrect
-        }
-
-        staff.setPassword(passwordEncoder.encode(newPassword));
-        staffRepository.save(staff);
-        return true; // Password successfully updated
-    }
-
     // ✅ Updated to return boolean
     public boolean updateProfilePicture(String staffId, MultipartFile photo) {
         Optional<Staff> optionalStaff = staffRepository.findById(staffId);
@@ -209,6 +196,31 @@ public class StaffService {
         staff.setImage(savedFileName);
         staffRepository.save(staff);
         return true; // Profile picture updated successfully
+    }
+    public void generatePasswordResetToken(Staff staff) {
+        String resetToken = UUID.randomUUID().toString();
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(30); // Token valid for 30 minutes
+
+        staff.setResetToken(resetToken);
+        staff.setResetTokenExpiry(expiryTime);
+
+        staffRepository.save(staff);
+
+        String resetUrl = "http://localhost:8081/forgotPassword?token=" + resetToken;
+        emailService.sendPasswordResetEmail(staff, resetUrl);
+    }
+
+    public boolean resetPasswordWithToken(String token, String newPassword) {
+        Optional<Staff> staffOptional = staffRepository.findByResetToken(token);
+
+        if (staffOptional.isPresent()) {
+            Staff staff = staffOptional.get();
+            staff.setPassword(passwordEncoder.encode(newPassword));
+            staff.setResetToken(null); // Clear the reset token
+            staffRepository.save(staff);
+            return true;
+        }
+        return false;
     }
 
 }

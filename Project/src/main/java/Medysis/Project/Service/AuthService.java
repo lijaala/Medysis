@@ -17,7 +17,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class AuthService {
     @Autowired
@@ -92,5 +95,4 @@ public class AuthService {
             return "Incorrect password or email";
         }
     }
-
-}
+    }

@@ -15,9 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -145,7 +143,30 @@ public class UserService {
         return userRepository.findById(userID).orElse(null);
     }
 
+    public void generatePasswordResetToken(User user) {
+        String resetToken = UUID.randomUUID().toString();
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(15); // Token valid for 30 minutes
 
+        user.setResetTokenExpiry(expiryTime);
+        user.setResetToken(resetToken);
+        userRepository.save(user);
+
+        String resetUrl = "http://localhost:8081/forgotPassword?token=" + resetToken;
+        emailService.sendPasswordResetEmail(user, resetUrl);
+    }
+
+    public boolean resetPasswordWithToken(String token, String newPassword) {
+        Optional<User> userOptional = userRepository.findByResetToken(token);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            user.setResetToken(null); // Clear the reset token
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
 }
 
 

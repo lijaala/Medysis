@@ -16,5 +16,6 @@ public interface StaffRepository extends JpaRepository<Staff, String> {
     List<Staff> findByRole(Role role);
     List<Staff> findByRoleRoleID(Integer roleID);
 
+    Optional<Staff> findByResetToken(String token);
 }
 

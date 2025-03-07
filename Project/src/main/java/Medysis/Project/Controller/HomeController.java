@@ -35,6 +35,8 @@ public class HomeController {
     @GetMapping("/patientHome")
     public String patientHome() {
         return "patientHome";
-          }
+    }
+     @GetMapping("/forgotPassword")
+    public String forgotPassword() {  return "forgotPassword"; }
 }
 

@@ -91,27 +91,6 @@ public class StaffController {
         Staff savedStaff = staffService.updateProfile(staffId, updatedStaff);
         return ResponseEntity.ok(savedStaff);
     }
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String currentPassword,
-                                           @RequestParam String newPassword,
-                                           HttpSession session) {
-        String staffId = (String) session.getAttribute("userId");
-
-        if (staffId == null) {
-            return ResponseEntity.status(401).body("User not logged in");
-        }
-
-        boolean isReset = staffService.resetPassword(staffId, currentPassword, newPassword);
-
-        if (isReset) {
-            session.invalidate(); // ✅ Logout user after password reset
-            return ResponseEntity.ok(Map.of(
-                    "message", "Password reset successful. Redirecting to login...",
-                    "redirectUrl", "/login"
-            ));        } else {
-            return ResponseEntity.badRequest().body(Map.of("message", "Incorrect current password or update failed."));
-        }
-    }
 
     @PostMapping("/update-profile-picture")
     public ResponseEntity<?> updateProfilePicture(@RequestParam("photo") MultipartFile photo, HttpSession session) {

@@ -1,3 +1,5 @@
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
 
@@ -262,7 +264,23 @@ function setupProfileFormSubmission() {
             body: JSON.stringify(formData)
         })
             .then(response => response.json())
-            .then(data => alert("Profile updated successfully!"))
+            .then(data =>
+                Toastify({
+                text: "Profile Updated successfully",
+                duration: 3000,
+
+                newWindow: true,
+
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                style: {
+                    backgroundColor: "#F0F2F9FF",
+                    borderRadius:"12px"
+                },
+                onClick: function(){} // Callback after click
+            }).showToast()
+            )
             .catch(error => alert("Error updating profile."));
     });
 }
