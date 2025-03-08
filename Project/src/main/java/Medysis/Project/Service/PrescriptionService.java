@@ -108,8 +108,8 @@ public class PrescriptionService {
     public List<PrescriptionResponse> getPrescriptionsByUserId(Integer userId) {
         List<Prescription> prescriptions = prescriptionRepository.findByUserId(userId);
         return prescriptions.stream().map(p -> new PrescriptionResponse(
-                p.getUser().getUserID(),
-                p.getStaff().getStaffID(),
+                p.getUser().getName(),
+                p.getStaff().getStaffName(),
                 p.getPrescriptionDate(),
 
                 p.getPrescribedMedications().stream()

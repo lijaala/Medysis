@@ -24,13 +24,36 @@ button{
     color: rgb(253, 253, 255);
 }
 .primary {
+    display: flex;
     background-color: rgb(245, 20, 125);
     box-shadow: 0 2px 2px rgba(190, 72, 127, 0.53);
+    align-items: center;
+    justify-content: center;
+    gap:5%;
+    text-wrap: nowrap;
 }
 .secondary{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:5%;
+    text-wrap: nowrap;
     background-color: #F0F2F9;
+    box-shadow: 0 1px 2px rgba(146, 206, 244, 0.3);
     color:#36B1FF;
     border:none;
+}
+.tertiary{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:5%;
+    text-wrap: nowrap;
+    background-color: #F0F2F9;
+    box-shadow: 0 1px 2px rgba(72, 132, 132, 0.44);
+    color:#008080;
+    border:none ;
+
 }
 .cancel{
     background-color: red!important;

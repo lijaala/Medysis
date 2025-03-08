@@ -17,38 +17,40 @@
                     <div class="medication-entry">
                         <div class="form-row">
 
-                            <div class="form-row">
+                            <div class="form-field">
                                 <label for="medication">Medication:</label>
                                 <input type="text" id="medication" name="medicationName[]" required placeholder="Enter medication name">
                             </div>
 
                         <!-- Dosage Input -->
-                            <div class="form-row">
+                            <div class="form-field">
                                 <label for="dosage">Dosage:</label>
                                 <input type="text" name="dosage[]" id="dosage" required placeholder="e.g., 500mg">
                             </div>
                         </div>  
                         <div class="form-row"> 
-                            <div class="form-row">
+                            <div class="form-field">
                                 <!-- Intake Instruction -->
                                 <label for="intake">Intake:</label>
                                 <input type="text" name="intake[]" id="intake" required placeholder="e.g., Oral">
                             </div>
-                            <div class="form-row">
+                            <div class="form-field">
                                 <!-- Frequency Input -->
                                 <label for="frequency">Frequency:</label>
                                 <input type="text" name="frequency[]" id="frequency" required placeholder="e.g., Every 6 hours">
                             </div>    
                         </div>
-                        <div class="form-row">
+                       <div class="form-row">
+                        <div class="form-field">
 
                             <label for="alternative">Alternative:</label>
                             <input type="text" name="alternative[]" id="alternative" min="1" required>
                         </div>
-                        <div class="form-row">       
+                        <div class="form-field">
                              <label for="daysOfIntake">Duration (days):</label>
                              <input type="number" name="daysOfIntake[]" id="daysOfIntake" min="1" required>
-                        </div>     
+                        </div>
+                       </div>
 
 
                     </div>
@@ -59,7 +61,8 @@
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button type="submit" id="prescriptionNext" class="primary">NEXT</button>
+                    <button type="submit" id="prescriptionNext" class="primary">Order Lab Tests</button>
+
                     <button type="button" id="prescriptionDone" class="secondary" onclick="closePrescriptionModal()">End Appointment</button>
                 </div>
             </form>
@@ -97,8 +100,9 @@
                     </div>
                 </div>
                 <div class="action-buttons">
-                    <button type="button" class="secondary" onclick="addLabTest()" id="addTestBtn">Add Test</button>
-                    <button type="button" class="primary" onclick="submitLabOrder()">DONE</button>
+                    <button type="button" class="primary" onclick="addLabTest()" id="addTestBtn">Add Test</button>
+                    <button type="button" class="secondary" id="saveAndPrescribe" onclick="saveLabOrderAndPrescribe()"> Add Prescription</button>
+                    <button type="button" class="tertiary" onclick="submitLabOrder()">End Appointment</button>
                 </div>
             </form>
         </div>

@@ -16,7 +16,7 @@
                 populatePatientTable(data);
             })
             .catch(error=>{
-                console.error("Error fetching staff Data", error);
+                console.error("Error fetching patient Data", error);
             })
     }
 

@@ -50,8 +50,14 @@
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button type="submit" id="nextButton" class="primary" >Next</button>
-                    <button type="button" id="doneButton" class="secondary" >End Appointment</button>
+
+
+                    <button type="button" id="doneButton" class="primary" >End Appointment</button>
+                </div>
+                <div class="form-row">
+                    <button type="button" id="nextButton" class="secondary" >Add Prescription</button>
+                    <button type="button" id="orderTest" onclick="saveDiagnosisAndOrderTest()" class="tertiary">Order Lab Tests
+                    </button>
                 </div>
 
             </form>
@@ -68,9 +74,9 @@
             <table class="Table">
                 <thead>
                 <tr>
-                    <th>Condition</th>
-                    <th>Diagnosed Date</th>
-                    <th>Status</th>
+                    <td>Condition</td>
+                    <td>Diagnosed Date</td>
+                    <td>Status</td>
                 </tr>
                 </thead>
                 <tbody id="medicalRecordsBody">
@@ -83,15 +89,19 @@
     </div>
     <!-- Past Prescriptions Modal -->
     <div id="viewPrescriptionsModal" class="modal" style="display:none;">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
-            <span class="close" onclick="document.getElementById('prescriptionsModal').style.display='none'">&times;</span>
-            <h2>Past Prescriptions</h2>
-            <table>
+            <span class="close" onclick="closePrescriptionHistory()">&times;</span>
+            <h3>Past Prescriptions</h3>
+            <table class="Table">
                 <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Medications</th>
-                    <th>Doctor</th>
+                    <td>Prescribed Date</td>
+                    <td>Prescribed By</td>
+                    <td>Medication Name</td>
+                    <td>Dosage</td>
+                    <td>Interval</td>
+                    <td>Duration</td>
                 </tr>
                 </thead>
                 <tbody id="prescriptionsBody"></tbody>
@@ -101,16 +111,17 @@
 
     <!-- Past Lab Results Modal -->
     <div id="viewLabResultsModal" class="modal" style="display:none;">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
-            <span class="close" onclick="document.getElementById('labResultsModal').style.display='none'">&times;</span>
-            <h2>Past Lab Results</h2>
-            <table>
+            <span class="close" onclick="closeLabResultsHistory()">&times;</span>
+            <h3>Past Lab Results</h3>
+            <table class="Table">
                 <thead>
                 <tr>
-                    <th>Test Name</th>
-                    <th>Result</th>
-                    <th>Notes</th>
-                    <th>Lab Technician</th>
+                    <td>Test Name</td>
+                    <td>Result</td>
+                    <td>Notes</td>
+                    <td>Lab Technician</td>
                 </tr>
                 </thead>
                 <tbody id="labResultsBody"></tbody>
