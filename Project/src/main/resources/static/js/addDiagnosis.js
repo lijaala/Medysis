@@ -163,7 +163,9 @@ function saveDiagnosisAndClose(event) {
         }
     });
 }
-
+let diagnosisNextHandler, diagnosisDoneHandler, diagnosisLabNextHandler;
+let prescriptionNextHandler, prescriptionDoneHandler;
+let labOrderSubmitHandler;
 //open diagnosis modal
 function openDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
@@ -178,22 +180,36 @@ function openDiagnosisModal() {
     }
 
     // Simply open the modal
+    if (diagnosisNextHandler) {
+        nextButton.removeEventListener('click', diagnosisNextHandler);
+    }
+    if (diagnosisDoneHandler) {
+        doneButton.removeEventListener('click', diagnosisDoneHandler);
+    }
+    if (diagnosisLabNextHandler) {
+        labNext.removeEventListener('click', diagnosisLabNextHandler);
+    }
+
+    // Define new event listener functions
+    diagnosisNextHandler = function (event) {
+        saveDiagnosisAndNext(event);
+    };
+    diagnosisDoneHandler = function (event) {
+        saveDiagnosisAndClose(event, () => {
+            completeAppointment(document.getElementById("appointmentIdInput").value);
+        });
+    };
+    diagnosisLabNextHandler = function (event) {
+        saveDiagnosisAndOrderTest(event);
+    };
+
+    // Add new event listeners
+    nextButton.addEventListener('click', diagnosisNextHandler);
+    doneButton.addEventListener('click', diagnosisDoneHandler);
+    labNext.addEventListener('click', diagnosisLabNextHandler);
+
     diagnosisModal.style.display = "flex";
 
-    labNext.addEventListener('click', function(event) {
-        saveDiagnosisAndOrderTest(event);
-
-    });
-    nextButton.addEventListener('click', function(event) {
-        saveDiagnosisAndNext(event);
-    });
-
-    // Done button handler
-    doneButton.addEventListener('click', function(event) {
-        saveDiagnosisAndClose(event, () => {
-            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
-        });
-    });
 }
 
 
@@ -316,26 +332,34 @@ function openPrescriptionModal(appointmentId, userId) {
     const prescriptionNextButton = document.getElementById('prescriptionNext');
     const prescriptionDoneButton = document.getElementById('prescriptionDone');
 
-    prescriptionNextButton.addEventListener('click', function (event){
-        setTimeout(()=>{
+    if (prescriptionNextHandler) {
+        prescriptionNextButton.removeEventListener('click', prescriptionNextHandler);
+    }
+    if (prescriptionDoneHandler) {
+        prescriptionDoneButton.removeEventListener('click', prescriptionDoneHandler);
+    }
+
+    // Define new event listener functions
+    prescriptionNextHandler = function (event) {
+        setTimeout(() => {
             closePrescriptionModal();
             openLabReportsModal(
                 document.getElementById("appointmentId").value,
                 document.getElementById("userId").value
             );
-
-        }, 5000)
-    });
-
-    prescriptionDoneButton.addEventListener("click", function (event){
-        const form= document.getElementById('prescriptionForm');
-
+        }, 5000);
+    };
+    prescriptionDoneHandler = function (event) {
         setTimeout(() => {
             closePrescriptionModal();
-            completeAppointment(document.getElementById("appointmentId").value); // Complete appointment
+            completeAppointment(document.getElementById("appointmentId").value);
         }, 3000);
+    };
 
-    })
+    // Add new event listeners
+    prescriptionNextButton.addEventListener('click', prescriptionNextHandler);
+    prescriptionDoneButton.addEventListener('click', prescriptionDoneHandler);
+
 
     document.getElementById('appointmentId').value = appointmentId;
     document.getElementById('userId').value = userId;
@@ -451,7 +475,7 @@ function openPrescriptionModal(appointmentId, userId) {
                             borderRadius:"8px"
                         },onClick: function(){}
                     }).showToast();
-                } catch (parseError) { // It's the success message (plain text)
+                } catch (parseError) {
                     console.log("Success:", data);
                     Toastify({
                         text: data,
@@ -578,12 +602,20 @@ function openLabReportsModal(){
 
 
 
-    labOrderForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        submitLabOrder(() => {  // Callback after lab order is submitted
-            completeAppointment(document.getElementById("appointmentIdInput").value); // Complete appointment
+    if (labOrderSubmitHandler) {
+        labOrderForm.removeEventListener('submit', labOrderSubmitHandler);
+    }
+
+    // Define new event listener function
+    labOrderSubmitHandler = function (event) {
+        event.preventDefault();
+        submitLabOrder(() => {
+            completeAppointment(document.getElementById("appointmentIdInput").value);
         });
-    });
+    };
+
+    // Add new event listener
+    labOrderForm.addEventListener('submit', labOrderSubmitHandler);
 
 
 }

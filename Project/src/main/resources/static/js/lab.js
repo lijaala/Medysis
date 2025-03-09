@@ -207,7 +207,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (labResults.length === 0) {
-            alert('Please enter at least one result before submitting.');
+
+            Toastify({
+                text: "Please enter at least one result before submitting.",
+                duration: 3000,
+                backgroundColor: "rgba(253,200,200,0.5)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius:"8px",
+                style:{
+                    color:"rgb(167,6,14)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
             return;
         }
         let updateCount = 0; // To track the number of successful updates
@@ -231,7 +244,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     updateCount++;
                     if (updateCount === labResults.length) {
-                        message.innerHTML = 'Lab results updated successfully!';
+
+                        Toastify({
+                            text:"Lab results updated successfully!",
+                            duration: 3000,
+                            backgroundColor: "rgba(200,253,223,0.5)",
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style:{
+
+                                color:"rgb(15,94,27)",
+                                borderRadius:"8px"
+                            }
+
+                        }).showToast();
 
                         // Delay before closing the modal
                         setTimeout(() => {

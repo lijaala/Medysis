@@ -281,7 +281,8 @@ function setupProfileFormSubmission() {
                 onClick: function(){} // Callback after click
             }).showToast()
             )
-            .catch(error => alert("Error updating profile."));
+            .catch(error => alert("Error updating profile.")
+            );
     });
 }
 function loadProfilePicture() {
@@ -312,14 +313,45 @@ function resetPassword(event) {
     })
         .then(response => response.json())
         .then(data => {
-            alert(data.message);
+
+            Toastify({
+                text: data.message,
+                duration: 1500,
+                backgroundColor: "rgba(200,253,223,0.5)",
+                gravity: "top",
+                position: "right",
+
+                style:{
+
+                    color:"rgb(15,94,27)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+
             if (data.redirectUrl) {
+
                 window.location.href = data.redirectUrl; // ✅ Redirect to login
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            console.error("Error:", error)
+            Toastify({
+                text: "Error",
+                duration: 3000,
+                backgroundColor: "rgba(253,200,200,0.5)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius:"8px",
+                style:{
+                    color:"rgb(167,6,14)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+
+        });
 }
-// Function to load profile picture
+
 
 
 // Function to handle profile picture upload
@@ -341,6 +373,20 @@ function updateProfilePicture() {
             .then(data => {
                 console.log("Server Response:", data);
                 alert(data.message);
+                Toastify({
+                    text: data.message,
+                    duration: 1500,
+                    backgroundColor: "rgba(200,253,223,0.5)",
+                    gravity: "top",
+                    position: "right",
+
+                    style:{
+
+                        color:"rgb(15,94,27)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+
                 if (data.redirectUrl) {
                     window.location.href = data.redirectUrl;
                 } else {
@@ -349,7 +395,20 @@ function updateProfilePicture() {
             })
             .catch(error => console.error("Error:", error));
     } else {
-        alert("Please select an image first.");
+
+        Toastify({
+            text: "Please select an image first.",
+            duration: 3000,
+            backgroundColor: "rgba(253,200,200,0.5)",
+            close: true,
+            gravity: "top",
+            position: "right",
+            borderRadius:"8px",
+            style:{
+                color:"rgb(167,6,14)",
+                borderRadius:"8px"
+            },onClick: function(){}
+        }).showToast();
     }
 }
 // Function to delete profile picture (if needed)
@@ -358,7 +417,21 @@ function deleteProfilePicture() {
         .then(response => response.text())
         .then(() => {
             document.getElementById("profileImage").src = "/default-profile.png";
-            alert("Profile picture deleted!");
+
+            Toastify({
+                text: "Profile picture deleted!",
+                duration: 3000,
+                backgroundColor: "rgba(253,200,200,0.5)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius:"8px",
+                style:{
+                    color:"rgb(167,6,14)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+
         })
         .catch(error => alert("Error deleting profile picture."));
 }

@@ -92,7 +92,6 @@ function saveAppointmentChanges() {
     const appTime = document.getElementById("editAppTime").value;
     const status = document.getElementById("editStatus").value;
     const modalContent= document.querySelector(".modal-content");
-    const messageBox=document.getElementById("editApp-message");
 
     // Prepare the form data
     const data = new URLSearchParams();
@@ -110,7 +109,8 @@ function saveAppointmentChanges() {
     })
         .then(response => response.text())
         .then(data => {
-            console.log(data); // Show success message
+            console.log(data);
+
 // Update the table row dynamically
             const row = document.querySelector(`tr[data-id='${appointmentID}']`);
             if (row) {
@@ -124,8 +124,20 @@ function saveAppointmentChanges() {
             <h3>${status === "Cancelled" ? "Appointment Cancelled" : "Appointment Updated"}</h3>
             <p>${status === "Cancelled" ? "This appointment has been successfully cancelled." : "The appointment details have been updated successfully."}</p>
         `;
-            messageBox.textContent = "Appointment Edited Successfully!";
-            messageBox.classList.add('message');
+
+            Toastify({
+                text:  "Appointment Edited Successfully!",
+                duration: 1500,
+                backgroundColor: "rgba(200,253,223,0.5)",
+                gravity: "top",
+                position: "right",
+
+                style:{
+
+                    color:"rgb(15,94,27)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
 
             // Hide modal after 3 seconds
             setTimeout(() => {
@@ -258,17 +270,24 @@ async function handleAddAppointmentSubmit(event) {
     const patientId = document.getElementById("patientDropdown").value;
     const appointmentDate = document.getElementById("appDate").value;
     const appointmentTime = document.getElementById("appTime").value;
-    const messageBox = document.getElementById("addApp-message");
 
-    if (!messageBox) {
-        console.error("Error: messageBox element not found.");
-        return;
-    }
 
     if (!doctorId ||!patientId ||!appointmentDate ||!appointmentTime) {
-        messageBox.textContent = "Please fill in all fields before submitting.";
-        messageBox.classList.add('message');
-        messageBox.style.display = 'block';
+
+        Toastify({
+            text: "Please fill in all fields before submitting.",
+            duration: 3000,
+            backgroundColor: "rgba(253,200,200,0.5)",
+            close: true,
+            gravity: "top",
+            position: "right",
+            borderRadius:"8px",
+            style:{
+                color:"rgb(167,6,14)",
+                borderRadius:"8px"
+            },onClick: function(){}
+        }).showToast();
+
         submitButton.disabled = false;
         //Re-add the event listener.
         addAppointmentForm.addEventListener("submit", handleAddAppointmentSubmit);
@@ -294,9 +313,21 @@ async function handleAddAppointmentSubmit(event) {
         if (!response.ok) {
             throw new Error("Failed to book appointment.");
         } else {
-            messageBox.textContent = "Appointment booked successfully!";
-            messageBox.classList.add('message');
-            messageBox.style.display = 'block';
+
+            Toastify({
+                text: "Appointment booked successfully!",
+                duration: 1500,
+                backgroundColor: "rgba(200,253,223,0.5)",
+                gravity: "top",
+                position: "right",
+
+                style:{
+
+                    color:"rgb(15,94,27)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+
             setTimeout(() => {
                 closeAddAppointment();
                 location.reload();
@@ -304,9 +335,22 @@ async function handleAddAppointmentSubmit(event) {
         }
     } catch (error) {
         console.error("Error booking appointment:", error);
-        messageBox.textContent = "An error occurred while booking the appointment. Please try again.";
-        messageBox.classList.add('message');
-        messageBox.style.display = 'block';
+
+
+        Toastify({
+            text: "An error occurred while booking the appointment. Please try again.",
+            duration: 3000,
+            backgroundColor: "rgba(253,200,200,0.5)",
+            close: true,
+            gravity: "top",
+            position: "right",
+            borderRadius:"8px",
+            style:{
+                color:"rgb(167,6,14)",
+                borderRadius:"8px"
+            },onClick: function(){}
+        }).showToast();
+
     } finally {
         submitButton.disabled = false;
         //Re-add the event listener.

@@ -84,7 +84,6 @@
     });
 
 
-    const editUserMessage=document.getElementById("editUserMessage");
 
 
     function savePatientRow(userID) {
@@ -105,13 +104,40 @@
         })
             .then(response => response.json())
             .then(data => {
-                editUserMessage.innerText = data.message;
+
+                Toastify({
+                    text: data.message,
+                    duration: 1500,
+                    backgroundColor: "rgba(200,253,223,0.5)",
+                    gravity: "top",
+                    position: "right",
+
+                    style:{
+
+                        color:"rgb(15,94,27)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+
                 console.log("Update Response:", data);
                 fetchPatientData(); // Refresh the table
                 closeEditPatient(); // Close the modal
             })
             .catch(error => {
-                editUserMessage.innerText = "Error updating patient: " + error.message;
+                Toastify({
+                    text: "Error updating patient:",
+                    duration: 3000,
+                    backgroundColor: "rgba(253,200,200,0.5)",
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    borderRadius:"8px",
+                    style:{
+                        color:"rgb(167,6,14)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+
                 console.error("Error updating patient:", error);
             });
     }

@@ -146,8 +146,7 @@ function closeUrgentResultsModal(){
 
 function submitUrgentLabResults(orderId) {
     const urgentLabResults = [];
-    const message=document.querySelector(".labResult-message");
-    message.innerHTML='';
+
 
     // Collect results from inputs (only for tests that have entered data)
     document.querySelectorAll('.result-value').forEach((input, index) => {
@@ -161,7 +160,20 @@ function submitUrgentLabResults(orderId) {
     });
 
     if (urgentLabResults.length === 0) {
-        alert('Please enter at least one result before submitting.');
+        Toastify({
+            text: "Please enter at least one result before submitting",
+            duration: 3000,
+            backgroundColor: "rgba(253,200,200,0.5)",
+            gravity: "top",
+            position: "right",
+            borderRadius:"8px",
+            style:{
+
+                color:"rgb(167,6,14)",
+                borderRadius:"8px"
+            }
+
+        }).showToast();
         return;
     }
     let updateCount = 0; // To track the number of successful updates
@@ -185,7 +197,20 @@ function submitUrgentLabResults(orderId) {
             .then(data => {
                 updateCount++;
                 if (updateCount === urgentLabResults.length) {
-                    message.innerHTML = 'Lab results updated successfully!';
+
+                    Toastify({
+                        text: "Lab results updated successfully!",
+                        duration: 1500,
+                        backgroundColor: "rgba(200,253,223,0.5)",
+                        gravity: "top",
+                        position: "right",
+
+                        style:{
+
+                            color:"rgb(15,94,27)",
+                            borderRadius:"8px"
+                        },onClick: function(){}
+                    }).showToast();
 
                     // Delay before closing the modal
                     setTimeout(() => {
@@ -198,9 +223,22 @@ function submitUrgentLabResults(orderId) {
                 console.error('Error updating lab results:', error);
                 errorCount++;
 
-                // Display error message only once
+
                 if (errorCount === 1) {
-                    message.innerHTML = '<span style="color: red;">Failed to update some lab results. Please try again.</span>';
+                    Toastify({
+                        text:"Failed to update some lab results. Please try again",
+                        duration: 3000,
+                        backgroundColor: "rgba(253,200,200,0.5)",
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        borderRadius:"8px",
+                        style:{
+                            color:"rgb(167,6,14)",
+                            borderRadius:"8px"
+                        },onClick: function(){}
+                    }).showToast();
+
                 }
 
 

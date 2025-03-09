@@ -140,15 +140,38 @@ document.getElementById('labTest').addEventListener('submit', function(event) {
     })
         .then(response => {
             if (!response.ok) {
-                // Display error message if response is not OK
-                document.querySelector('.labTest-message').innerHTML = 'Error: Unable to add lab test.';
-            } else {
-                // Display success message
-                const message= document.querySelector('.labTest-message');
-                message.innerHTML = 'Lab test added successfully!';
-                message.className="message";
 
-                // Delay the closing of the modal to ensure user can read the message
+
+                Toastify({
+                    text:"Error: Unable to add lab test.",
+                    duration: 3000,
+                    backgroundColor: "rgba(253,200,200,0.5)",
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    borderRadius:"8px",
+                    style:{
+                        color:"rgb(167,6,14)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+
+            } else {
+                               Toastify({
+                    text: "Lab test added successfully!",
+                    duration: 3000,
+                    backgroundColor: "rgba(200,253,223,0.5)",
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    borderRadius:"8px",
+                    style:{
+                        color:"rgb(15,94,27)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+
+
                 setTimeout(() => {
                     closeTest();  // Close the modal after 2 seconds
                 }, 2000);
@@ -156,7 +179,20 @@ document.getElementById('labTest').addEventListener('submit', function(event) {
         })
         .catch(error => {
             // Handle network or other errors
-            document.querySelector('.labTest-message').innerHTML = 'Network error, please try again.';
+
+            Toastify({
+                text: "Network error, please try again.",
+                duration: 3000,
+                backgroundColor: "rgba(253,200,200,0.5)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius:"8px",
+                style:{
+                    color:"rgb(167,6,14)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
         });
 });
 /**function deleteTest(testID) {
