@@ -4,10 +4,7 @@ import Medysis.Project.DTO.AppointmentDTO;
 import Medysis.Project.DTO.DoctorDashboardDTO;
 import Medysis.Project.DTO.LabOrderDTO;
 import Medysis.Project.DTO.LabResultDTO;
-import Medysis.Project.Model.Appointment;
-import Medysis.Project.Model.LabOrder;
-import Medysis.Project.Model.LabResults;
-import Medysis.Project.Model.Staff;
+import Medysis.Project.Model.*;
 import Medysis.Project.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,7 +83,9 @@ public class DashboardService {
         if (staffOptional.isEmpty()) {
             return dashboard; // Return empty dashboard if staff not found
         }
+
         Staff staff = staffOptional.get();
+
 
         // Get total appointments for the doctor
         dashboard.totalAppointments = appointmentRepository.countByDoctorID(staff);

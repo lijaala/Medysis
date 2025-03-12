@@ -39,12 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             console.log("Fetched Doctor Dashboard Data:", data);
 
-            const staticChartData = {
-                "18-35 Years": 45,
-                "35-45 Years": 30,
-                "45-60 Years": 20,
-                "60+ Years": 5
-            };// Debugging
+
 
             if (data.totalAppointments !== undefined) {
                 document.getElementById('totalAppointmentsDoc').textContent = data.totalAppointments;
