@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/navBar.css">
+    <link rel="stylesheet" href="css/patientHome.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+
+        <div class="myHeader p-2 ">
+        <div class="row py-2">
+
+            <div class="col-sm-1">
+                <button class="back" onclick="goBack()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="none" stroke="#currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18l-6-6l6-6" />
+                    </svg>
+                </button>
+            </div>
+            <div class="col">
+                <h2 id="page-title" >Default Title</h2>
+            </div>
+            </div>
+
+            <div class="row d-flex align-items-center">
+                <div class="search-container mx-3">
+                    <input class="p-1" type="text" placeholder="Search...">
+                </div>
+            </div>
+
+       </div>
+
+        <div class="row mainScreen">
+
+            <div class="col-sm-12 mx-3">
+
+                <div class="row px-4">
+                 <div class="col-sm-6">
+                    <div><span>Gender:</span> Female &nbsp;&nbsp;
+                        <span>Blood Type:</span> AB +</div>
+                </div>
+                    <div class="col-sm-6">
+                    <div><span>Age:</span>  26 Years &nbsp;&nbsp; <span>Weight:</span> 65 Kg</div>
+                </div>
+                </div>
+
+
+        <div class="row px-4">
+                <div class="col-5 col-md-3 m-2 p-2 card">
+                    <a href="/#">
+                        <img src="image/LabReports.svg" alt="Diagnosis" style="height: 5vh; width: 5vh;" >
+                        <h6>Lab Reports</h6>
+                    </a>
+                </div>
+                <div class="col-5 col-md-3 m-2 p-2 card" >
+                    <a href="/">
+                        <img src="image/Pill--Streamline-Ultimate.svg" alt="Diagnosis" style="height: 5vh; width: 5vh;" >
+                        <div class="card-title">Prescription</div>
+                    </a>
+                </div>
+                <div class="col-5 col-md-3 m-2 p-2 card">
+                    <a href="/appointment">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="5vh" height="5vh" viewBox="0 0 24 24" >
+                            <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
+                                <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5M16 2v4M8 2v4m-5 4h5m9.5 7.5L16 16.3V14" />
+                                <circle cx="16" cy="16" r="6" />
+                            </g>
+                        </svg>
+                        <div class="card-title">Appointments</div>
+                    </a>
+                </div>
+                <div class="col-5 col-md-3 m-2 p-2 card">
+                    <a href="/addPastmedical">
+                        <img src="image/Medical History-Big.svg" alt="Medical History" style="height: 5vh; width: 5vh;">
+                        <div class="card-title">Medical History</div>
+                    </a>
+                </div>
+
+    </div>
+        </div>
+            <div class="row mx-4 navFix">
+                <div class="col-sm-12"></div>
+                <div class="col" >
+                    <a href="/patientHome" class="nav-link active">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                                <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            </g>
+                        </svg>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="notifications.html" class="nav-link position-relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                  d="M10.268 21a2 2 0 0 0 3.464 0m-10.47-5.674A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="col" >
+                    <a href="settings.html" class="nav-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
+                                <path
+                                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2" />
+                                <circle cx="12" cy="12" r="3" />
+                            </g>
+                        </svg>
+                    </a>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+
+</div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>

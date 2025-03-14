@@ -38,5 +38,9 @@ public class HomeController {
     }
      @GetMapping("/forgotPassword")
     public String forgotPassword() {  return "forgotPassword"; }
+    @GetMapping("/userHome")
+    public String userHome() {
+        return "userHome";
+    }
 }
 

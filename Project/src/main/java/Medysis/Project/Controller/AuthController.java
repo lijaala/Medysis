@@ -99,7 +99,7 @@ public class AuthController {
 
         if ("success".equals(response)) {
             String userRole = (String) session.getAttribute("userRole"); // Retrieve the role from session
-            String redirectUrl = "ROLE_PATIENT".equals(userRole) ? "/patientHome" : "/home"; // Determine redirection
+            String redirectUrl = "ROLE_PATIENT".equals(userRole) ? "/userHome" : "/home"; // Determine redirection
 
             Map<String, String> responseBody = new HashMap<>();
             responseBody.put("message", "Login successful");

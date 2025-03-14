@@ -1,0 +1,83 @@
+.card {
+    align-items: center;
+
+    a{
+        align-content: center;
+        text-decoration: none;
+        img{
+            align-self: center;
+        }
+        h6{
+            width:100%;
+            text-align: center;
+
+        }
+    }
+}
+.myHeader{
+    position: sticky;
+    top:1px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.62);
+    height:fit-content;
+    border-bottom-left-radius:50px;
+    border-bottom-right-radius: 50px;
+    align-items: center;
+    background-color: #07104e;
+    color: #f3f3f3;
+    width:100%;
+
+    .row {
+
+        div:first-child{
+            flex:1;
+
+        }
+        div:nth-child(2){
+            flex:4;
+        }
+    }
+
+}
+.container{
+    align-items: center;
+}
+.search-container input{
+    align-self: center;
+    flex:1;
+    width:100%;
+    border-radius: 12px;
+}
+.search-container{
+    align-items: center;
+}
+.back{
+    all:unset;
+    background-color: transparent;
+    svg path{
+        color:white;
+
+        stroke:white;
+    }
+}
+.navFix{
+    position: fixed;
+    bottom:1px;
+    flex-direction: row;
+    width:100%;
+    align-items: center;
+
+
+
+}
+.navFix .col{
+    flex:1;
+}
+.mainScreen{
+    height:60vh;
+    overflow: scroll;
+    align-items: center;
+    -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+    scrollbar-width: none;
+
+
+}
