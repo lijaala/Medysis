@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/home","api/admin/**","api/dashboard/admin","/api/user/update/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("api/LabOrder/orderRequest","api/LabOrder/details/","api/LabOrder/labResults", "api/labTests/availableTests").hasAnyAuthority("ROLE_DOCTOR","ROLE_LAB TECHNICIAN")
                         .requestMatchers("/home","appointment/**","api/dashboard/doctor","api/medicalRecords/saveDiagnosis","api/prescriptions/**","api/staff").hasAuthority("ROLE_DOCTOR")
-                        .requestMatchers("api/medicalRecords/getByUserId","api/medicalRecords/updateStatus","api/prescriptions/getByUserId").hasAnyAuthority("ROLE_DOCTOR", "ROLE_PATIENT")
+                        .requestMatchers("api/medicalRecords/getByUserId","api/medicalRecords/updateStatus","api/prescriptions/getByUserId","api/prescriptions/getByAppointmentID").hasAnyAuthority("ROLE_DOCTOR", "ROLE_PATIENT")
 
                         .requestMatchers("/home","api/dashboard/lab-tech", "api/LabOrder/**","api/labTests/**").hasAuthority("ROLE_LAB TECHNICIAN")
                         .requestMatchers("api/medicalRecords/history").hasAuthority("ROLE_PATIENT")

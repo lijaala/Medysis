@@ -1,6 +1,3 @@
-/*fuction for dynamic table content*/
-import {startAppointment} from "./addDiagnosis";
-
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const roleResponse = await fetch('api/auth/role', { method: 'GET', credentials: 'same-origin' });
@@ -17,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
         const appointments = await appointmentResponse.json();
+        console.log("Appointments data:", appointments); // Inspect data
         const tbody = document.getElementById('appointmentTableBody');
         const doctorColumnIndex = 1;
 

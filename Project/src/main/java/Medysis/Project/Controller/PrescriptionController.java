@@ -4,6 +4,7 @@ import Medysis.Project.DTO.PrescriptionResponse;
 import Medysis.Project.Model.Prescription;
 import Medysis.Project.Service.PrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
@@ -39,7 +40,7 @@ public class PrescriptionController {
         }
         System.out.println(prescription.getPrescribedMedications());
 
-        Integer userId=prescription.getUser().getUserID();
+        Integer userId = prescription.getUser().getUserID();
         String staffId = (String) session.getAttribute("userId");
         System.out.println(staffId);
 
@@ -87,20 +88,27 @@ public class PrescriptionController {
     }
 
 
+    @GetMapping("/getByUserId")
+    public ResponseEntity<List<PrescriptionResponse>> getPrescriptionsByUserId(@RequestParam Integer userId) {
+        List<PrescriptionResponse> prescriptions = prescriptionService.getPrescriptionsByUserId(userId);
+        return ResponseEntity.ok(prescriptions);
+    }
 
-        @GetMapping("/getByUserId")
-        public ResponseEntity<List<PrescriptionResponse>> getPrescriptionsByUserId(@RequestParam Integer userId) {
-            List<PrescriptionResponse> prescriptions = prescriptionService.getPrescriptionsByUserId(userId);
-            return ResponseEntity.ok(prescriptions);
+    @GetMapping("/appointment/{appointmentId}")
+    public ResponseEntity<PrescriptionResponse> getPrescription(@PathVariable Integer appointmentId) {
+        try {
+            PrescriptionResponse prescription = prescriptionService.getPrescriptionByAppointmentId(appointmentId);
+            if (prescription == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(prescription);
+        } catch (Exception e) {
+            // Log the exception
+            e.printStackTrace(); // Or use a proper logger
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    @GetMapping("/getByAppointmentID")
-    public ResponseEntity<PrescriptionResponse> getPrescriptionByAppointment(@PathVariable Integer appointmentId) {
-        PrescriptionResponse prescription = prescriptionService.getPrescriptionByAppointmentId(appointmentId);
-        if (prescription == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(prescription);
     }
-    }
+}
+
 
 

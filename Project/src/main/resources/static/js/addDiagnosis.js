@@ -1,10 +1,8 @@
-import {completeAppointment, openLabReportsModal} from "./orderLabTest";
-
-
 let diagnosisNextHandler, diagnosisDoneHandler, diagnosisLabNextHandler;
 let prescriptionNextHandler, prescriptionDoneHandler;
 
 let prescriptionSubmitHandler;
+let labOrderSubmitHandler;
 
 function startAppointment(appointmentID) {
     console.log("Start Appointment triggered for ID:", appointmentID);
@@ -225,6 +223,7 @@ function closeDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
     diagnosisModal.style.display = "none";
 }
+
 closeDiagnosis.addEventListener('click', closeDiagnosisModal);
 // view past medical records
 function viewPastRecords() {
@@ -356,12 +355,15 @@ function openPrescriptionModal(appointmentId, userId) {
             );
         }, 5000);
     };
-    prescriptionDoneHandler = function (event) {
-        setTimeout(() => {
-            closePrescriptionModal();
-            completeAppointment(document.getElementById("appointmentId").value);
-        }, 3000);
+    prescriptionDoneHandler = async function (event) {
+        console.log("prescriptionDoneHandler called.");
+        await submitPrescription(event);
+        closePrescriptionModal();
+        completeAppointment(document.getElementById("appointmentId").value);
+
+
     };
+
 
     // Add new event listeners
     prescriptionNextButton.addEventListener('click', prescriptionNextHandler);
@@ -374,7 +376,7 @@ function openPrescriptionModal(appointmentId, userId) {
 
     const form = document.getElementById('prescriptionForm');
     if (form) {
-        // Remove existing listener (if any)
+
         if (prescriptionSubmitHandler) {
             form.removeEventListener('submit', prescriptionSubmitHandler);
         }
@@ -619,19 +621,22 @@ function printPrescription(appointmentId) {
             return response.json();
         })
         .then(prescriptionData => {
-            // Implement your prescription printing/download logic here
-            console.log("Prescription data:", prescriptionData);
+            console.log("Prescription data:", prescriptionData); // Log the entire object
+            console.log("Patient:", prescriptionData.userId); // Log individual properties
+            console.log("Doctor:", prescriptionData.prescribedBy);
+            // ... rest of your code ...
+
             // Example: Display prescription data in a new window for printing
             const printWindow = window.open('', '_blank');
             if (printWindow) {
                 printWindow.document.write('<html><head><title>Prescription</title></head><body>');
                 printWindow.document.write('<h1>Prescription</h1>');
                 // Format and display prescription data
-                printWindow.document.write(`<p>Patient: ${prescriptionData.userName}</p>`);
-                printWindow.document.write(`<p>Doctor: ${prescriptionData.staffName}</p>`);
+                printWindow.document.write(`<p>Patient: ${prescriptionData.userId}</p>`); // Corrected patient name
+                printWindow.document.write(`<p>Doctor: ${prescriptionData.prescribedBy}</p>`); // Corrected doctor name
                 printWindow.document.write(`<p>Date: ${new Date(prescriptionData.prescriptionDate).toLocaleString()}</p>`);
                 printWindow.document.write('<h2>Medications:</h2>');
-                prescriptionData.medicationDTOs.forEach(medication => {
+                prescriptionData.medications.forEach(medication => { // Corrected medication array name
                     printWindow.document.write(`<p>Medication: ${medication.medicationName}</p>`);
                     printWindow.document.write(`<p>Dosage: ${medication.dosage}</p>`);
                     printWindow.document.write(`<p>Intake: ${medication.intake}</p>`);
@@ -651,5 +656,317 @@ function printPrescription(appointmentId) {
             alert("Failed to print prescription. Please try again.");
         });
 }
-export {startAppointment,openPrescriptionModal,printPrescription}
+function openLabReportsModal(){
+    document.getElementById('orderLabReports').style.display = 'flex';
+
+    document.querySelectorAll(".test-dropdown").forEach(select => populateLabTestDropdown(select));
+
+    const existingDropdowns = document.querySelectorAll(".test-dropdown");
+    existingDropdowns.forEach(dropdown => populateLabTestDropdown(dropdown));
+
+    const labOrderForm = document.getElementById('labOrder');
+    const prescribeBtn=document.getElementById('saveAndPrescribe');
+    const endLabBtn=document.getElementById('saveAndEndLab');
+
+    prescribeBtn.addEventListener('click', saveLabOrderAndPrescribe);
+    endLabBtn.addEventListener('click',saveLabOrderAndFinish);
+
+
+    if (labOrderSubmitHandler) {
+        labOrderForm.removeEventListener('submit', labOrderSubmitHandler);
+    }
+
+    // Define new event listener function
+    labOrderSubmitHandler = function (event) {
+        event.preventDefault();
+        submitLabOrder(() => {
+            completeAppointment(document.getElementById("appointmentIdInput").value);
+        });
+    };
+
+    // Add new event listener
+    labOrderForm.addEventListener('submit', labOrderSubmitHandler);
+
+
+}
+function closeLabReportsModal(){
+    document.getElementById('orderLabReports').style.display='none';
+
+}
+const closeLabReports=document.getElementById('closeLabReports');
+closeLabReports.addEventListener('click',closeLabReportsModal);
+
+//addLabtest
+let testCount = 1; // Start from 1 since the initial entry is already there
+
+async function addLabTest() {
+    const container = document.getElementById("labTestsContainer");
+    const testEntry = document.createElement("div");
+    testEntry.classList.add("lab-test-entry");
+
+    testEntry.innerHTML = `
+        <div class="form-row">
+            <label for="testName"> Test Name </label>
+            <select class="form-select test-dropdown" id="testName${testCount}" name="testName[]">
+                <option value="">Select</option>
+            </select>
+        </div>
+        <button type="button" class="remove-medication" onclick="removeLabTest(this)">Remove</button>
+    `;
+
+    container.appendChild(testEntry);
+    const newDropdown = testEntry.querySelector(".test-dropdown");
+    await populateLabTestDropdown(newDropdown);
+    console.log(`🆕 New test added. Total dropdowns now: ${document.querySelectorAll('.test-dropdown').length}`);
+    testCount++;
+}
+const addTestBtn=document.getElementById('addTestBtn');
+addTestBtn.addEventListener('click', addLabTest);
+
+function removeLabTest(button) {
+    button.parentElement.remove();
+}
+
+async function populateLabTestDropdown(selectElement) {
+    try {
+        const response = await fetch("/api/labTests/availableTests"); // Adjust if needed
+        if (!response.ok) {
+            throw new Error("Failed to fetch lab tests");
+        }
+        const labTests = await response.json();
+
+        // Populate options
+        selectElement.innerHTML = `<option value="">Select</option>`;
+
+        labTests.forEach(test => {
+            selectElement.innerHTML += `<option value="${test.testID}">${test.testName} </option>`;
+        });
+        console.log("Dropdown updated:", selectElement, "Options count:", selectElement.options.length);
+
+    } catch (error) {
+        console.error("Error fetching lab tests:", error);
+    }
+}
+
+
+function submitLabOrder(callback) {
+    console.log(" Submitting lab order...");
+
+    const appointmentIdInput = document.getElementById('appointmentIdInput').value;
+    if (!appointmentIdInput) {
+        console.error("Appointment ID is missing or empty!");
+        alert("Error: Appointment ID is required.");
+        return;
+    }
+    const userId = document.getElementById('userIdInput').value;
+    let urgency = document.querySelector('input[name="urgency"]:checked')?.value || "no";
+
+    const testIds = [];
+    let allTestsSelected = true; // Assume true initially
+    document.querySelectorAll('.lab-test-entry').forEach(entry => {
+        const selectElement = entry.querySelector('.test-dropdown');
+        if (selectElement && selectElement.value === "") {
+            console.warn("🗑 Removing empty dropdown before submission...");
+            entry.remove();
+        }
+    });
+    // Loop through all test dropdowns
+    document.querySelectorAll('.lab-test-entry').forEach((entry, index) => {
+        const selectElement = entry.querySelector('.test-dropdown');
+        if (!selectElement) {
+            console.error(` Dropdown ${index + 1}: Not found!`);
+            allTestsSelected = false;
+            return;
+        }
+
+        const testId = selectElement.value;
+        console.log(` Dropdown ${index + 1}: Selected testID -> "${testId}"`);
+
+        testIds.push(testId);
+
+        if (testId === "") {
+            console.error(`Dropdown ${index + 1}: Empty selection detected.`);
+            allTestsSelected = false;
+        }
+    });
+
+    console.log("Final selected test IDs:", testIds);
+
+    if (!allTestsSelected) {
+        alert("Please select a test for each entry.");
+        if(callback){
+            callback();
+        }
+        return;
+
+
+    }
+
+    // Continue with form submission
+    fetch('/api/LabOrder/orderRequest', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            appointmentID: appointmentIdInput,
+            userID: userId,
+            'urgency[]': urgency,
+            'testName[]': testIds
+        })
+    })
+        .then(response => {
+            if (response.ok) {
+                closeLabReportsModal();
+                Toastify({
+                    text: "Lab Order Created Successfully",
+                    duration: 1500,
+                    backgroundColor: "rgba(200,253,223,0.5)",
+                    gravity: "top",
+                    position: "right",
+
+                    style:{
+
+                        color:"rgb(15,94,27)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+                if (callback) {
+                    callback();
+                }
+            } else {
+                console.error("Error creating lab order:", response);
+                Toastify({
+                    text: "Error creating lab order. Please try again.",
+                    duration: 3000,
+                    backgroundColor: "rgb(253,200,200)",
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    borderRadius:"8px",
+                    style:{
+                        color:"rgb(167,6,14)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+                if (callback) {
+                    callback();
+                }
+
+
+            }
+        })
+        .catch(error => {
+            console.error("Error creating lab order:", error);
+
+
+            Toastify({
+                text: "An error occurred. Please try again later.",
+                duration: 3000,
+                backgroundColor: "rgb(253,200,200)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius:"8px",
+                style:{
+                    color:"rgb(167,6,14)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+            if (callback) {
+                callback();
+            }
+
+
+
+        });
+}
+function saveLabOrderAndPrescribe(){
+    submitLabOrder(() => {
+        const appointmentId = document.getElementById("appointmentIdInput")?.value;
+        const userId = document.getElementById("userIdInput")?.value;
+
+        if (!appointmentId || !userId) {
+            console.error("❌ Error: Missing appointmentId or userId.");
+            alert("Error: Missing required information.");
+            return;
+        }
+
+
+        openPrescriptionModal(appointmentId, userId);
+    });
+}
+
+function saveLabOrderAndFinish() {
+    console.log("saveLabOrderAndFinish called.");
+    submitLabOrder(() => {
+        console.log("Callback in saveLabOrderAndFinish is executing.");
+        const appointmentId = document.getElementById("appointmentIdInput")?.value;
+        if (!appointmentId) {
+            console.error("❌ Error: Missing appointmentId.");
+            alert("Error: Missing required information.");
+            return;
+        }
+        console.log("Calling completeAppointment with appointmentId:", appointmentId);
+        completeAppointment(appointmentId);
+    });
+}
+
+
+function completeAppointment(appointmentId) {
+    if (confirm("Do you want to print the prescription?")) {
+        setTimeout(() => {
+            printPrescription(appointmentId);
+        }, 1000); // 1-second delay
+    }
+    fetch('/appointment/complete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            appointmentID: appointmentId
+        })
+    })
+        .then(response => response.text())
+        .then(message => {
+
+
+            Toastify({
+                text: message,
+                duration: 1500,
+                backgroundColor: "rgba(200,253,223,0.5)",
+                gravity: "top",
+                position: "right",
+
+                style:{
+
+                    color:"rgb(15,94,27)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();// Or a better way to display the message
+
+
+
+        })
+        .catch(error => {
+            console.error("Error completing appointment:", error);
+
+
+            Toastify({
+                text: "An error occurred. Please try again.",
+                duration: 3000,
+                backgroundColor: "rgba(253,200,200,0.5)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius:"8px",
+                style:{
+                    color:"rgb(167,6,14)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+        });
+}
+
 

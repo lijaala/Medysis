@@ -3,7 +3,7 @@
     <div id="prescriptionModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div>
         <div class="modal-content">
-            <span class="close" id="closePres">&times;</span>
+            <span class="close" id="closePres" onclick="closePrescriptionModal()">&times;</span>
             <h3>Prescription</h3>
             <div id="prescription-message" ></div>
 
@@ -71,7 +71,7 @@
 
     <div id="orderLabReports" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="close" id="closeLabReports" >&times;</span>
+            <span class="close" id="closeLabReports" onclick="closeLabReportsModal()">&times;</span>
             <h3>Order Lab Test</h3>
             <div class="labReport-message"></div>
             <form id="labOrder">
@@ -109,6 +109,5 @@
 
     </div>
 
-    <script src="js/orderLabTests.js"></script>
-    <script src="js/addDaignosis.js"></script>
+
 </section>
