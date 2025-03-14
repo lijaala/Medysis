@@ -3,7 +3,7 @@
     <div id="prescriptionModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div>
         <div class="modal-content">
-            <span class="close" onclick="closePrescriptionModal()">&times;</span>
+            <span class="close" id="closePres">&times;</span>
             <h3>Prescription</h3>
             <div id="prescription-message" ></div>
 
@@ -57,13 +57,13 @@
                 </div>
 
                 <!-- Add Medication Button -->
-                <button type="button" id="addMedicationBtn" onclick="addMedication()">Add Medication</button>
+                <button type="button" id="addMedicationBtn">Add Medication</button>
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button type="submit" id="prescriptionNext" class="primary">Order Lab Tests</button>
 
-                    <button type="button" id="prescriptionDone" class="secondary" onclick="closePrescriptionModal()">End Appointment</button>
+                    <button type="button" id="prescriptionDone" class="secondary" >End Appointment</button>
                 </div>
             </form>
         </div>
@@ -71,7 +71,7 @@
 
     <div id="orderLabReports" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="close" onclick="closeLabReportsModal()">&times;</span>
+            <span class="close" id="closeLabReports" >&times;</span>
             <h3>Order Lab Test</h3>
             <div class="labReport-message"></div>
             <form id="labOrder">
@@ -100,14 +100,15 @@
                     </div>
                 </div>
                 <div class="action-buttons">
-                    <button type="button" class="primary" onclick="addLabTest()" id="addTestBtn">Add Test</button>
-                    <button type="button" class="secondary" id="saveAndPrescribe" onclick="saveLabOrderAndPrescribe()"> Add Prescription</button>
-                    <button type="button" class="tertiary" onclick="saveLabOrderAndFinish()">End Appointment</button>
+                    <button type="button" class="primary"  id="addTestBtn">Add Test</button>
+                    <button type="button" class="secondary" id="saveAndPrescribe" > Add Prescription</button>
+                    <button type="button" class="tertiary" id="saveAndEndLab" >End Appointment</button>
                 </div>
             </form>
         </div>
 
     </div>
 
-
+    <script src="js/orderLabTests.js"></script>
+    <script src="js/addDaignosis.js"></script>
 </section>

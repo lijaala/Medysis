@@ -408,7 +408,12 @@ option {
     gap:2vh;
 
 }
-
+#diagnosisModal .modal-content{
+    width:90%;
+    textarea{
+        height:20%;
+    }
+}
 button.remove-medication {
     background-color: #f44336;
     color: white;

@@ -85,7 +85,7 @@ h1 {
     align-items: center; /* Center horizontally */
     justify-content: center; /* Center vertically */
     transition: all 0.3s ease;
-    overflow-y: scroll;
+
 }
 
 /* Blur the background */
@@ -114,6 +114,8 @@ h1 {
     flex-direction: column;
     gap:2vh;
     overflow-y: scroll;
+    -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+    scrollbar-width: none;
 }
 .modal-content h3{
     color: rgb( 255, 52, 147);

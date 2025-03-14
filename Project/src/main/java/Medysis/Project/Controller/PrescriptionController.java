@@ -93,6 +93,14 @@ public class PrescriptionController {
             List<PrescriptionResponse> prescriptions = prescriptionService.getPrescriptionsByUserId(userId);
             return ResponseEntity.ok(prescriptions);
         }
+    @GetMapping("/getByAppointmentID")
+    public ResponseEntity<PrescriptionResponse> getPrescriptionByAppointment(@PathVariable Integer appointmentId) {
+        PrescriptionResponse prescription = prescriptionService.getPrescriptionByAppointmentId(appointmentId);
+        if (prescription == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(prescription);
+    }
     }
 
 

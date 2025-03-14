@@ -4,13 +4,13 @@
     <div id="diagnosisModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div>
         <div class="modal-content">
-            <span class="close" onclick="closeDiagnosisModal()">&times;</span>
+            <span class="close" id="closeDiagnosis">&times;</span>
 
             <div class="modal-header">
                 <h3>Add Diagnosis</h3>
 
                 <div>
-                <button type="button" class="icon" onclick="viewPastRecords()" title="Past Records">
+                <button type="button" class="icon" id="vewPastMedicalRecords" title="Past Records">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M17.44 3.5h-1.69v-.53a.95.95 0 0 0-1-.91h-5.5a.95.95 0 0 0-1 .91v.53H6.56A2.5 2.5 0 0 0 4.06 6v13.44a2.5 2.5 0 0 0 2.5 2.5h10.88a2.5 2.5 0 0 0 2.5-2.5V6a2.5 2.5 0 0 0-2.5-2.5m-8.19-.44l5.5.01v1.12c0 .61-.69 1.12-1.5 1.12h-2.5c-.82 0-1.5-.51-1.5-1.12Zm9.69 16.38a1.51 1.51 0 0 1-1.5 1.5H6.56a1.5 1.5 0 0 1-1.5-1.5V6a1.5 1.5 0 0 1 1.5-1.5h1.72a2.4 2.4 0 0 0 2.47 1.81h2.5a2.4 2.4 0 0 0 2.47-1.81h1.72a1.5 1.5 0 0 1 1.5 1.5Z"/><path fill="currentColor" d="M14.5 12.71a.5.5 0 0 1-.5.5h-1.5v1.5a.5.5 0 0 1-.5.5a.5.5 0 0 1-.5-.5v-1.5H10a.5.5 0 0 1-.5-.5a.5.5 0 0 1 .5-.5h1.5v-1.5a.5.5 0 0 1 .5-.5a.51.51 0 0 1 .5.5v1.5H14a.51.51 0 0 1 .5.5"/>
                     </svg>
@@ -56,7 +56,7 @@
                 </div>
                 <div class="form-row">
                     <button type="button" id="nextButton" class="secondary" >Add Prescription</button>
-                    <button type="button" id="orderTest" onclick="saveDiagnosisAndOrderTest()" class="tertiary">Order Lab Tests
+                    <button type="button" id="orderTest"  class="tertiary">Order Lab Tests
                     </button>
                 </div>
 
@@ -67,7 +67,7 @@
     <div id="medicalHistoryModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div>
         <div class="modal-content">
-            <span class="close" onclick="closeMedicalHistoryModal()">&times;</span>
+            <span class="close" id=" closeMedicalHistory" >&times;</span>
             <h3>Medical History</h3>
 
             <!-- Medical Records Table -->
@@ -84,7 +84,7 @@
                 </tbody>
             </table>
 
-            <button type="button" class="primary" onclick="updateMedicalHistory()">Save Changes</button>
+            <button type="button" class="primary" id="updateMedical" >Save Changes</button>
         </div>
     </div>
     <!-- Past Prescriptions Modal -->
@@ -130,10 +130,11 @@
     </div>
 
     <div class=" main " th:include="addPrecription::prescription">
-        <script type="text/javascript" src="js/orderLabTests.js"></script>
+
     </div>
 
-    <script type="text/javascript" src="js/addDiagnosis.js"></script>
-    <script type="text/javascript" src="js/viewPrescriptionAndLabResults.js"></script>
+    <script type="module" src="js/addDiagnosis.js"></script>
+    <script type="module" src="js/viewPrescriptionAndLabResults.js"></script>
+    <script type="module" src="js/orderLabTests.js"></script>
 
 </section>

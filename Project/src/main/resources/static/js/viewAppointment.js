@@ -1,4 +1,5 @@
 /*fuction for dynamic table content*/
+import {startAppointment} from "./addDiagnosis";
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -85,6 +86,14 @@ function openEditModal(id, appDate, appTime, status) {
 function closeEditModal() {
     document.getElementById('editModal').style.display = 'none';
 }
+const closeAppEdit=document.getElementById('closeAppEdit');
+const saveAppEdit=document.getElementById('saveAppEdit');
+const closeAddApp=document.getElementById('closeAddApp');
+
+closeAppEdit.addEventListener('click',closeEditModal);
+saveAppEdit.addEventListener('click',saveAppointmentChanges);
+closeAddApp.addEventListener('click', closeAddAppointment);
+
 //function to save appointment changes
 function saveAppointmentChanges() {
     const appointmentID = document.getElementById("editAppointmentID").value;
@@ -156,6 +165,8 @@ function openAddAppointment(){
     addApp.style.display="flex";
     populateDropdowns();
 }
+const openAddApp=document.getElementById('openAddApp');
+openAddApp.addEventListener("click", openAddAppointment);
 
 function closeAddAppointment(){
     const addApp=document.getElementById("addAppModal");
@@ -354,7 +365,7 @@ async function handleAddAppointmentSubmit(event) {
     } finally {
         submitButton.disabled = false;
         //Re-add the event listener.
-        addAppointmentForm.addEventListener("submit", handleAddAppointmentSubmit);
+
     }
 }
 

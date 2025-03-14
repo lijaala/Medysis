@@ -1,6 +1,6 @@
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="appointments">
     <div class="search2">
-        <button class="primary"  onclick="openAddAppointment()"> Add Appointments</button>
+        <button class="primary" id="openAddApp" > Add Appointments</button>
 
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 3H2l8 9.46V19l4 2v-8.54z" />
@@ -31,7 +31,7 @@
     <div id="editModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div> <!-- Blur background -->
         <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
+            <span class="close" id="closeAppEdit" >&times;</span>
             <h3>Edit Appointment</h3>
             <div id="editApp-message" ></div>
 
@@ -50,7 +50,7 @@
                 </select>
 
                 <input type="hidden" id="editAppointmentID" name="appointmentID">
-                <button type="button" class="primary " onclick="saveAppointmentChanges()">Save Changes</button>
+                <button type="button" class="primary " id="saveAppEdit" >Save Changes</button>
             </form>
         </div>
     </div>
@@ -58,7 +58,7 @@
     <div id="addAppModal" class="modal" style="display: none;">
         <div class="modal-overlay"></div> <!-- Blur background -->
         <div class="modal-content">
-            <span class="close" onclick="closeAddAppointment()">&times;</span>
+            <span class="close" id="closeAddApp" >&times;</span>
             <h3>Add Appointment</h3>
             <div id="addApp-message" ></div>
             <form id="addAppointmentForm">

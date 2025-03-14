@@ -1,7 +1,11 @@
+import {completeAppointment, openLabReportsModal} from "./orderLabTest";
+
+
 let diagnosisNextHandler, diagnosisDoneHandler, diagnosisLabNextHandler;
 let prescriptionNextHandler, prescriptionDoneHandler;
-let labOrderSubmitHandler;
+
 let prescriptionSubmitHandler;
+
 function startAppointment(appointmentID) {
     console.log("Start Appointment triggered for ID:", appointmentID);
 
@@ -212,13 +216,16 @@ function openDiagnosisModal() {
 
 }
 
-
+const closeDiagnosis=document.getElementById("closeDiagnosis");
+const viewPastMedical=document.getElementById('viewPastMedicalRecords');
+const updateMedicalRecord=document.getElementById('updateMedical');
+const closeMedicalHis=document.getElementById('closeMedicalHistory');
 // close diagnosis modal
 function closeDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
     diagnosisModal.style.display = "none";
 }
-
+closeDiagnosis.addEventListener('click', closeDiagnosisModal);
 // view past medical records
 function viewPastRecords() {
     const userID = document.getElementById("userIdInput").value;
@@ -260,7 +267,7 @@ function viewPastRecords() {
 })
     .catch(error => console.error("Error fetching medical history:", error));
 }
-
+viewPastMedical.addEventListener('click',viewPastRecords);
 
 // update the status of medical condition
 
@@ -298,11 +305,12 @@ function updateMedicalHistory() {
 })
     .catch(error => console.error("Error updating status:", error));
 }
-
+updateMedicalRecord.addEventListener('click', updateMedicalHistory);
 // close the medical history
 function closeMedicalHistoryModal() {
     document.getElementById("medicalHistoryModal").style.display = "none";
 }
+closeMedicalHis.addEventListener('click', closeMedicalHistoryModal);
 
 // open prescription modal
 function openPrescriptionModal(appointmentId, userId) {
@@ -530,6 +538,11 @@ function submitPrescription(event){
 function closePrescriptionModal() {
     document.getElementById('prescriptionModal').style.display = 'none';
 }
+const closePresc=document.getElementById("closePres");
+const addMed=document.getElementById('addMedicationBtn');
+
+closePresc.addEventListener('click',closePrescriptionModal);
+addMed.addEventListener('click',addMedication);
 let medicationCount = 0;
 
 function addMedication() {
@@ -597,4 +610,46 @@ function removeMedication(button) {
     // Remove the entry from the container
     medicationEntry.remove();
 }
+function printPrescription(appointmentId) {
+    fetch(`/api/prescriptions/appointment/${appointmentId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch prescription.");
+            }
+            return response.json();
+        })
+        .then(prescriptionData => {
+            // Implement your prescription printing/download logic here
+            console.log("Prescription data:", prescriptionData);
+            // Example: Display prescription data in a new window for printing
+            const printWindow = window.open('', '_blank');
+            if (printWindow) {
+                printWindow.document.write('<html><head><title>Prescription</title></head><body>');
+                printWindow.document.write('<h1>Prescription</h1>');
+                // Format and display prescription data
+                printWindow.document.write(`<p>Patient: ${prescriptionData.userName}</p>`);
+                printWindow.document.write(`<p>Doctor: ${prescriptionData.staffName}</p>`);
+                printWindow.document.write(`<p>Date: ${new Date(prescriptionData.prescriptionDate).toLocaleString()}</p>`);
+                printWindow.document.write('<h2>Medications:</h2>');
+                prescriptionData.medicationDTOs.forEach(medication => {
+                    printWindow.document.write(`<p>Medication: ${medication.medicationName}</p>`);
+                    printWindow.document.write(`<p>Dosage: ${medication.dosage}</p>`);
+                    printWindow.document.write(`<p>Intake: ${medication.intake}</p>`);
+                    printWindow.document.write(`<p>Frequency: ${medication.medicationInterval}</p>`);
+                    printWindow.document.write(`<p>Days: ${medication.daysOfIntake}</p>`);
+                    printWindow.document.write('<hr>');
+                });
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.print();
+            } else {
+                alert('Popup blocked. Please allow popups for this site.');
+            }
+        })
+        .catch(error => {
+            console.error("Error printing prescription:", error);
+            alert("Failed to print prescription. Please try again.");
+        });
+}
+export {startAppointment,openPrescriptionModal,printPrescription}
 

@@ -1,3 +1,6 @@
+import {openPrescriptionModal, printPrescription} from "./addDiagnosis";
+
+let labOrderSubmitHandler;
 function openLabReportsModal(){
     document.getElementById('orderLabReports').style.display = 'flex';
 
@@ -7,7 +10,11 @@ function openLabReportsModal(){
     existingDropdowns.forEach(dropdown => populateLabTestDropdown(dropdown));
 
     const labOrderForm = document.getElementById('labOrder');
+    const prescribeBtn=document.getElementById('saveAndPrescribe');
+    const endLabBtn=document.getElementById('saveAndEndLab');
 
+    prescribeBtn.addEventListener('click', saveLabOrderAndPrescribe);
+    endLabBtn.addEventListener('click',saveLabOrderAndFinish);
 
 
     if (labOrderSubmitHandler) {
@@ -31,6 +38,8 @@ function closeLabReportsModal(){
     document.getElementById('orderLabReports').style.display='none';
 
 }
+const closeLabReports=document.getElementById('closeLabReports');
+closeLabReports.addEventListener('click',closeLabReportsModal);
 
 //addLabtest
 let testCount = 1; // Start from 1 since the initial entry is already there
@@ -56,6 +65,8 @@ async function addLabTest() {
     console.log(`🆕 New test added. Total dropdowns now: ${document.querySelectorAll('.test-dropdown').length}`);
     testCount++;
 }
+const addTestBtn=document.getElementById('addTestBtn');
+addTestBtn.addEventListener('click', addLabTest);
 
 function removeLabTest(button) {
     button.parentElement.remove();
@@ -230,6 +241,9 @@ function saveLabOrderAndFinish(){
 
 
 function completeAppointment(appointmentId) {
+    if (confirm("Do you want to print the prescription before ending the appointment?")) {
+        printPrescription(appointmentId);
+    }
     fetch('/appointment/complete', {
         method: 'POST',
         headers: {
@@ -278,3 +292,4 @@ function completeAppointment(appointmentId) {
             }).showToast();
         });
 }
+export {openLabReportsModal,closeLabReportsModal,addLabTest,removeLabTest,populateLabTestDropdown,submitLabOrder,saveLabOrderAndPrescribe,saveLabOrderAndFinish,completeAppointment}

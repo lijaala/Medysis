@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,6 +104,17 @@ public class PrescriptionService {
             prescribedMedicationsRepository.save(prescribedMedication);
             logger.info("Saved PrescribedMedication for Medication ID: " + prescribedMedication.getMedication().getMedicationID());
         }
+    }
+    public PrescriptionResponse getPrescriptionByAppointmentId(Integer appointmentId) {
+        Optional<Prescription> prescription=prescriptionRepository.findByAppointmentAppointmentID(appointmentId);
+        return prescription.map(p -> new PrescriptionResponse(
+                p.getUser().getName(),
+                p.getStaff().getStaffName(),
+                p.getPrescriptionDate(),
+                p.getPrescribedMedications().stream()
+                        .map(med -> new MedicationDTO(med.getMedication().getMedicationName(), med.getDosage(), med.getIntake(), med.getMedicationInterval(), med.getDaysOfIntake()))
+                        .collect(Collectors.toList())
+        )).orElse(null);
     }
 
     public List<PrescriptionResponse> getPrescriptionsByUserId(Integer userId) {
