@@ -7,6 +7,8 @@ import Medysis.Project.Service.RecordService;
 import Medysis.Project.Service.UploadImageService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +17,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -71,7 +74,30 @@ public class MedicalRecordController {
 
 
     @GetMapping("/getByUserId")
-    public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam Integer userID) {
+    public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam (value = "userId", required = false)  Integer userID,HttpSession session) {
+        if (userID == null) {
+            Object userIdFromSession = session.getAttribute("userId");
+            if (userIdFromSession instanceof String) {
+                try {
+                    userID = Integer.parseInt((String) userIdFromSession);
+                } catch (NumberFormatException e) {
+                    // Handle the case where the String in the session is not a valid integer
+                    // Log the error and potentially return an error response
+                    System.err.println("Error: userId in session is not a valid integer: " + userIdFromSession);
+                    return Collections.emptyList(); // Or throw an appropriate exception
+                }
+            } else if (userIdFromSession instanceof Integer) {
+                userID = (Integer) userIdFromSession;
+            } else {
+                // Handle the case where userId is not in the session or is of an unexpected type
+                return Collections.emptyList(); // Or throw an appropriate exception
+            }
+
+            if (userID == null) {
+                // Still null after trying to retrieve from session
+                return Collections.emptyList(); // Or throw an appropriate exception
+            }
+        }
         return recordService.getMedicalRecordsByUserId(userID);
     }
 

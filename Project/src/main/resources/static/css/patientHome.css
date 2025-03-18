@@ -1,3 +1,6 @@
+html,body{
+    overflow-x: hidden;
+}
 .card {
     align-items: center;
 
@@ -41,14 +44,19 @@
 .container{
     align-items: center;
 }
-.search-container input{
-    align-self: center;
-    flex:1;
-    width:100%;
-    border-radius: 12px;
-}
-.search-container{
+
+.search-container {
+    display: flex;
+    justify-content: center;
     align-items: center;
+    width: 100%;
+}
+.search-bar {
+    padding: 5px;
+    width: 80%;
+    border: none;
+    border-radius:12px;
+    font-size: 1em;
 }
 .back{
     all:unset;
@@ -61,23 +69,70 @@
 }
 .navFix{
     position: fixed;
-    bottom:1px;
+    bottom:0;
     flex-direction: row;
-    width:100%;
+    width:100vw;
     align-items: center;
-
-
+    background-color: #ffffff;
 
 }
 .navFix .col{
     flex:1;
 }
 .mainScreen{
-    height:60vh;
+
     overflow: scroll;
     align-items: center;
     -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
     scrollbar-width: none;
 
 
+}
+form{
+    border-radius: 8px;
+
+}
+button{
+    padding: 1% 5%;
+    border-radius: .6vw;
+    text-transform: uppercase;
+    border: 1px solid rgb(245, 20, 125);
+    font-size: 0.8rem;
+    width: 100%;
+    color: rgb(253, 253, 255);
+}
+.primary {
+    display: flex;
+    background-color: rgb(245, 20, 125);
+    box-shadow: 0 2px 2px rgba(190, 72, 127, 0.53);
+    align-items: center;
+    justify-content: center;
+    gap:5%;
+    text-wrap: nowrap;
+}
+.secondary{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:5%;
+    text-wrap: nowrap;
+    background-color: #F0F2F9;
+    box-shadow: 0 1px 2px rgba(146, 206, 244, 0.3);
+    color:#36B1FF;
+    border:none;
+}
+.tertiary{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:5%;
+    text-wrap: nowrap;
+    background-color: #F0F2F9;
+    box-shadow: 0 1px 2px rgba(72, 132, 132, 0.44);
+    color:#008080;
+    border:none ;
+
+}
+.cancel {
+    background-color: red !important;
 }

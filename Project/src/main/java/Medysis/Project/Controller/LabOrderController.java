@@ -3,7 +3,7 @@ package Medysis.Project.Controller;
 
 import Medysis.Project.DTO.LabOrderDTO;
 import Medysis.Project.DTO.LabResultDTO;
-import Medysis.Project.Model.LabOrder;
+
 import Medysis.Project.Model.User;
 import Medysis.Project.Repository.UserRepository;
 import Medysis.Project.Service.LabOrderService;
@@ -11,6 +11,7 @@ import Medysis.Project.Service.LabResultService;
 import Medysis.Project.Service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,9 +67,16 @@ public class LabOrderController {
     }
 
     @GetMapping("/getByUserId")
-    public ResponseEntity<List<LabOrderDTO>> getLabOrdersByUserId(@RequestParam Integer userId) {
+    public ResponseEntity<List<LabOrderDTO>> getLabOrdersByUserId(@RequestParam (value = "userId", required = false) Integer userId, HttpSession session) {
+        if (userId == null) {
+            userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+        }
+        final Integer finalUserId = userId;
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + userId));
+                .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + finalUserId));
 
         List<LabOrderDTO> labOrders = labOrderService.getLabOrdersByUserId(user);
         return ResponseEntity.ok(labOrders);

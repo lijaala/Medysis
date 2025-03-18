@@ -65,7 +65,7 @@ public class AuthService {
             return "Invalid credentials";
         }
 
-        return authenticateAndSetSession(user.getEmail(), password, String.valueOf(user.getUserID()), "ROLE_PATIENT", session);
+        return authenticateAndSetSession(user.getEmail(), password, String.valueOf(user.getUserID()), user.getRole().getRole(), session);
     }
 
     private String authenticateStaff(Staff staff, String password, HttpSession session) {

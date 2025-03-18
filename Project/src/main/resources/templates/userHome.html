@@ -13,7 +13,7 @@
 <div class="container">
     <div class="row">
 
-        <div class="myHeader p-2 ">
+        <div class="myHeader p-2" xmlns:th="http://www.thymeleaf.org" th:fragment="header">
         <div class="row py-2">
 
             <div class="col-sm-1">
@@ -28,9 +28,9 @@
             </div>
             </div>
 
-            <div class="row d-flex align-items-center">
+            <div class="row d-flex align-items-center my-2">
                 <div class="search-container mx-3">
-                    <input class="p-1" type="text" placeholder="Search...">
+                    <input class="p-1 search-bar" type="text" placeholder="Search...">
                 </div>
             </div>
 
@@ -38,9 +38,9 @@
 
         <div class="row mainScreen">
 
-            <div class="col-sm-12 mx-3">
+            <div class="col-sm-12 mx-3 my-5 ">
 
-                <div class="row px-4">
+                <div class="row px-4 mb-5">
                  <div class="col-sm-6">
                     <div><span>Gender:</span> Female &nbsp;&nbsp;
                         <span>Blood Type:</span> AB +</div>
@@ -84,8 +84,8 @@
 
     </div>
         </div>
-            <div class="row mx-4 navFix">
-                <div class="col-sm-12"></div>
+            <div class="row mx-4  navFix" xmlns:th="http://www.thymeleaf.org" th:fragment="navBar" >
+
                 <div class="col" >
                     <a href="/patientHome" class="nav-link active">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
