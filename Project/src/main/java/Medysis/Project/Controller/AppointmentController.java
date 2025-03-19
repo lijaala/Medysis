@@ -42,7 +42,8 @@ public class AppointmentController {
             @RequestParam("time") String appTimeStr,
             HttpSession session) {
 
-        Integer patientID = (Integer) session.getAttribute("userId");
+        String userId = (String) session.getAttribute("userId");
+        Integer patientID = Integer.parseInt(userId);
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -195,6 +196,12 @@ public class AppointmentController {
         Appointment appointment = appointmentService.bookAppointment(patientID, doctor, appDate, appTime);
 
         return "Appointment added successfully by Admin.";
+    }
+    @GetMapping("/getByUserID")
+    public List<Appointment> getAppointmentsByUerId(HttpSession session) {
+        String user= (String) session.getAttribute("userId");
+        Integer patientID=Integer.parseInt(user);
+        return appointmentService.getAppointmentByUserId(patientID);
     }
 
 }

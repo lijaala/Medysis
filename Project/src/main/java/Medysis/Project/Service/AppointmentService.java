@@ -125,5 +125,11 @@ public class AppointmentService {
             throw new RuntimeException("Doctor with ID " + doctorID + " not found.");
         }
     }
+    public List<Appointment> getAppointmentByUserId(Integer userID) {
+        User user=userRepository.findById(userID).orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        return appointmentRepository.getAppointmentByPatientID(user);
+
+    }
 
 }

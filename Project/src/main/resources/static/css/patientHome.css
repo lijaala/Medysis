@@ -136,3 +136,19 @@ button{
 .cancel {
     background-color: red !important;
 }
+#page-title h2{
+
+     text-align: center;
+
+}
+.card div{
+    text-wrap: nowrap;
+
+}
+.navCard{
+    background-color: #f5f9ff;
+
+}
+.card-title{
+    text-decoration: none;
+}
