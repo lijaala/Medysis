@@ -131,5 +131,15 @@ public class AppointmentService {
         return appointmentRepository.getAppointmentByPatientID(user);
 
     }
+    public void cancelAppointment(Integer appointmentID) {
+        Optional<Appointment> appointmentOptional = appointmentRepository.findById(appointmentID);
+        if (appointmentOptional.isPresent()) {
+            Appointment appointment = appointmentOptional.get();
+            appointment.setStatus("Cancelled"); // Or another status
+            appointmentRepository.save(appointment);
+        } else {
+            throw new RuntimeException("Appointment not found");
+        }
+    }
 
 }

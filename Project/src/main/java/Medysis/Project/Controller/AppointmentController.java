@@ -6,6 +6,8 @@ import Medysis.Project.Repository.StaffRepository;
 import Medysis.Project.Service.AppointmentService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -73,7 +75,7 @@ public class AppointmentController {
             @RequestParam("appointmentID") Integer appointmentID,
             @RequestParam("date") String appDateStr,
             @RequestParam("time") String appTimeStr,
-            @RequestParam("status") String status,
+            @RequestParam(value = "status",required = false) String status,
             HttpSession session) {
 
         // Get the doctor ID from the session
@@ -202,6 +204,16 @@ public class AppointmentController {
         String user= (String) session.getAttribute("userId");
         Integer patientID=Integer.parseInt(user);
         return appointmentService.getAppointmentByUserId(patientID);
+    }
+    @PostMapping("/cancel/{appointmentID}")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Integer appointmentID) {
+        try {
+            appointmentService.cancelAppointment(appointmentID);
+            return ResponseEntity.ok("Appointment cancelled successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to cancel appointment.");
+        }
     }
 
 }

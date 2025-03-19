@@ -1,3 +1,5 @@
+<!doctype html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +9,7 @@
     <link href="/css/default.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/patientHome.css">
     <link rel="stylesheet" href="/css/navBar.css">
+<!--    <link rel="stylesheet" href="/css/login.css">-->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     </head>
 
@@ -60,10 +63,44 @@
 
                 </div>
 
+
+
                 <div class="row mx-1 navFix" th:include="userHome::navBar" >
 
                 </div>
             </div>
+        </div>
+    </div>
+
+</div>
+<div id="editAppointment" class="modal" style="display: none">
+    <div class="modal-overlay"></div>
+    <div class="modal-content ">
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn-close" aria-label="Close" onclick="closeEditForm()"></button>
+        </div>
+        <div class="row px-4 w-100" id="appointmentFormEdit" >
+
+            <form  method="POST"  id="appointmentEditSubmit">
+
+                <input type="hidden" id="rescheduleAppointmentId">
+                <div class="mb-3">
+                    <label for="rescheduleDate">New Date</label>
+                    <input type="date" class="form-control" id="rescheduleDate" name="date" required>
+                </div>
+                <div class="mb-3">
+                    <label for="rescheduleTime">New Time</label>
+                    <select class="form-control" id="rescheduleTime" name="time" required>
+                        <option value="" disabled selected>Select a time</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="primary mb-3">Confirm Re-schedule</button>
+                    <button type="submit" class="secondary mb-3">Cancel</button>
+
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -296,14 +333,15 @@
                         rescheduleBtn.textContent = 'Reschedule';
                         rescheduleBtn.classList.add('m-1', 'btn', 'btn-sm', 'btn-outline-primary', 'me-2');
                         rescheduleBtn.onclick = () => {
-                            console.log(`Reschedule appointment ${appointment.appointmentID}`);
+                            rescheduleAppointment(appointment);
+                            openEditForm();
                         };
 
                         const cancelBtn = document.createElement('button');
                         cancelBtn.textContent = 'Cancel';
                         cancelBtn.classList.add('m-1', 'btn', 'btn-sm', 'btn-outline-danger');
                         cancelBtn.onclick = () => {
-                            console.log(`Cancel appointment ${appointment.appointmentID}`);
+                            cancelAppointment(appointment.appointmentID); // Pass appointment ID
                         };
 
                         buttonDiv.appendChild(rescheduleBtn);
@@ -319,7 +357,145 @@
             })
             .catch(error => console.error('Error fetching appointment history:', error));
     }
+    function cancelAppointment(appointmentID) {
+        fetch(`/appointment/cancel/${appointmentID}`, {
+            method: 'POST',
+        })
+            .then(response => {
+                if (response.ok) {
+                    Toastify({
+                        text: "Appointment Cancelled!",
+                        duration: 3000,
+                        backgroundColor: "rgba(200,253,223)",
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            color: "rgb(15,94,27)",
+                            borderRadius: "8px"
+                        }
+                    }).showToast();
+                    fetchAppointmentHistory(); // Refresh appointment history
+                } else {
+                    Toastify({
+                        text: "Failed to cancel appointment. Please try again.",
+                        duration: 3000,
+                        backgroundColor: "rgba(253,200,200)",
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            color: "rgb(167,6,14)",
+                            borderRadius: "8px"
+                        }
+                    }).showToast();
+                }
+            })
+            .catch(error => console.error('Error cancelling appointment:', error));
+    }
+    function rescheduleAppointment(appointment) {
+        console.log("Rescheduling appointment:", appointment);
+        console.log("Doctor ID:", appointment.doctorID.staffID);
 
+        $('#rescheduleAppointmentId').val(appointment.appointmentID);
+        $('#rescheduleDate').val(appointment.appDate);
+
+        // Reset the form
+        document.getElementById('appointmentEditSubmit').reset();
+
+        // Attach event listener BEFORE showing modal
+        $('#editAppointment').show();
+
+        const doctorID = appointment.doctorID.staffID;
+        const date = appointment.appDate;
+
+        const encodedDoctorID = encodeURIComponent(doctorID);
+        console.log("Encoded Doctor ID:", encodedDoctorID);
+
+        fetch(`/appointment/availableSlots?doctorID=${encodedDoctorID}&date=${date}`)
+            .then(response => {
+                if (!response.ok) {
+                    console.error("Failed to fetch slots:", response.status);
+                    return response.json().then(data => {
+                        console.error("Server response:", data);
+                    });
+                }
+                return response.json();
+            })
+            .then(slots => {
+                if (slots) {
+                    console.log("Available slots:", slots);
+                    const timeSelect = document.getElementById('rescheduleTime');
+                    if (timeSelect) {
+                        timeSelect.innerHTML = '<option value="" disabled selected>Select a time</option>';
+                        slots.forEach(slot => {
+                            const option = document.createElement('option');
+                            option.value = slot;
+                            option.textContent = slot;
+                            timeSelect.appendChild(option);
+                        });
+                        $('#rescheduleTime').val(appointment.appTime);
+                    } else {
+                        console.error("rescheduleTime element not found.");
+                    }
+                }
+            })
+            .catch(error => console.error("Error fetching slots:", error));
+        document.getElementById('rescheduleTime').value = appointment.appTime;
+        document.getElementById('rescheduleDate').value = appointment.appDate;
+
+
+    }
+
+    document.getElementById('appointmentEditSubmit').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const appointmentId = $('#rescheduleAppointmentId').val();
+        const date = $('#rescheduleDate').val();
+        const time = $('#rescheduleTime').val();
+
+        fetch(`/appointment/edit?appointmentID=${appointmentId}&date=${date}&time=${time}`, {
+            method: 'POST',
+        })
+            .then(response => {
+                if (response.ok) {
+                    Toastify({
+                        text: "Appointment Rescheduled!",
+                        duration: 3000,
+                        backgroundColor: "rgba(200,253,223)",
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            color: "rgb(15,94,27)",
+                            borderRadius: "8px"
+                        }
+                    }).showToast();
+                    $('#editAppointment').hide(); // Close the modal
+                    fetchAppointmentHistory();
+                } else {
+                    Toastify({
+                        text: "Failed to reschedule appointment. Please try again.",
+                        duration: 3000,
+                        backgroundColor: "rgba(253,200,200)",
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            color: "rgb(167,6,14)",
+                            borderRadius: "8px"
+                        }
+                    }).showToast();
+                }
+            })
+            .catch(error => console.error('Error rescheduling appointment:', error));
+    });
+function closeEditForm(){
+        document.getElementById('editAppointment').style.display="none";
+}function openEditForm(){
+        document.getElementById('editAppointment').style.display="flex";
+
+}
 </script>
 </body>
 
