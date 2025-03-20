@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -69,11 +70,18 @@ public class LabOrderController {
     @GetMapping("/getByUserId")
     public ResponseEntity<List<LabOrderDTO>> getLabOrdersByUserId(@RequestParam (value = "userId", required = false) Integer userId, HttpSession session) {
         if (userId == null) {
-            userId = (Integer) session.getAttribute("userId");
-            if (userId == null) {
+            String userIdStr = (String) session.getAttribute("userId");
+            if (userIdStr != null) {
+                try {
+                    userId = Integer.parseInt(userIdStr);
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body(null); // Or handle the error appropriately
+                }
+            } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
         }
+
         final Integer finalUserId = userId;
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + finalUserId));
@@ -81,6 +89,7 @@ public class LabOrderController {
         List<LabOrderDTO> labOrders = labOrderService.getLabOrdersByUserId(user);
         return ResponseEntity.ok(labOrders);
     }
-
-
 }
+
+
+

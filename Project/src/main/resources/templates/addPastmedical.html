@@ -133,9 +133,7 @@
         filePreview.removeChild(filePreview.childNodes[index]);
     }
 
-    function goBack() {
-        window.history.back();
-    }
+
     document.addEventListener("DOMContentLoaded", function () {
         fetchMedicalHistory();
     });
@@ -201,6 +199,7 @@
                 <h5 class="card-title">${record.conditionName}</h5>
                 <p class="card-text"><strong>Diagnosed Date:</strong> ${record.diagnosedDate}</p>
                 <p class="card-text"><strong>Treated:</strong> ${record.isTreated }</p>
+                <p class="card-text"><strong>Treatment Plan</strong> ${record.treatmentPlan }</p>
                 ${record.doctor ? `<p class="card-text"><strong>Diagnosed By:</strong> ${record.doctor.staffName}</p>` : ""}
                 <div>${fileContent}</div>
                <!--${record.scans ? `<a href="${record.scans}" target="_blank" class="btn btn-sm btn-info">View Report</a>` : ""}-->

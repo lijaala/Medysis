@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="/css/navBar.css">
     <link rel="stylesheet" href="css/patientHome.css">
 </head>
@@ -45,6 +44,10 @@
         pageTitle.textContent = 'Appointments';
     } else if (path.includes('medical')) {
         pageTitle.textContent = 'Medical Records';
+    }else if (path.includes('prescription')) {
+        pageTitle.textContent = 'Prescription';
+    }else if (path.includes('lab')) {
+        pageTitle.textContent = 'Lab Reports';
     } else {
         pageTitle.textContent = 'WELCOME'; // Fallback title
     }
@@ -57,6 +60,9 @@
         window.onpopstate = function() {
         setPageTitle();
             };
+function goBack() {
+    window.history.back();
+}
         </script>
         </div>
 
@@ -77,13 +83,13 @@
 
         <div class="row px-4">
 
-                    <a href="/#" class="col-5 col-md-2 m-2 p-4 card navCard">
+                    <a href="/labView" class="col-5 col-md-2 m-2 p-4 card navCard">
                         <img src="image/LabReports.svg" alt="Diagnosis" style="height: 5vh; width: 5vh;" >
                         <div class="card-title">Lab Reports</div>
                     </a>
 
 
-                    <a href="/" class="col-5 col-md-2 m-2 p-4 card navCard">
+                    <a href="/prescription" class="col-5 col-md-2 m-2 p-4 card navCard">
                         <img src="image/Pill--Streamline-Ultimate.svg" alt="Diagnosis" style="height: 5vh; width: 5vh;" >
                         <div class="card-title">Prescription</div>
                     </a>
@@ -111,7 +117,7 @@
             <div class="row mx-4  navFix" xmlns:th="http://www.thymeleaf.org" th:fragment="navBar" >
 
                 <div class="col" >
-                    <a href="/patientHome" class="nav-link active">
+                    <a href="/userHome" class="nav-link active">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                                 <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />

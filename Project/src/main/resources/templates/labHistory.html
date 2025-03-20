@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Prescriptions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/navBar.css">
+    <link rel="stylesheet" href="css/patientHome.css">
+</head>
+<body>
+<div class="container">
+    <div class="row ">
+        <div class="myHeader p-2" th:include="userHome::header"></div>
+
+        <div class="row mainScreen">
+            <div class="col-sm-12 mx-3 my-5 ">
+                <div class="row px-4 w-100" id="labHistory">
+
+                </div>
+                <div class="row mx-1 navFix" th:include="userHome::navBar" >
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="labResultModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn-close" aria-label="Close" onclick="closeLabResultModal()"></button>
+        </div>
+        <div id="labResultDetails">
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+
+        fetchLabHistory();
+
+
+    });
+    function fetchLabHistory() {
+        fetch('api/LabOrder/getByUserId')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch lab history');
+                }
+                return response.json();
+            })
+            .then(labOrders => {
+                const labHistoryDiv = document.getElementById('labHistory');
+                labHistoryDiv.innerHTML = '';
+
+                if (labOrders && labOrders.length > 0) {
+                    labOrders.forEach(labOrder => {
+                        const labOrderDiv = document.createElement('div');
+                        labOrderDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded','navCard');
+
+                        const orderDate = new Date(labOrder.orderDate).toLocaleDateString();
+
+                        let labOrderInfo = `
+                        <p><strong>Order Date:</strong> ${orderDate}</p>
+                        <p><strong>Status:</strong> ${labOrder.labStatus}</p>
+                        <p><strong>Doctor:</strong> ${labOrder.doctorName}</p>
+                    `;
+
+                        // Lab Tech Name (if available)
+                        if (labOrder.labResults && labOrder.labResults[0] && labOrder.labResults[0].labTechnicianID) {
+                            labOrderInfo += `<p><strong>Lab Technician:</strong> ${labOrder.labResults[0].labTechnicianID}</p>`;
+                        }
+
+                        // Test Names
+                        if (labOrder.labResults && labOrder.labResults.length > 0) {
+                            labOrderInfo += '<h5>Tests:</h5><ul>';
+                            labOrder.labResults.forEach(result => {
+                                labOrderInfo += `<li>${result.testName}</li>`;
+                            });
+                            labOrderInfo += '</ul>';
+                        }
+
+                        // View Result Button (Conditional)
+                        if (labOrder.labStatus === 'Completed' || labOrder.labStatus === 'Ongoing') {
+                            const viewResultButton = document.createElement('button');
+                            viewResultButton.textContent = 'View Result';
+                            viewResultButton.classList.add('btn', 'btn-primary', 'btn-sm');
+                            viewResultButton.onclick = () => {
+                                displayLabResultsModal(labOrder);
+                            };
+                            labOrderDiv.innerHTML = labOrderInfo;
+                            labOrderDiv.appendChild(viewResultButton);
+                        } else {
+                            labOrderDiv.innerHTML = labOrderInfo;
+                        }
+
+                        labHistoryDiv.appendChild(labOrderDiv);
+                    });
+                } else {
+                    labHistoryDiv.innerHTML = '<p>No lab history found.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching lab history:', error);
+                const labHistoryDiv = document.getElementById('labHistory');
+                labHistoryDiv.innerHTML = '<p>Failed to load lab history.</p>';
+            });
+    }
+
+    // ... (displayLabResultsModal and closeLabResultModal functions remain the same)
+
+    function displayLabResultsModal(labOrder) {
+        const labResultDetailsDiv = document.getElementById('labResultDetails');
+        labResultDetailsDiv.innerHTML = ''; // Clear previous content
+
+        if (labOrder.labResults && labOrder.labResults.length > 0) {
+            labOrder.labResults.forEach(result => {
+                labResultDetailsDiv.innerHTML += `
+                <p>Test Name:${result.testName}</p>
+                <p>Result Value:${result.resultValue || 'Pending'}</p>
+                <p>Normal Range:${result.normalRange}</p>
+                <p>Measurement Unit:</strong> ${result.measurementUnit}</p>
+
+            `;
+            });
+        } else {
+            labResultDetailsDiv.innerHTML = '<p>No lab results available.</p>';
+        }
+
+        document.getElementById('labResultModal').style.display = 'flex'; // Show modal
+    }
+
+    function closeLabResultModal() {
+        document.getElementById('labResultModal').style.display = 'none';
+    }
+</script>
+
+
+</body>
+</html>

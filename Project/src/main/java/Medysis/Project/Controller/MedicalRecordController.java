@@ -94,7 +94,7 @@ public class MedicalRecordController {
             }
 
             if (userID == null) {
-                // Still null after trying to retrieve from session
+
                 return Collections.emptyList(); // Or throw an appropriate exception
             }
         }

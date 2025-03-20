@@ -42,5 +42,13 @@ public class HomeController {
     public String userHome() {
         return "userHome";
     }
+    @GetMapping("/prescription")
+    public String prescription() {
+        return "prescriptionView";
+    }
+    @GetMapping("labView")
+    public String labView() {
+        return "labHistory";
+    }
 }
 

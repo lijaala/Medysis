@@ -106,7 +106,7 @@
 </div>
 
 
-<!-- Bootstrap JS and Dependencies -->
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
@@ -293,9 +293,11 @@
     }
     function openAppointmentForm(){
         document.getElementById('appointmentForm').style.display="block";
+        document.getElementById('bookBtn').style.display="none";
     }
     function closeAppointmentForm(){
         document.getElementById('appointmentForm').style.display="none";
+        document.getElementById('bookBtn').style.display="block";
     }
     function fetchAppointmentHistory() {
         fetch('/appointment/getByUserID')
@@ -307,7 +309,7 @@
 
                 appointments.forEach(appointment => {
                     const appointmentDiv = document.createElement('div');
-                    appointmentDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'position-relative');
+                    appointmentDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'position-relative','navCard');
 
                     const formattedDate = new Date(appointment.appDate).toLocaleDateString();
                     const formattedTime = appointment.appTime;
@@ -319,10 +321,10 @@
                     detailsDiv.classList.add('col');
 
                     detailsDiv.innerHTML = `
-                    <p><strong>Doctor:</strong> ${appointment.doctorID.staffName}</p>
-                    <p><strong>Date:</strong> ${formattedDate}</p>
-                    <p><strong>Time:</strong> ${formattedTime}</p>
-                    <p><strong>Status:</strong> ${appointment.status}</p>
+                    <p>Doctor: ${appointment.doctorID.staffName}</p>
+                    <p>Date:${formattedDate}</p>
+                    <p>Time: ${formattedTime}</p>
+                    <p>Status: ${appointment.status}</p>
                 `;
 
                     const buttonDiv = document.createElement('div');
@@ -331,7 +333,7 @@
                     if (appointment.status === 'Pending') {
                         const rescheduleBtn = document.createElement('button');
                         rescheduleBtn.textContent = 'Reschedule';
-                        rescheduleBtn.classList.add('m-1', 'btn', 'btn-sm', 'btn-outline-primary', 'me-2');
+                        rescheduleBtn.classList.add('m-1', 'btn', 'btn-sm', 'secondary', 'me-2');
                         rescheduleBtn.onclick = () => {
                             rescheduleAppointment(appointment);
                             openEditForm();
