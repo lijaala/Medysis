@@ -55,25 +55,23 @@
             })
             .then(labOrders => {
                 const labHistoryDiv = document.getElementById('labHistory');
+                console.log(labOrders);
                 labHistoryDiv.innerHTML = '';
 
                 if (labOrders && labOrders.length > 0) {
                     labOrders.forEach(labOrder => {
                         const labOrderDiv = document.createElement('div');
-                        labOrderDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded','navCard');
+                        labOrderDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'navCard');
 
                         const orderDate = new Date(labOrder.orderDate).toLocaleDateString();
 
                         let labOrderInfo = `
                         <p><strong>Order Date:</strong> ${orderDate}</p>
                         <p><strong>Status:</strong> ${labOrder.labStatus}</p>
-                        <p><strong>Doctor:</strong> ${labOrder.doctorName}</p>
+                        <p><strong>Ordered By:</strong> ${labOrder.doctorName}</p>
                     `;
 
-                        // Lab Tech Name (if available)
-                        if (labOrder.labResults && labOrder.labResults[0] && labOrder.labResults[0].labTechnicianID) {
-                            labOrderInfo += `<p><strong>Lab Technician:</strong> ${labOrder.labResults[0].labTechnicianID}</p>`;
-                        }
+
 
                         // Test Names
                         if (labOrder.labResults && labOrder.labResults.length > 0) {
@@ -88,7 +86,7 @@
                         if (labOrder.labStatus === 'Completed' || labOrder.labStatus === 'Ongoing') {
                             const viewResultButton = document.createElement('button');
                             viewResultButton.textContent = 'View Result';
-                            viewResultButton.classList.add('btn', 'btn-primary', 'btn-sm');
+                            viewResultButton.classList.add('btn', 'primary', 'btn-sm');
                             viewResultButton.onclick = () => {
                                 displayLabResultsModal(labOrder);
                             };
@@ -96,6 +94,17 @@
                             labOrderDiv.appendChild(viewResultButton);
                         } else {
                             labOrderDiv.innerHTML = labOrderInfo;
+                        }
+
+                        // Print Report Button (Conditional)
+                        if (labOrder.labStatus === 'Completed') {
+                            const printButton = document.createElement('button');
+                            printButton.textContent = 'Print Report';
+                            printButton.classList.add('btn', 'secondary', 'btn-sm', 'mt-2');
+                            printButton.onclick = () => {
+                                printLabReport(labOrder.orderID); // Pass only the orderID
+                            };
+                            labOrderDiv.appendChild(printButton);
                         }
 
                         labHistoryDiv.appendChild(labOrderDiv);
@@ -111,7 +120,66 @@
             });
     }
 
-    // ... (displayLabResultsModal and closeLabResultModal functions remain the same)
+    function printLabReport(orderID) {
+        fetch(`api/LabOrder/details/${orderID}`) // Fetch details using orderID
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch lab order details');
+                }
+                return response.json();
+            })
+            .then(labOrder => {
+                let reportContent = `
+                <html lang="en">
+                    <head>
+                        <title>Lab Report</title>
+                        <style>
+                            body { font-family: sans-serif; }
+                            h1, h2 { margin-bottom: 10px; }
+                            p { margin: 5px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Lab Report</h1>
+                        <p><strong>Order Date:</strong> ${new Date(labOrder.orderDate).toLocaleDateString()}</p>
+                        <p><strong>Status:</strong> ${labOrder.labStatus}</p>
+                        <p><strong>Doctor:</strong> ${labOrder.doctorName}</p>
+            `;
+
+                if (labOrder.labResults && labOrder.labResults.length > 0) {
+                    reportContent += '<h2>Lab Results:</h2>';
+                    labOrder.labResults.forEach(result => {
+                        reportContent += `
+                        <p><strong>Test Name:</strong> ${result.testName}</p>
+                        <p><strong>Result Value:</strong> ${result.resultValue || 'Pending'}</p>
+                        <p><strong>Normal Range:</strong> ${result.normalRange}</p>
+                        <p><strong>Measurement Unit:</strong> ${result.measurementUnit}</p>
+                    `;
+                        if (result.labTechnicianID) {
+                            reportContent += `<p><strong>Lab Technician:</strong> ${result.labTechnicianID}</p>`;
+                        }
+                        reportContent += '<hr>';
+                    });
+                }
+
+                reportContent += `
+                    </body>
+                </html>
+            `;
+
+                const printWindow = window.open('', '_blank');
+                printWindow.document.open();
+                printWindow.document.write(reportContent);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+            })
+            .catch(error => console.error('Error printing report:', error));
+    }
+
+
+
 
     function displayLabResultsModal(labOrder) {
         const labResultDetailsDiv = document.getElementById('labResultDetails');
@@ -121,9 +189,11 @@
             labOrder.labResults.forEach(result => {
                 labResultDetailsDiv.innerHTML += `
                 <p>Test Name:${result.testName}</p>
+                ${result.labTechnicianID ? `<p><strong>Lab Technician:</strong> ${result.labTechnicianID}</p>` : ''}
                 <p>Result Value:${result.resultValue || 'Pending'}</p>
                 <p>Normal Range:${result.normalRange}</p>
                 <p>Measurement Unit:</strong> ${result.measurementUnit}</p>
+                <hr>
 
             `;
             });

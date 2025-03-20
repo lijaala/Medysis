@@ -195,12 +195,12 @@
             }
 
             recordElement.innerHTML = `
-            <div class="card-body">
+            <div class="card-body align-itemn">
                 <h5 class="card-title">${record.conditionName}</h5>
                 <p class="card-text"><strong>Diagnosed Date:</strong> ${record.diagnosedDate}</p>
                 <p class="card-text"><strong>Treated:</strong> ${record.isTreated }</p>
-                <p class="card-text"><strong>Treatment Plan</strong> ${record.treatmentPlan }</p>
-                ${record.doctor ? `<p class="card-text"><strong>Diagnosed By:</strong> ${record.doctor.staffName}</p>` : ""}
+                <p class="card-text cardText"><strong>Treatment Plan</strong> ${record.treatmentPlan }</p>
+                ${record.doctor ? `<p class="card-text "><strong>Diagnosed By:</strong> ${record.doctor.staffName}</p>` : ""}
                 <div>${fileContent}</div>
                <!--${record.scans ? `<a href="${record.scans}" target="_blank" class="btn btn-sm btn-info">View Report</a>` : ""}-->
             </div>

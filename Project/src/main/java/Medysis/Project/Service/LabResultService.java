@@ -12,7 +12,7 @@ import Medysis.Project.Repository.LabTestRepository;
 import Medysis.Project.Repository.StaffRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,6 +57,7 @@ public class LabResultService {
         dto.measurementUnit=labResults.getTestID().getMeasurementUnit();
         dto.resultValue=labResults.getResultValue();
         dto.notes = labResults.getNotes();
+        dto.labTechnicianID=labResults.getLabTechnicianID().getStaffName();
 
 
 

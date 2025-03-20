@@ -104,6 +104,7 @@ button{
 .primary {
     display: flex;
     background-color: rgb(245, 20, 125);
+    color:whitesmoke;
     box-shadow: 0 2px 2px rgba(190, 72, 127, 0.53);
     align-items: center;
     justify-content: center;
@@ -150,6 +151,15 @@ button{
 }
 .card-title{
     text-decoration: none;
+}
+.card-body{
+    width:90%;
+}
+.cardText{
+
+    max-width: 100%;
+    text-wrap: balance;
+    text-align: justify;
 }
 .modal {
     position: fixed;
