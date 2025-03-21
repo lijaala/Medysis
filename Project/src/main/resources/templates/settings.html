@@ -44,7 +44,7 @@
             <div class="col-sm-12  my-5">
                 <ul class="nav flex-column settingBar px-4">
                     <li class="nav-item py-4">
-                        <a class="d-flex flex-row setting-link" data-target="profileSettings" href="#">
+                        <a class="d-flex flex-row setting-link" data-target="profileSettings" >
                             <svg class="me-3 " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                                 <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
                                     <path d="M24 27a8 8 0 1 0 0-16a8 8 0 0 0 0 16m0-2a6 6 0 1 0 0-12a6 6 0 0 0 0 12"/>
@@ -54,7 +54,7 @@
                             Profile Settings</a>
                     </li>
                     <li class="nav-item py-4">
-                        <a class="d-flex flex-row setting-link" data-target="changePassword" href="#">
+                        <a class="d-flex flex-row setting-link" data-target="changePassword" >
                             <svg class="me-3 " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256">
 
                                 <path fill="currentColor" d="M46 56v144a6 6 0 0 1-12 0V56a6 6 0 0 1 12 0m94.58 56.41L118 119.74V96a6 6 0 0 0-12 0v23.74l-22.58-7.33a6 6 0 1 0-3.71 11.41l22.58 7.33l-14 19.21a6 6 0 1 0 9.7 7.06l14-19.21l14 19.21a6 6 0 0 0 9.7-7.06l-14-19.21l22.58-7.33a6 6 0 1 0-3.71-11.41Zm103.56 3.85a6 6 0 0 0-7.56-3.85L214 119.74V96a6 6 0 0 0-12 0v23.74l-22.58-7.33a6 6 0 1 0-3.71 11.41l22.58 7.33l-13.95 19.21a6 6 0 1 0 9.7 7.06l14-19.21l14 19.21a6 6 0 0 0 9.7-7.06l-13.95-19.21l22.58-7.33a6 6 0 0 0 3.77-7.56" stroke-width="6.5" stroke="currentColor" />
@@ -79,25 +79,28 @@
                     </li>
 
                 </ul>
-
+                <!--Change Password Section-->
                 <div class="row px-4 w-100 link-section" id="changePassword" style="display: none;">
-                    <div class="d-flex justify-content-end">
-                        <button type="button" class="btn-close" aria-label="Close" onclick="closeAppointmentForm()"></button>
+                    <div class="d-flex mb-3">
+                        <span class=" align-self-start me-5 back-to-settings" aria-label="Back">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024">
+	                            <path fill="currentColor" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64" stroke-width="25.5" stroke="currentColor" />
+	                            <path fill="currentColor" d="m237.248 512l265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312z" stroke-width="25.5" stroke="currentColor" />
+                            </svg>
+                        </span>
+                            <h4 class="justify-self-center"> Change Password</h4>
                     </div>
                     <form id="resetPasswordForm">
-                        <div class="mb-3">
-                            <h4> Change Password</h4>
-                        </div>
                         <div class="mb-3">
                             <label for="currentPassword">Current Password</label>
                             <input type="password" class="form-control" id="currentPassword" name="currentPassword" required placeholder="Enter your current password">
                         </div>
-                    <div class="mb-3">
+                        <div class="mb-3">
                             <label for="newPassword">New Password</label>
                             <input type="password" class="form-control" id="newPassword" name="newPassword" required placeholder="Enter your new password">
                         </div>
-                    <div class="mb-3">
-                            <label for="confirmPassword">Current Password</label>
+                        <div class="mb-3">
+                            <label for="confirmPassword">Re-enter Password</label>
                             <input type="password" class="form-control" id="confirmPassword" name="currentPassword" required placeholder="Re-enter your new password">
                         </div>
                         <div class="mb-3">
@@ -106,9 +109,71 @@
                         </div>
                     </form>
             </div>
-            <div id="profileSettings" class="link-section">
-                <h2>Profile Settings</h2>
-                <p>Here you can update your profile information.</p>
+                <!--Profile Settings-->
+            <div id="profileSettings" class="row px-4 w-100 link-section">
+                <div class="d-flex mb-3">
+                        <span class=" align-self-start me-5 back-to-settings" aria-label="Back">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024">
+	                            <path fill="currentColor" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64" stroke-width="25.5" stroke="currentColor" />
+	                            <path fill="currentColor" d="m237.248 512l265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312z" stroke-width="25.5" stroke="currentColor" />
+                            </svg>
+                        </span>
+                    <h4 class="justify-self-center"> Update Profile Details</h4>
+                </div>
+
+                    <div class="col-md-4 my-3">
+                        <div class=" text-center">
+                            <div class="mt-3 d-flex ">
+                            <img id="profileImage" src="path/to/profile-image.jpg" alt="Profile Picture" class="rounded-circle img-fluid" style="cursor: zoom-in;" onclick="zoomImage()">
+                            <input type="file" id="imageUpload" accept="image/*" class="form-control mb-2">
+                            </div>
+                            <div class="mt-3 d-flex ">
+
+                                <button class="primary m-1" onclick="updateProfileImage()">Update</button>
+                                <button class="btn btn-danger btn-sm m-1" onclick="deleteProfileImage()">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                <form id="profileUpdate">
+
+                    <div class="mb-3">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required >
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone" required >
+                    </div>
+                    <div class="mb-3">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" required >
+                    </div>
+                    <div class="mb-3">
+                        <label for="gender" >Gender</label>
+                        <select id="gender" class="form-control" name="gender">
+                            <option class="form-control" value="Female">Female</option>
+                            <option class="form-control" value="Male">Male</option>
+                            <option class="form-control" value="Other"> Other</option>
+
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="age">Age</label>
+                        <input type="number" class="form-control" id="age" name="age" required >
+                    </div>
+                    <div class="mb-3">
+                        <label for="weight">Weight</label>
+                        <input type="number" class="form-control" id="weight" name="weight" required >
+                    </div>
+                    <div class="mb-3">
+                        <label for="bloodType">Blood Type</label>
+                        <input type="text" class="form-control" id="bloodType" name="bloodType" required >
+                    </div>
+                    <div class="mb-3">
+                        <button type="submit" class="primary">Update</button>
+
+                    </div>
+                </form>
             </div>
 
 
@@ -134,7 +199,7 @@
         const settingLinks = document.querySelectorAll('.setting-link');
         const settingBar = document.querySelector('.settingBar');
         const linkSections = document.querySelectorAll('.link-section');
-
+        const backButtons = document.querySelectorAll('.back-to-settings');
         settingLinks.forEach(link => {
             link.addEventListener('click', function(event) {
                 event.preventDefault();
@@ -148,6 +213,14 @@
 
                 // Show the target link section
                 document.getElementById(targetId).style.display = 'block';
+            });
+        });
+        backButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                linkSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+                settingBar.style.display = 'block';
             });
         });
     });

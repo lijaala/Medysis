@@ -29,7 +29,7 @@ public class UserController {
 
     @PutMapping("/update/{userID}")
     public ResponseEntity<Map<String, String>> updateUser(
-            @PathVariable Integer userID,
+            @PathVariable(required = false) Integer userID,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) Integer age,
@@ -44,6 +44,11 @@ public class UserController {
         if (editorId == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("error", "Unauthorized: Editor ID not found."));
+        }
+        if(userID == null) {
+            String user=(String) session.getAttribute("userId");
+            userID=Integer.parseInt(user);
+
         }
 
         try {

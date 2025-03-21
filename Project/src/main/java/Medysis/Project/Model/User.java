@@ -62,7 +62,11 @@ public class User {
     @Column(name = "resetTokenExpiry")
     private LocalDateTime resetTokenExpiry;
 
+    @Column(name = "weight")
+    private Double weight;
 
+    @Column(name = "bloodType")
+    private String bloodType;
 
     public void setId(Integer id) {
         this.userID = userID;
@@ -209,5 +213,21 @@ public class User {
 
     public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
         this.resetTokenExpiry = resetTokenExpiry;
+    }
+
+    public Double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public String getBloodType() {
+        return bloodType;
+    }
+
+    public void setBloodType(String bloodType) {
+        this.bloodType = bloodType;
     }
 }
