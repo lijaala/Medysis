@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"/>
+
+    <link rel="stylesheet" href="/css/navBar.css"/>
+    <link rel="stylesheet" href="css/patientHome.css"/>
+    <style>
+        svg {
+            g, path{
+
+                stroke:#07104E;
+                color:#07104E;
+
+            }
+        }
+        .nav-item a{
+            text-decoration: none;
+            color:#07104E;
+        }
+        .nav-item a:hover{
+            text-decoration: none;
+            color:rgb(255, 52, 147);
+        }
+        .row>*{
+            padding-right: 0 !important;
+        }
+        .link-section {
+            display: none; /* Initially hide all link sections */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="myHeader p-2" th:include="userHome::header"></div>
+        <div class="row mainScreen">
+            <div class="col-sm-12  my-5">
+                <ul class="nav flex-column settingBar px-4">
+                    <li class="nav-item py-4">
+                        <a class="d-flex flex-row setting-link" data-target="profileSettings" href="#">
+                            <svg class="me-3 " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
+                                <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
+                                    <path d="M24 27a8 8 0 1 0 0-16a8 8 0 0 0 0 16m0-2a6 6 0 1 0 0-12a6 6 0 0 0 0 12"/>
+                                    <path d="M44 24c0 11.046-8.954 20-20 20S4 35.046 4 24S12.954 4 24 4s20 8.954 20 20M33.63 39.21A17.9 17.9 0 0 1 24 42a17.9 17.9 0 0 1-9.831-2.92q-.36-.45-.73-.93A2.14 2.14 0 0 1 13 36.845c0-1.077.774-1.98 1.809-2.131c6.845-1 11.558-.914 18.412.035A2.08 2.08 0 0 1 35 36.818c0 .48-.165.946-.463 1.31q-.461.561-.907 1.082m3.355-2.744c-.16-1.872-1.581-3.434-3.49-3.698c-7.016-.971-11.92-1.064-18.975-.033c-1.92.28-3.335 1.856-3.503 3.733A17.94 17.94 0 0 1 6 24c0-9.941 8.059-18 18-18s18 8.059 18 18a17.94 17.94 0 0 1-5.015 12.466"/>
+                                </g>
+                            </svg>
+                            Profile Settings</a>
+                    </li>
+                    <li class="nav-item py-4">
+                        <a class="d-flex flex-row setting-link" data-target="changePassword" href="#">
+                            <svg class="me-3 " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256">
+
+                                <path fill="currentColor" d="M46 56v144a6 6 0 0 1-12 0V56a6 6 0 0 1 12 0m94.58 56.41L118 119.74V96a6 6 0 0 0-12 0v23.74l-22.58-7.33a6 6 0 1 0-3.71 11.41l22.58 7.33l-14 19.21a6 6 0 1 0 9.7 7.06l14-19.21l14 19.21a6 6 0 0 0 9.7-7.06l-14-19.21l22.58-7.33a6 6 0 1 0-3.71-11.41Zm103.56 3.85a6 6 0 0 0-7.56-3.85L214 119.74V96a6 6 0 0 0-12 0v23.74l-22.58-7.33a6 6 0 1 0-3.71 11.41l22.58 7.33l-13.95 19.21a6 6 0 1 0 9.7 7.06l14-19.21l14 19.21a6 6 0 0 0 9.7-7.06l-13.95-19.21l22.58-7.33a6 6 0 0 0 3.77-7.56" stroke-width="6.5" stroke="currentColor" />
+
+                            </svg>
+                            Change Password</a>
+                    </li>
+                    <li class="nav-item py-4">
+                        <a class="d-flex flex-row setting-link" data-target="logout" href="#">
+                            <svg class="me-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M5.616 20q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h6.403v1H5.616q-.231 0-.424.192T5 5.616v12.769q0 .23.192.423t.423.192h6.404v1zm10.846-4.461l-.702-.72l2.319-2.319H9.192v-1h8.887l-2.32-2.32l.702-.718L20 12z" />
+                            </svg>
+                            Logout</a>
+                    </li>
+                    <li class="nav-item py-4">
+                        <a class="d-flex flex-row setting-link" data-target="deleteAccount" href="#">
+
+                            <svg class="me-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+                                <path fill="currentColor" d="M9.5 9a1.5 1.5 0 0 1 1.5 1.5v.5c0 1.971-1.86 4-5 4s-5-2.029-5-4v-.5A1.5 1.5 0 0 1 2.5 9zm0 1h-7a.5.5 0 0 0-.5.5v.5c0 1.438 1.432 3 4 3s4-1.562 4-3v-.5a.5.5 0 0 0-.5-.5M6 2.5A2.75 2.75 0 1 1 6 8a2.75 2.75 0 0 1 0-5.5m0 1A1.75 1.75 0 1 0 6 7a1.75 1.75 0 0 0 0-3.5m4.784-2.411l.07.057L12.5 2.793l1.646-1.647a.5.5 0 0 1 .708.708L13.207 3.5l1.647 1.646a.5.5 0 0 1 .057.638l-.057.07a.5.5 0 0 1-.638.057l-.07-.057L12.5 4.207l-1.646 1.647a.5.5 0 0 1-.708-.708L11.793 3.5l-1.647-1.646a.5.5 0 0 1-.057-.638l.057-.07a.5.5 0 0 1 .562-.1z" stroke-width="0.2" />
+                            </svg>
+                            Delete Account</a>
+                    </li>
+
+                </ul>
+
+                <div class="row px-4 w-100 link-section" id="changePassword" style="display: none;">
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn-close" aria-label="Close" onclick="closeAppointmentForm()"></button>
+                    </div>
+                    <form id="resetPasswordForm">
+                        <div class="mb-3">
+                            <h4> Change Password</h4>
+                        </div>
+                        <div class="mb-3">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required placeholder="Enter your current password">
+                        </div>
+                    <div class="mb-3">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" required placeholder="Enter your new password">
+                        </div>
+                    <div class="mb-3">
+                            <label for="confirmPassword">Current Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="currentPassword" required placeholder="Re-enter your new password">
+                        </div>
+                        <div class="mb-3">
+                            <button type="submit" class="primary">Change Password</button>
+
+                        </div>
+                    </form>
+            </div>
+            <div id="profileSettings" class="link-section">
+                <h2>Profile Settings</h2>
+                <p>Here you can update your profile information.</p>
+            </div>
+
+
+            <div id="logout" class="link-section">
+                <h2>Logout</h2>
+                <p>Are you sure you want to logout?</p>
+            </div>
+            <div id="deleteAccount" class="link-section">
+                <h2>Delete Account</h2>
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+            </div>
+
+            <div class="row mx-2 mb-1 navFix" th:include="userHome::navBar" >
+            </div>
+        </div>
+        </div>
+
+
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const settingLinks = document.querySelectorAll('.setting-link');
+        const settingBar = document.querySelector('.settingBar');
+        const linkSections = document.querySelectorAll('.link-section');
+
+        settingLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                const targetId = this.getAttribute('data-target');
+
+                // Hide setting bar and all link sections
+                settingBar.style.display = 'none';
+                linkSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+
+                // Show the target link section
+                document.getElementById(targetId).style.display = 'block';
+            });
+        });
+    });
+    document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+            Toastify({
+                text: "New passwords do not match",
+                duration: 3000,
+                backgroundColor: "rgba(253,200,200)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius:"8px",
+                style:{
+                    color:"rgb(167,6,14)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+            return;
+        }
+
+        fetch('api/user/reset-password?currentPassword=' + encodeURIComponent(currentPassword) + '&newPassword=' + encodeURIComponent(newPassword), {
+            method: 'POST',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message.includes('successful')) {
+                    Toastify({
+                        text: data.message,
+                        duration: 1500,
+                        backgroundColor: "rgba(200,253,223)",
+                        gravity: "top",
+                        position: "right",
+
+                        style:{
+
+                            color:"rgb(15,94,27)",
+                            borderRadius:"8px"
+                        },onClick: function(){}
+                    }).showToast();
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl;
+                    }, 3000); // 3-second delay
+                } else {
+                    Toastify({
+                        text: data.message,
+                        duration: 3000,
+                        backgroundColor: "linear-gradient(to right, #FF0000, #FF3333)",
+                    }).showToast();
+                }
+            })
+            .catch(error => {
+                Toastify({
+                    text: error.message || "Invalid credentials!",
+                    duration: 3000,
+                    backgroundColor: "rgba(253,200,200)",
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    borderRadius:"8px",
+                    style:{
+                        color:"rgb(167,6,14)",
+                        borderRadius:"8px"
+                    },onClick: function(){}
+                }).showToast();
+            });
+    });
+</script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+</body>
+</html>

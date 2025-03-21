@@ -71,6 +71,27 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String currentPassword,
+                                           @RequestParam String newPassword,
+                                           HttpSession session) {
+        String user = (String) session.getAttribute("userId");
+        Integer userID = Integer.parseInt(user);
+        if (userID == null) {
+            return ResponseEntity.status(401).body("User not logged in");
+        }
+
+        boolean isReset = userService.resetPassword(userID, currentPassword, newPassword);
+
+        if (isReset) {
+            session.invalidate(); // ✅ Logout user after password reset
+            return ResponseEntity.ok(Map.of(
+                    "message", "Password reset successful. Redirecting to login...",
+                    "redirectUrl", "/login"
+            ));        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Incorrect current password or update failed."));
+        }
+    }
 
 
 

@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/home","api/dashboard/doctor","api/medicalRecords/saveDiagnosis","/api/prescriptions/**","api/staff").hasAuthority("ROLE_DOCTOR")
                         .requestMatchers("api/medicalRecords/getByUserId","api/medicalRecords/updateStatus","/api/prescriptions/getByUserId","/api/prescriptions/getByAppointmentID").hasAnyAuthority("ROLE_DOCTOR", "ROLE_PATIENTS")
                         .requestMatchers("/home","api/dashboard/lab-tech", "api/LabOrder/**","api/labTests/**").hasAuthority("ROLE_LAB TECHNICIAN")
-                        .requestMatchers("api/medicalRecords/history","/userHome","/addPastmedical","/appointment").hasAuthority("ROLE_PATIENTS")
+                        .requestMatchers("api/user/reset-password","api/medicalRecords/history","/userHome","/addPastmedical","/appointment","/settings").hasAuthority("ROLE_PATIENTS")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -1,9 +1,8 @@
 package Medysis.Project.Service;
 
-import Medysis.Project.DTO.RoleDTO;
 import Medysis.Project.DTO.UserDTO;
-import Medysis.Project.Model.Availability;
 import Medysis.Project.Model.Role;
+import Medysis.Project.Model.Staff;
 import Medysis.Project.Model.User;
 import Medysis.Project.Repository.AvailabilityRepository;
 import Medysis.Project.Repository.UserRepository;
@@ -166,6 +165,23 @@ public class UserService {
             return true;
         }
         return false;
+    }
+    public boolean resetPassword(Integer userId, String currentPassword, String newPassword) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isEmpty()) {
+            return false; // Staff not found
+        }
+
+        User user = optionalUser.get();
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false; // Current password is incorrect
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true; // Password successfully updated
     }
 }
 

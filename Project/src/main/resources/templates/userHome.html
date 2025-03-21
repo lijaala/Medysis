@@ -39,7 +39,7 @@
 
     // Set different titles based on the URL path
     if (path.includes('userHome')) {
-        pageTitle.textContent = 'HOME';
+        pageTitle.textContent = 'HOME PAGE';
     } else if (path.includes('appointment')) {
         pageTitle.textContent = 'Appointments';
     } else if (path.includes('medical')) {
@@ -48,6 +48,8 @@
         pageTitle.textContent = 'Prescription';
     }else if (path.includes('lab')) {
         pageTitle.textContent = 'Lab Reports';
+    } else if (path.includes('settings')) {
+        pageTitle.textContent = 'SETTINGS';
     } else {
         pageTitle.textContent = 'WELCOME'; // Fallback title
     }
@@ -135,7 +137,7 @@ function goBack() {
                     </a>
                 </div>
                 <div class="col" >
-                    <a href="settings.html" class="nav-link">
+                    <a href="/settings" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
                                 <path

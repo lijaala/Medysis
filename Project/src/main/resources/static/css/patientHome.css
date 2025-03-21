@@ -217,3 +217,23 @@ button{
     color: #aaa;
     cursor: pointer;
 }
+.settingBar li{
+
+    border-bottom: 1px solid rgba(7, 16, 78, 0.69);
+
+}
+.settingBar li:hover{
+
+    border-bottom: 1px solid rgb(255, 52, 147);
+
+    svg {
+        g, path{
+
+            stroke:rgb(255, 52, 147);
+            color:rgb(255, 52, 147);
+
+        }
+    }
+
+
+}

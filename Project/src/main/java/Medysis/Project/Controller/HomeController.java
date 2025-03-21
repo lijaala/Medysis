@@ -50,6 +50,10 @@ public class HomeController {
     public String labView() {
         return "labHistory";
     }
+    @GetMapping("/settings")
+    public String settings() {
+        return "settings";
+    }
 
 }
 

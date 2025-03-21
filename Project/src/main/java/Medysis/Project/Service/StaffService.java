@@ -222,6 +222,23 @@ public class StaffService {
         }
         return false;
     }
+    public boolean resetPassword(String staffId, String currentPassword, String newPassword) {
+        Optional<Staff> optionalStaff = staffRepository.findById(staffId);
+
+        if (optionalStaff.isEmpty()) {
+            return false; // Staff not found
+        }
+
+        Staff staff = optionalStaff.get();
+
+        if (!passwordEncoder.matches(currentPassword, staff.getPassword())) {
+            return false; // Current password is incorrect
+        }
+
+        staff.setPassword(passwordEncoder.encode(newPassword));
+        staffRepository.save(staff);
+        return true; // Password successfully updated
+    }
 
 }
 

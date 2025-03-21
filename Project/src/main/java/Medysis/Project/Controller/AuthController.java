@@ -93,6 +93,7 @@ public class AuthController {
 
         }
     }
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestParam String email, @RequestParam String password, HttpSession session) {
         String response = authService.authenticate(email, password, session);
