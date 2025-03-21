@@ -1,0 +1,43 @@
+body { font-family: sans-serif; position: relative; }
+.signature-space { height: 100px; border-top: 1px dashed #ccc; margin-top: 20px; }
+.watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 4em;
+    color: rgba(0, 0, 0, 0.1);
+    z-index: -1;
+    pointer-events: none;
+}
+.Table {
+    table-layout: auto;
+    width: 100%;
+    border-collapse: collapse;
+    color: #07104e;
+    tbody {
+        padding: 5px;
+    }
+}
+thead{
+    background-color: rgb(240, 242, 249);
+    border-radius: 8px;
+    width: max-content;
+}
+th,td {
+    padding: 1%;
+    margin:2vh;
+    text-align: center;
+    align-items: center;
+    width:15vw;
+    text-wrap: nowrap;
+}
+thead td:first-child{
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+thead td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}

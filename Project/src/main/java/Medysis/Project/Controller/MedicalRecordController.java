@@ -36,7 +36,8 @@ public class MedicalRecordController {
 
     @PostMapping("/history")
     public String addMedicalRecord(@RequestParam String conditionName, @RequestParam String isTreated, @RequestParam String diagnosedDate, @RequestParam MultipartFile[] scans, HttpSession session){
-        Integer userID=(Integer)session.getAttribute("userId");
+        String userid=(String)session.getAttribute("userId");
+        Integer userID= Integer.parseInt(userid);
         if (userID==null){
             return "redirect:/login";
         }

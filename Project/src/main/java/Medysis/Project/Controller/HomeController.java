@@ -50,5 +50,6 @@ public class HomeController {
     public String labView() {
         return "labHistory";
     }
+
 }
 

@@ -2,6 +2,8 @@ package Medysis.Project.Controller;
 
 import Medysis.Project.DTO.PrescriptionResponse;
 import Medysis.Project.Model.Prescription;
+import Medysis.Project.Model.User;
+import Medysis.Project.Repository.UserRepository;
 import Medysis.Project.Service.PrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @RestController
@@ -24,7 +27,7 @@ public class PrescriptionController {
     @Autowired
     private PrescriptionService prescriptionService;
 
-    // Endpoint to add a new prescription
+
     @PostMapping("/add/{appointmentId}")
     public ResponseEntity<Object> addPrescription(
             @PathVariable("appointmentId") Integer appointmentId,
@@ -89,7 +92,12 @@ public class PrescriptionController {
 
 
     @GetMapping("/getByUserId")
-    public ResponseEntity<List<PrescriptionResponse>> getPrescriptionsByUserId(@RequestParam Integer userId) {
+    public ResponseEntity<List<PrescriptionResponse>> getPrescriptionsByUserId(@RequestParam (value = "userId", required = false) Integer userId, HttpSession session) {
+        if (userId == null) {
+            String user=(String) session.getAttribute("userId");
+            userId=Integer.parseInt(user);
+        }
+
         List<PrescriptionResponse> prescriptions = prescriptionService.getPrescriptionsByUserId(userId);
         return ResponseEntity.ok(prescriptions);
     }
