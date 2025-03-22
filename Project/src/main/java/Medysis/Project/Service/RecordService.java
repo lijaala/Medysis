@@ -121,7 +121,7 @@ public class RecordService {
             appointment.setFollowUpDate(followUpDate); // Set the follow-up date
             appointmentRepository.save(appointment);  // Save the updated appointment
 
-            return "Success";  // Return success message
+            return "Diagnosis added successfully!";  // Return success message
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,7 +129,10 @@ public class RecordService {
         }
     }
     public List<MedicalRecord> getMedicalRecordsByUserId(Integer userID) {
-        return medicalRecordsRepository.findByUserId(userID);
+        System.out.println("Service: Retrieving records for userID: " + userID);
+        List<MedicalRecord> records = medicalRecordsRepository.findByUserId(userID); // Assuming your repository method is named findByUserID
+        System.out.println("Service: Retrieved records: " + records);
+        return records;
     }
 
     public void updateTreatmentStatus(List<MedicalRecord> records) {
@@ -141,8 +144,43 @@ public class RecordService {
             });
         }
     }
+
+    public MedicalRecord getMedicalRecordByAppointmentId(Integer appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId).orElse(null); // Find Appointment object
+        if (appointment != null) {
+            return medicalRecordsRepository.findByAppointment(appointment);
+        }
+        return null; // Or throw an exception if appointment is not found
     }
 
+    public String updateDiagnosis(Integer recordId, Integer userID, String doctorID, String conditionName, String treatmentPlan, Integer appointmentID, Integer followUpMonths) {
+        Optional<MedicalRecord> optionalRecord = medicalRecordsRepository.findById(recordId);
+        User user=userRepository.findById(userID).orElse(null);
+        Staff doctor= staffRepository.findById(doctorID).orElse(null);
+        Appointment appointment = appointmentRepository.findById(appointmentID).orElse(null);
+        if (optionalRecord.isPresent()) {
+            MedicalRecord record = optionalRecord.get();
+
+            // Update the record's fields
+            record.setUser(user);
+            record.setDoctor(doctor);
+            record.setConditionName(conditionName);
+            record.setTreatmentPlan(treatmentPlan);
+            record.setAppointment(appointment);
+
+            LocalDate followUpDate = LocalDate.now().plusMonths(followUpMonths); // Add the follow-up months
+
+            appointment.setFollowUpDate(followUpDate);
+            appointmentRepository.save(appointment);
+
+
+            medicalRecordsRepository.save(record);
+            return "Diagnosis updated successfully!";
+        } else {
+            return "Record not found!";
+        }
+    }
+}
 
 
 

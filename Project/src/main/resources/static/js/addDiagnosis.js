@@ -1,8 +1,7 @@
 let diagnosisNextHandler, diagnosisDoneHandler, diagnosisLabNextHandler;
-let prescriptionNextHandler, prescriptionDoneHandler;
-
+let prescriptionNextHandler, prescriptionDoneHandler, prescriptionBackHandler;
 let prescriptionSubmitHandler;
-let labOrderSubmitHandler;
+let labOrderSubmitHandler,labBackHandler;
 
 function startAppointment(appointmentID) {
     console.log("Start Appointment triggered for ID:", appointmentID);
@@ -40,65 +39,49 @@ function startAppointment(appointmentID) {
 }
 
 
-
-// save diagnosis
 function saveDiagnosis(event, callback) {
-
     event.preventDefault();
-
     const form = document.getElementById("diagnosisForm");
     const formData = new FormData(form);
-
-
+    const recordId = formData.get('recordId');
     fetch("/api/medicalRecords/saveDiagnosis", {
         method: "POST",
         body: formData
     })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(err => {throw new Error(err)}); // Get error as text
-            }
-            return response.text(); // Get success as text
-        })
-        .then(data => {
-
-            try {
-                const jsonData = JSON.parse(data); //try to parse as JSON
-                console.error("Server Error:", jsonData.message);
+        .then(response => response.text()) // Get plain text response
+        .then(message => {
+            if (message.includes("successfully")) { // Check for "successfully"
+                console.log("Success:", message);
                 Toastify({
-                    text: "Error saving Diagnosis",
-                    duration: 1500,
-                    backgroundColor: "rgba(200,253,223,0.5)",
-                    gravity: "top",
-                    position: "right",
-
-                    style:{
-
-                        color:"rgb(15,94,27)",
-                        borderRadius:"8px"
-                    },onClick: function(){}
-                }).showToast();
-
-            } catch (parseError) {
-                console.log("Success:", data);
-                Toastify({
-                    text: "Diagnosis Saved Successfully",
+                    text: message, // Use the message from the backend
                     duration: 1500,
                     backgroundColor: "rgb(200,253,223)",
                     gravity: "top",
                     position: "right",
-
-                    style:{
-                        color:"rgb(15,94,27)",
-                        borderRadius:"8px"
-                    },onClick: function(){}
+                    style: {
+                        color: "rgb(15,94,27)",
+                        borderRadius: "8px"
+                    },
+                    onClick: function () {}
                 }).showToast();
                 if (callback) {
-                callback(data);
+                    callback(message);
                 }
+            } else {
+                console.error("Server Error:", message);
+                Toastify({
+                    text: message, // Use the message from the backend
+                    duration: 1500,
+                    backgroundColor: "rgba(200,253,223,0.5)",
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        color: "rgb(15,94,27)",
+                        borderRadius: "8px"
+                    },
+                    onClick: function () {}
+                }).showToast();
             }
-
-
         })
         .catch(error => {
             console.error("Fetch Error:", error);
@@ -109,16 +92,15 @@ function saveDiagnosis(event, callback) {
                 close: true,
                 gravity: "top",
                 position: "right",
-                borderRadius:"8px",
-                style:{
-
-                    color:"rgb(167,6,14)",
-                    borderRadius:"8px"
-                },onClick: function(){}
+                borderRadius: "8px",
+                style: {
+                    color: "rgb(167,6,14)",
+                    borderRadius: "8px"
+                },
+                onClick: function () {}
             }).showToast();
         });
 }
-
 //open prescription modal and save diagnosis
 function saveDiagnosisAndNext(event) {
     const appointmentId = document.getElementById("appointmentIdInput").value;
@@ -126,7 +108,7 @@ function saveDiagnosisAndNext(event) {
     openPrescriptionModal(appointmentId,userId);
 
     saveDiagnosis(event, (message) => {
-        if (message === "Success") {
+        if (message.includes("successfully")) {
             // Delay closing the diagnosis modal to show the message:
             setTimeout(() => {
                 closeDiagnosisModal();
@@ -142,16 +124,16 @@ function saveDiagnosisAndNext(event) {
 }
 function saveDiagnosisAndOrderTest(event){
     saveDiagnosis(event, (message) => {
-        if (message === "Success") {
+        if (message.includes("successfully")){
             // Delay closing the diagnosis modal to show the message:
 
                 closeDiagnosisModal();
-                setTimeout(() => { // Delay opening prescription modal
+                // Delay opening prescription modal
                     const appointmentId = document.getElementById("appointmentIdInput").value;
                     const userId = document.getElementById("userIdInput").value;
 
                     openLabReportsModal(appointmentId,userId);
-                }, 1000);
+
             // Delay for closing (1.5 seconds)
         }
     });
@@ -159,7 +141,7 @@ function saveDiagnosisAndOrderTest(event){
 // save diagnosis and close
 function saveDiagnosisAndClose(event) {
     saveDiagnosis(event, (message) => {
-        if (message === "Success") {
+        if (message.includes("successfully")) {
             const appointmentId = document.getElementById("appointmentIdInput").value;
             completeAppointment(appointmentId);
             setTimeout(closeDiagnosisModal, 3000);
@@ -169,28 +151,26 @@ function saveDiagnosisAndClose(event) {
 }
 
 //open diagnosis modal
-function openDiagnosisModal() {
+async function openDiagnosisModal() {
     const diagnosisModal = document.getElementById("diagnosisModal");
-
     const nextButton = document.getElementById('nextButton');
     const doneButton = document.getElementById('doneButton');
-    const labNext=document.getElementById('orderTest');
+    const labNext = document.getElementById('orderTest');
+    const diagnosisForm = document.getElementById("diagnosisForm");
+    const appointmentId = document.getElementById("appointmentIdInput").value;
 
     if (!diagnosisModal) {
         console.error("Diagnosis modal not found!");
         return;
     }
 
-    // Simply open the modal
-    if (diagnosisNextHandler) {
-        nextButton.removeEventListener('click', diagnosisNextHandler);
-    }
-    if (diagnosisDoneHandler) {
-        doneButton.removeEventListener('click', diagnosisDoneHandler);
-    }
-    if (diagnosisLabNextHandler) {
-        labNext.removeEventListener('click', diagnosisLabNextHandler);
-    }
+    // Clear form fields
+    diagnosisForm.reset();
+
+    // Remove existing event listeners
+    if (diagnosisNextHandler) nextButton.removeEventListener('click', diagnosisNextHandler);
+    if (diagnosisDoneHandler) doneButton.removeEventListener('click', diagnosisDoneHandler);
+    if (diagnosisLabNextHandler) labNext.removeEventListener('click', diagnosisLabNextHandler);
 
     // Define new event listener functions
     diagnosisNextHandler = function (event) {
@@ -198,7 +178,7 @@ function openDiagnosisModal() {
     };
     diagnosisDoneHandler = function (event) {
         saveDiagnosisAndClose(event, () => {
-            completeAppointment(document.getElementById("appointmentIdInput").value);
+            completeAppointment(appointmentId);
         });
     };
     diagnosisLabNextHandler = function (event) {
@@ -210,9 +190,40 @@ function openDiagnosisModal() {
     doneButton.addEventListener('click', diagnosisDoneHandler);
     labNext.addEventListener('click', diagnosisLabNextHandler);
 
-    diagnosisModal.style.display = "flex";
+    // Populate form if diagnosis record exists for appointmentId
+    try {
+        const response = await fetch(`/api/medicalRecords/getByAppointmentId/${appointmentId}`);
+        if (!response.ok) {
+            // If no record found, leave form empty
+            if (response.status === 404) {
+                console.log("No existing diagnosis found for appointmentId:", appointmentId);
 
+                const recordIdInput = diagnosisForm.querySelector('input[name="recordId"]');
+                if(recordIdInput){
+                    recordIdInput.remove();
+                }
+                diagnosisModal.style.display = "flex";
+                return;
+            }
+            throw new Error("Failed to fetch diagnosis");
+        }
+        const record = await response.json();
+        document.getElementById("conditionName").value = record.conditionName;
+        document.getElementById("treatmentPlan").value = record.treatmentPlan;
+        document.getElementById("followUpMonths").value = record.followUpMonths;
+        // Add recordId to a hidden input for updates
+        const recordIdInput = document.createElement('input');
+        recordIdInput.type = 'hidden';
+        recordIdInput.name = 'recordId';
+        recordIdInput.value = record.recordID;
+        diagnosisForm.appendChild(recordIdInput);
+
+    } catch (error) {
+        console.error("Error fetching diagnosis:", error);
+    }
+    diagnosisModal.style.display = "flex";
 }
+
 
 const closeDiagnosis=document.getElementById("closeDiagnosis");
 const viewPastMedical=document.getElementById('viewPastMedicalRecords');
@@ -228,10 +239,12 @@ closeDiagnosis.addEventListener('click', closeDiagnosisModal);
 // view past medical records
 function viewPastRecords() {
     const userID = document.getElementById("userIdInput").value;
+    console.log(userID);
 
     fetch(`/api/medicalRecords/getByUserId?userID=${userID}`)
     .then(response => response.json())
     .then(data => {
+        console.log(data)
     const tableBody = document.getElementById("medicalRecordsBody");
     tableBody.innerHTML = ""; // Clear previous data
 
@@ -337,12 +350,16 @@ function openPrescriptionModal(appointmentId, userId) {
 
     const prescriptionNextButton = document.getElementById('prescriptionNext');
     const prescriptionDoneButton = document.getElementById('prescriptionDone');
-
+    const prescriptionBackBtn=document.getElementById('prescriptionBack');
     if (prescriptionNextHandler) {
         prescriptionNextButton.removeEventListener('click', prescriptionNextHandler);
     }
     if (prescriptionDoneHandler) {
         prescriptionDoneButton.removeEventListener('click', prescriptionDoneHandler);
+    }
+    if(prescriptionBackHandler){
+        prescriptionBackBtn.removeEventListener('click', prescriptionBackHandler);
+
     }
 
     // Define new event listener functions
@@ -353,7 +370,7 @@ function openPrescriptionModal(appointmentId, userId) {
                 document.getElementById("appointmentId").value,
                 document.getElementById("userId").value
             );
-        }, 5000);
+        }, 1000);
     };
     prescriptionDoneHandler = async function (event) {
         console.log("prescriptionDoneHandler called.");
@@ -363,12 +380,15 @@ function openPrescriptionModal(appointmentId, userId) {
 
 
     };
+    prescriptionBackHandler=async function(event){
+        await submitPrescription(event);
+        closePrescriptionModal();
 
-
+    }
     // Add new event listeners
     prescriptionNextButton.addEventListener('click', prescriptionNextHandler);
     prescriptionDoneButton.addEventListener('click', prescriptionDoneHandler);
-
+    prescriptionBackBtn.addEventListener('click',prescriptionBackHandler);
 
     document.getElementById('appointmentId').value = appointmentId;
     document.getElementById('userId').value = userId;
@@ -667,10 +687,10 @@ function openLabReportsModal(){
     const labOrderForm = document.getElementById('labOrder');
     const prescribeBtn=document.getElementById('saveAndPrescribe');
     const endLabBtn=document.getElementById('saveAndEndLab');
-
+    const labBackBtn=document.getElementById('labBack');
     prescribeBtn.addEventListener('click', saveLabOrderAndPrescribe);
     endLabBtn.addEventListener('click',saveLabOrderAndFinish);
-
+    labBackBtn.addEventListener('click',saveAndEditDiagnosis);
 
     if (labOrderSubmitHandler) {
         labOrderForm.removeEventListener('submit', labOrderSubmitHandler);
@@ -910,6 +930,20 @@ function saveLabOrderAndFinish() {
         console.log("Calling completeAppointment with appointmentId:", appointmentId);
         completeAppointment(appointmentId);
     });
+}
+function saveAndEditDiagnosis(){
+    submitLabOrder(() => {
+        const appointmentId = document.getElementById("appointmentIdInput")?.value;
+        const userId = document.getElementById("userIdInput")?.value;
+
+        if (!appointmentId || !userId) {
+            console.error("❌ Error: Missing appointmentId or userId.");
+            alert("Error: Missing required information.");
+            return;
+        }
+
+});
+    openDiagnosisModal();
 }
 
 

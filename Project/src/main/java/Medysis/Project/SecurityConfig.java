@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("appointment/list","appointment/admin/book","appointment/edit","api/user/all").hasAnyAuthority("ROLE_ADMIN", "ROLE_DOCTOR")
                         .requestMatchers("/home","api/admin/**","api/dashboard/admin","/api/user/update/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("api/LabOrder/orderRequest","api/LabOrder/labResults", "api/labTests/availableTests").hasAnyAuthority("ROLE_DOCTOR","ROLE_LAB TECHNICIAN")
-                        .requestMatchers("/home","api/dashboard/doctor","api/medicalRecords/saveDiagnosis","/api/prescriptions/**","api/staff").hasAuthority("ROLE_DOCTOR")
+                        .requestMatchers("/home","api/dashboard/doctor","api/medicalRecords/saveDiagnosis","/api/prescriptions/**","api/staff", "api/medicalRecords/getByAppointmentId/**").hasAuthority("ROLE_DOCTOR")
                         .requestMatchers("api/medicalRecords/getByUserId","api/medicalRecords/updateStatus","/api/prescriptions/getByUserId","/api/prescriptions/getByAppointmentID").hasAnyAuthority("ROLE_DOCTOR", "ROLE_PATIENTS")
                         .requestMatchers("/home","api/dashboard/lab-tech", "api/LabOrder/**","api/labTests/**").hasAuthority("ROLE_LAB TECHNICIAN")
                         .requestMatchers("api/user/reset-password","api/medicalRecords/history","/userHome","/addPastmedical","/appointment","/settings").hasAuthority("ROLE_PATIENTS")

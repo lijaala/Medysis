@@ -58,54 +58,59 @@ public class MedicalRecordController {
     public String saveDiagnosis(@RequestParam Integer userID,
                                 @RequestParam String conditionName,
                                 @RequestParam Integer appointmentID,
-                                @RequestParam Integer followUpMonths, // New field for follow-up
-                                @RequestParam String treatmentPlan, // Treatment plan field
+                                @RequestParam Integer followUpMonths,
+                                @RequestParam String treatmentPlan,
+                                @RequestParam(required = false) Integer recordId, // Add recordId parameter
                                 HttpSession session) {
 
-        // Retrieve doctorID from the session
         String doctorID = (String) session.getAttribute("userId");
-
         if (doctorID == null) {
             return "Doctor ID is not found in session.";
         }
 
-        // Call the service to add the diagnosis and update the appointment
-        return recordService.addDiagnosis(userID, doctorID, conditionName, treatmentPlan, appointmentID, followUpMonths);
+        if (recordId != null) {
+            // Update existing record
+            return recordService.updateDiagnosis(recordId, userID, doctorID, conditionName, treatmentPlan, appointmentID, followUpMonths);
+        } else {
+            // Create new record
+            return recordService.addDiagnosis(userID, doctorID, conditionName, treatmentPlan, appointmentID, followUpMonths);
+        }
     }
 
 
     @GetMapping("/getByUserId")
-    public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam (value = "userId", required = false)  Integer userID,HttpSession session) {
-        if (userID == null) {
-            Object userIdFromSession = session.getAttribute("userId");
-            if (userIdFromSession instanceof String) {
-                try {
-                    userID = Integer.parseInt((String) userIdFromSession);
-                } catch (NumberFormatException e) {
-                    // Handle the case where the String in the session is not a valid integer
-                    // Log the error and potentially return an error response
-                    System.err.println("Error: userId in session is not a valid integer: " + userIdFromSession);
-                    return Collections.emptyList(); // Or throw an appropriate exception
-                }
-            } else if (userIdFromSession instanceof Integer) {
-                userID = (Integer) userIdFromSession;
-            } else {
-                // Handle the case where userId is not in the session or is of an unexpected type
-                return Collections.emptyList(); // Or throw an appropriate exception
-            }
+    public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam(value = "userId", required = false) Integer userID, HttpSession session) {
+        if (userID != null) {
+            // userID parameter is provided, use it
+            return recordService.getMedicalRecordsByUserId(userID);
+        }
 
-            if (userID == null) {
-
-                return Collections.emptyList(); // Or throw an appropriate exception
+        // userID parameter is NOT provided, use session userId
+        Object userIdFromSession = session.getAttribute("userId");
+        if (userIdFromSession instanceof Integer) {
+            return recordService.getMedicalRecordsByUserId((Integer) userIdFromSession);
+        } else {
+            try {
+                return recordService.getMedicalRecordsByUserId(Integer.parseInt((String) userIdFromSession));
+            } catch (NumberFormatException e) {
+                System.err.println("Error: userId in session is not a valid integer: " + userIdFromSession);
+                return Collections.emptyList();
             }
         }
-        return recordService.getMedicalRecordsByUserId(userID);
     }
 
     @PostMapping("/updateStatus")
     public String updateTreatmentStatus(@RequestBody List<MedicalRecord> records) {
         recordService.updateTreatmentStatus(records);
         return "Treatment status updated successfully!";
+    }
+    @GetMapping("/getByAppointmentId/{appointmentId}")
+    public MedicalRecord getDiagnosisByAppointmentId(@PathVariable Integer appointmentId) {
+        MedicalRecord record = recordService.getMedicalRecordByAppointmentId(appointmentId);
+        if (record == null) {
+            return new MedicalRecord(); // Return empty MedicalRecord object
+        }
+        return record;
     }
 
 
