@@ -37,7 +37,7 @@ public class MedicalRecord {
     private Staff doctor;
 
     @ManyToOne
-    @JoinColumn(name = "appointment", referencedColumnName = "appointmentID", nullable = true,unique = true)
+    @JoinColumn(name = "appointment", referencedColumnName = "appointmentID", nullable = true, unique = true)
     private Appointment appointment;  // New field linking to Appointment
 
     @Column(name = "alteredBy")

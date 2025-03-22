@@ -29,30 +29,19 @@ public class PrescriptionController {
 
 
     @PostMapping("/add/{appointmentId}")
-    public ResponseEntity<Object> addPrescription(
+    public ResponseEntity<Object> addOrUpdatePrescription(
             @PathVariable("appointmentId") Integer appointmentId,
-
             @RequestBody Prescription prescription,
             HttpSession session) {
-
-
-        logger.info("Received Prescription: " + prescription);
-
+        System.out.println(prescription);
         if (prescription.getPrescribedMedications() == null || prescription.getPrescribedMedications().isEmpty()) {
             return ResponseEntity.badRequest().body("No prescribed medications found.");
         }
-        System.out.println(prescription.getPrescribedMedications());
 
         Integer userId = prescription.getUser().getUserID();
         String staffId = (String) session.getAttribute("userId");
-        System.out.println(staffId);
 
-        if (userId == null) {
-            return ResponseEntity.status(400).body(new ErrorResponse("User cannot be null"));
-        }
-
-
-        if (prescription.getUser() == null) {
+        if (userId == null || prescription.getUser() == null) {
             return ResponseEntity.status(400).body(new ErrorResponse("User cannot be null"));
         }
         if (staffId == null) {
@@ -62,15 +51,15 @@ public class PrescriptionController {
             return ResponseEntity.status(400).body(new ErrorResponse("Appointment cannot be null"));
         }
 
-
         try {
-            prescriptionService.addPrescription(appointmentId, prescription, staffId, userId);
-            return ResponseEntity.ok().body("Prescription added successfully");
+            prescriptionService.addOrUpdatePrescription(appointmentId, prescription, staffId, userId);
+            return ResponseEntity.ok().body("Prescription added/updated successfully");
         } catch (Exception e) {
-            logger.error("Error while adding prescription: ", e);
             return ResponseEntity.status(500).body(new ErrorResponse("Error while adding prescription: " + e.getMessage()));
         }
     }
+
+
 
 
     // Error response class to send JSON formatted error messages

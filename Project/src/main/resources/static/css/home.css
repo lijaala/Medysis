@@ -406,6 +406,7 @@ option {
     display: flex;
     flex-direction: column;
     gap:2vh;
+    margin-bottom: 2vh;
 
 }
 #diagnosisModal .modal-content{

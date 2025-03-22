@@ -325,7 +325,7 @@ function closeMedicalHistoryModal() {
 closeMedicalHis.addEventListener('click', closeMedicalHistoryModal);
 
 // open prescription modal
-function openPrescriptionModal(appointmentId, userId) {
+async function openPrescriptionModal(appointmentId, userId) {
     console.log("Opening prescription modal for Appointment ID:", appointmentId, "User ID:", userId);
 
 
@@ -347,6 +347,19 @@ function openPrescriptionModal(appointmentId, userId) {
         }).showToast();
         return;
     }
+    try {
+        const response = await fetch(`/api/prescriptions/appointment/${appointmentId}`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch prescription data.");
+        }
+        const prescriptionData = await response.json();
+
+        // Populate form fields with existing data
+        populatePrescriptionForm(prescriptionData);
+    } catch (error) {
+        console.error("Error fetching prescription data:", error);
+    }
+
 
     const prescriptionNextButton = document.getElementById('prescriptionNext');
     const prescriptionDoneButton = document.getElementById('prescriptionDone');
@@ -408,152 +421,164 @@ function openPrescriptionModal(appointmentId, userId) {
         form.addEventListener('submit', prescriptionSubmitHandler);
     }
 }
-function submitPrescription(event){
+function populatePrescriptionForm(prescriptionData) {
+    const medicationsContainer = document.getElementById('medicationsContainer');
+    medicationsContainer.innerHTML = ''; // Clear existing form fields
+    let medicationCount = 0; // Reset medication count
+
+    if (prescriptionData && prescriptionData.medications) {
+        prescriptionData.medications.forEach(medication => {
+            addMedication(); // Add a new medication entry
+            const medicationEntry = medicationsContainer.children[medicationCount]; // Get the last added entry
+
+            // Populate form fields
+            medicationEntry.querySelector('input[name="medicationName[]"]').value = medication.medicationName;
+            medicationEntry.querySelector('input[name="dosage[]"]').value = medication.dosage;
+            medicationEntry.querySelector('input[name="intake[]"]').value = medication.intake;
+            medicationEntry.querySelector('input[name="frequency[]"]').value = medication.medicationInterval;
+            medicationEntry.querySelector('input[name="alternative[]"]').value = medication.alternative;
+            medicationEntry.querySelector('input[name="daysOfIntake[]"]').value = medication.daysOfIntake;
+
+            medicationCount++;
+        });
+    }
+}
+function submitPrescription(event) {
     event.preventDefault();
     const form = document.getElementById('prescriptionForm');
-        // Collecting form data manually
-        const medications = [];
-        const medicationNames = document.querySelectorAll('input[name="medicationName[]"]');
-        const dosages = document.querySelectorAll('input[name="dosage[]"]');
-        const intakes = document.querySelectorAll('input[name="intake[]"]');
-        const frequencies = document.querySelectorAll('input[name="frequency[]"]');//interval
-        const alternatives = document.querySelectorAll('input[name="alternative[]"]');//interval
-        const daysOfIntakes = document.querySelectorAll('input[name="daysOfIntake[]"]');
 
-        for (let i = 0; i < medicationNames.length; i++) {
-            const medicationName = medicationNames[i].value.trim(); // Trim whitespace
-            const dosage = dosages[i].value.trim();
-            const intake = intakes[i].value.trim();
-            const frequency = frequencies[i].value.trim();
-            const alternative = alternatives[i].value.trim();
-            const daysOfIntake = parseInt(daysOfIntakes[i].value, 10);
+    // Collecting form data manually
+    const medications = [];
+    const medicationNames = document.querySelectorAll('input[name="medicationName[]"]');
+    const dosages = document.querySelectorAll('input[name="dosage[]"]');
+    const intakes = document.querySelectorAll('input[name="intake[]"]');
+    const frequencies = document.querySelectorAll('input[name="frequency[]"]');
+    const alternatives = document.querySelectorAll('input[name="alternative[]"]');
+    const daysOfIntakes = document.querySelectorAll('input[name="daysOfIntake[]"]');
 
-            if (medicationName === "") { // Frontend validation: Skip empty entries
-                console.warn("Skipping empty medication entry.");
-                continue; // Go to the next iteration of the loop
-            }
+    for (let i = 0; i < medicationNames.length; i++) {
+        const medicationName = medicationNames[i].value.trim();
+        const dosage = dosages[i].value.trim();
+        const intake = intakes[i].value.trim();
+        const frequency = frequencies[i].value.trim();
+        const alternative = alternatives[i].value.trim();
+        const daysOfIntake = parseInt(daysOfIntakes[i].value, 10);
 
-            if (isNaN(daysOfIntake) || daysOfIntake <= 0) {
-
-                Toastify({
-                    text: "Days of intake must be a positive number for " + medicationName,
-                    duration: 3000,
-                    backgroundColor: "rgb(253,200,200)",
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    borderRadius:"8px",
-                    style:{
-                        color:"rgb(167,6,14)",
-                        borderRadius:"8px"
-                    },onClick: function(){}
-                }).showToast();
-                return; // Stop submission
-            }
-
-            const medication = {
-                medicationName: medicationName,
-                dosage: dosage,
-                intake: intake,
-                medicationInterval: frequency,
-                alternative: alternative,
-                daysOfIntake: daysOfIntake
-            };
-            medications.push(medication);
+        if (medicationName === "") {
+            console.warn("Skipping empty medication entry.");
+            continue;
         }
-        medications.forEach((medication, index) => {
-            console.log(`Medication ${index + 1}:`, medication);
-        });
 
-        const userID = document.getElementById('userId').value;
-        const appointmentId=document.getElementById('appointmentId').value
+        if (isNaN(daysOfIntake) || daysOfIntake <= 0) {
+            Toastify({
+                text: "Days of intake must be a positive number for " + medicationName,
+                duration: 3000,
+                backgroundColor: "rgb(253,200,200)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius: "8px",
+                style: {
+                    color: "rgb(167,6,14)",
+                    borderRadius: "8px"
+                },
+                onClick: function () { }
+            }).showToast();
+            return;
+        }
 
-        const data = {
-            user: { userID: parseInt(userID, 10) },
-            appointment: { appointmentId: parseInt(appointmentId, 10) },
-            prescribedMedications: medications.map(medication => ({
-                medication: { medicationName: medication.medicationName }, // Correct: Medication object with name only
-                dosage: medication.dosage,                               // Dosage directly under prescribedMedications
-                intake: medication.intake,                               // Intake directly under prescribedMedications
-                medicationInterval: medication.medicationInterval,         // Interval directly under prescribedMedications
-                alternative:medication.alternative,
-                daysOfIntake: medication.daysOfIntake                     // daysOfIntake directly under prescribedMedications
-            }))
+        const medication = {
+            medicationName: medicationName,
+            alternative: alternative
         };
+        medications.push({
+            medication: medication,
+            dosage: dosage,
+            intake: intake,
+            medicationInterval: frequency,
+            daysOfIntake: daysOfIntake
+        });
+    }
 
+    const userID = document.getElementById('userId').value;
+    const appointmentId = document.getElementById('appointmentId').value;
 
-        console.log("Submitting prescription data:", data);
+    const data = {
+        user: { userID: parseInt(userID, 10) },
+        appointment: { appointmentID: parseInt(appointmentId, 10) },
+        prescribedMedications: medications
+    };
 
-        fetch(`/api/prescriptions/add/${appointmentId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify(data)
+    console.log("Submitting prescription data:", data);
+
+    fetch(`/api/prescriptions/add/${appointmentId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message) });
+            }
+            return response.text();
         })
-            .then(response => {
-                if (!response.ok) { // Check for HTTP errors (status outside 200-299)
-                    return response.json().then(err => {throw new Error(err.message)}); // Throw error for catch block
-                }
-                return response.text();
-            })
-            .then(data => {
-                try {
-                    const jsonData = JSON.parse(data); // Try to parse as JSON (error case)
-                    console.error("Server Error:", jsonData.message);
-
-                    Toastify({
-                        text: "Error!",
-                        duration: 3000,
-                        backgroundColor: "rgba(253,200,200)",
-                        close: true,
-                        gravity: "top",
-                        position: "right",
-                        borderRadius:"8px",
-                        style:{
-                            color:"rgb(167,6,14)",
-                            borderRadius:"8px"
-                        },onClick: function(){}
-                    }).showToast();
-                } catch (parseError) {
-                    console.log("Success:", data);
-                    Toastify({
-                        text: data,
-                        duration: 1500,
-                        backgroundColor: "rgba(200,253,223,0.5)",
-                        gravity: "top",
-                        position: "right",
-
-                        style:{
-
-                            color:"rgb(15,94,27)",
-                            borderRadius:"8px"
-                        },onClick: function(){}
-                    }).showToast();
-                    closePrescriptionModal();
-                }
-            })
-            .catch(error => {
-                console.error("Error saving prescription:", error);
-
+        .then(data => {
+            try {
+                const jsonData = JSON.parse(data);
+                console.error("Server Error:", jsonData.message);
 
                 Toastify({
-                    text: "An Error occurred.Please try again later",
+                    text: "Error!",
                     duration: 3000,
-                    backgroundColor: "rgba(253,200,200,0.5)",
+                    backgroundColor: "rgba(253,200,200)",
                     close: true,
                     gravity: "top",
                     position: "right",
-                    borderRadius:"8px",
-                    style:{
-                        color:"rgb(167,6,14)",
-                        borderRadius:"8px"
-                    },onClick: function(){}
+                    borderRadius: "8px",
+                    style: {
+                        color: "rgb(167,6,14)",
+                        borderRadius: "8px"
+                    },
+                    onClick: function () { }
                 }).showToast();
+            } catch (parseError) {
+                console.log("Success:", data);
+                Toastify({
+                    text: data,
+                    duration: 1500,
+                    backgroundColor: "rgba(200,253,223,0.5)",
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        color: "rgb(15,94,27)",
+                        borderRadius: "8px"
+                    },
+                    onClick: function () { }
+                }).showToast();
+                closePrescriptionModal();
+            }
+        })
+        .catch(error => {
+            console.error("Error saving prescription:", error);
 
-            });
-
+            Toastify({
+                text: "An Error occurred.Please try again later",
+                duration: 3000,
+                backgroundColor: "rgba(253,200,200,0.5)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius: "8px",
+                style: {
+                    color: "rgb(167,6,14)",
+                    borderRadius: "8px"
+                },
+                onClick: function () { }
+            }).showToast();
+        });
 }
 
 
@@ -565,9 +590,11 @@ const addMed=document.getElementById('addMedicationBtn');
 
 closePresc.addEventListener('click',closePrescriptionModal);
 addMed.addEventListener('click',addMedication);
-let medicationCount = 0;
+
+
 
 function addMedication() {
+    let medicationCount = 0;
     console.log("Adding medication entry. Current count:", medicationCount);  // Log for debugging
 
     // Get the medications container
@@ -579,44 +606,48 @@ function addMedication() {
 
     // Set the HTML for the new medication entry
     medicationEntry.innerHTML = `
-        <div class="form-row">
+<hr>
+                        <div class="form-row mt-2">
 
-                            <div class="form-row">
+                            <div class="form-field">
                                 <label for="medication">Select Medication:</label>
                                 <input type="text" id="medication${medicationCount}" name="medicationName[]" required placeholder="Enter medication name">
                             </div>
 
                         <!-- Dosage Input -->
-                            <div class="form-row">
+                            <div class="form-field">
                                 <label for="dosage">Dosage:</label>
                                 <input type="text" name="dosage[]" id="dosage${medicationCount}" required placeholder="e.g., 500mg">
                             </div>
                         </div>  
                         <div class="form-row"> 
-                            <div class="form-row">
+                            <div class="form-field">
                                 <!-- Intake Instruction -->
                                 <label for="intake">Intake:</label>
                                 <input type="text" name="intake[]" id="intake${medicationCount}" required placeholder="e.g., Oral">
                             </div>
-                            <div class="form-row">
+                            <div class="form-field">
                                 <!-- Frequency Input -->
                                 <label for="frequency">Frequency:</label>
                                 <input type="text" name="frequency[]" id="frequency${medicationCount}" required placeholder="e.g., Every 6 hours">
                             </div>    
                         </div>
                         <div class="form-row">
+                        <div class="form-field">
                             <!-- Duration Input -->
                            <label for="alternative">Alternative:</label>
                             <input type="text" name="alternative[]" id="alternative${medicationCount}" min="1" required>
                         </div>
-                        <div class="form-row">       
+                        <div class="form-field">       
                              <label for="daysOfIntake">Duration (days):</label>
                              <input type="number" name="daysOfIntake[]" id="daysOfIntake${medicationCount}" min="1" required>
-                        </div>     
+                        </div>  
+                        </div>   
 
 
                         <!-- Remove Medication Button -->
                         <button type="button" class="remove-medication" onclick="removeMedication(this)">Remove Medication</button>
+                        
                     
     `;
 

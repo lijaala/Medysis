@@ -105,6 +105,59 @@ public class PrescriptionService {
             logger.info("Saved PrescribedMedication for Medication ID: " + prescribedMedication.getMedication().getMedicationID());
         }
     }
+    @Transactional
+    public void addOrUpdatePrescription(Integer appointmentId, Prescription prescription, String staffId, Integer userId) {
+        Optional<Prescription> existingPrescription = prescriptionRepository.findByAppointmentAppointmentID(appointmentId);
+
+        if (existingPrescription.isPresent()) {
+            updatePrescription(existingPrescription.get().getPrescriptionID(), prescription, staffId, userId);
+        } else {
+            addPrescription(appointmentId, prescription, staffId, userId);
+        }
+    }
+    @Transactional
+    public void updatePrescription(Long prescriptionId, Prescription prescription, String staffId, Integer userId) {
+        Optional<Prescription> existingPrescriptionOptional = prescriptionRepository.findById(prescriptionId.intValue());
+
+        if (existingPrescriptionOptional.isPresent()) {
+            Prescription existingPrescription = existingPrescriptionOptional.get();
+
+            logger.info("Deleting existing PrescribedMedications...");
+            prescribedMedicationsRepository.deleteInBatch(existingPrescription.getPrescribedMedications());
+            logger.info("Deleted existing PrescribedMedications.");
+            // Clear existing prescribed medications
+
+
+
+            // Update prescription fields
+            existingPrescription.setStaff(staffRepository.findById(staffId).orElse(null));
+            existingPrescription.setUser(userRepository.findById(userId).orElse(null));
+            existingPrescription.setAppointment(appointmentRepository.findById(prescription.getAppointment().getAppointmentID()).orElse(null));
+            existingPrescription.setPrescriptionDate(LocalDate.now());
+
+            // Save the updated prescription
+            Prescription updatedPrescription = prescriptionRepository.save(existingPrescription);
+
+            // Save new prescribed medications
+            for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
+                String medicationName = prescribedMedication.getMedication().getMedicationName();
+                Medication medication = medicationRepository.findByMedicationName(medicationName).orElse(null);
+
+                if (medication == null) {
+                    medication = new Medication();
+                    medication.setMedicationName(medicationName);
+                    medication.setAlternative(prescribedMedication.getMedication().getAlternative());
+                    medicationRepository.save(medication);
+                }
+
+                prescribedMedication.setMedication(medication);
+                prescribedMedication.setPrescription(updatedPrescription);
+                prescribedMedicationsRepository.save(prescribedMedication);
+            }
+        } else {
+            throw new RuntimeException("Prescription not found with ID: " + prescriptionId);
+        }
+    }
     public PrescriptionResponse getPrescriptionByAppointmentId(Integer appointmentId) {
         Optional<Prescription> prescription=prescriptionRepository.findByAppointmentAppointmentID(appointmentId);
         return prescription.map(p -> new PrescriptionResponse(
