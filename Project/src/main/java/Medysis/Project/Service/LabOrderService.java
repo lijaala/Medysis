@@ -42,7 +42,8 @@ public class LabOrderService {
 
     @Autowired
     private AppointmentService appointmentService;
-
+    @Autowired
+    private NotificationService notificationService;
 
 
     @Autowired
@@ -78,19 +79,22 @@ public class LabOrderService {
 
             // Create LabResults
             createLabResults(labOrder, userId, staffId, appointment, testIds);
+            sendNewLabOrderNotification(labOrder);
             return labOrder;
         }
     }
 
     @Transactional
     public LabOrder updateLabOrder(int orderId, int appointmentId, int userId, String staffId, String urgency, List<Integer> testIds) {
-        LabOrder labOrder = labOrderRepository.findById(orderId)
+        LabOrder existingLabOrder = labOrderRepository.findById(orderId)
                 .orElseThrow(() -> new NoSuchElementException("Lab Order not found with ID: " + orderId));
-        return updateExistingLabOrder(labOrder, userId, staffId, urgency, testIds);
+        LabOrder updatedLabOrder = updateExistingLabOrder(existingLabOrder, userId, staffId, urgency, testIds);
+        sendUpdatedLabOrderNotification(updatedLabOrder);
+        return updatedLabOrder;
     }
 
     @Transactional
-    private LabOrder updateExistingLabOrder(LabOrder labOrder, int userId, String staffId, String urgency, List<Integer> testIds) {
+    public LabOrder updateExistingLabOrder(LabOrder labOrder, int userId, String staffId, String urgency, List<Integer> testIds) {
         User user = userRepository.findById(userId).orElse(null);
         Staff staffID = staffRepository.findById(staffId)
                 .orElseThrow(() -> new RuntimeException("Staff not found for ID: " + staffId));
@@ -110,9 +114,27 @@ public class LabOrderService {
         // Add new lab results based on the provided test IDs
         createLabResults(labOrder, userId, staffId, appointment, testIds);
 
+
         return labOrder;
     }
 
+    private void sendNewLabOrderNotification(LabOrder labOrder) {
+        List<Staff> labTechnicians = staffRepository.findByRoleRoleID(3);
+        String message = String.format("New lab order created for patient %s (Appointment ID: %d).",
+                labOrder.getUserID().getName(), labOrder.getAppointmentID().getAppointmentID());
+        for (Staff technician : labTechnicians) {
+            notificationService.createStaffNotifications(technician.getStaffID(), message, "lab_order");
+        }
+    }
+
+    private void sendUpdatedLabOrderNotification(LabOrder labOrder) {
+        List<Staff> labTechnicians = staffRepository.findByRoleRoleID(3);
+        String message = String.format("Lab order updated for patient %s (Order ID: %d, Appointment ID: %d).",
+                labOrder.getUserID().getName(), labOrder.getOrderID(), labOrder.getAppointmentID().getAppointmentID());
+        for (Staff technician : labTechnicians) {
+            notificationService.createStaffNotifications(technician.getStaffID(), message, "lab_order");
+        }
+    }
     private void createLabResults(LabOrder labOrder, int userId, String staffId, Appointment appointment, List<Integer> testIds) {
         User user = userRepository.findById(userId).orElse(null);
         Staff staffID = staffRepository.findById(staffId)
