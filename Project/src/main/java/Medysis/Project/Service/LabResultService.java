@@ -57,9 +57,11 @@ public class LabResultService {
         dto.measurementUnit=labResults.getTestID().getMeasurementUnit();
         dto.resultValue=labResults.getResultValue();
         dto.notes = labResults.getNotes();
-        dto.labTechnicianID=labResults.getLabTechnicianID().getStaffName();
-
-
+        if (labResults.getLabTechnicianID() != null) {
+            dto.labTechnicianID = labResults.getLabTechnicianID().getStaffName();
+        } else {
+            dto.labTechnicianID = null; // Or set to an empty string "" or a default value like "Not Assigned"
+        }
 
         return dto;
     }

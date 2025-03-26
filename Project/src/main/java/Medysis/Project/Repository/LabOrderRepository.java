@@ -31,4 +31,7 @@ public interface LabOrderRepository extends JpaRepository<LabOrder, Integer> {
 
 
     List<LabOrder> findByUserID(User userID);
+
+    List<LabOrder> findByAppointmentID(Appointment appointmentID); // Add this method
+
 }

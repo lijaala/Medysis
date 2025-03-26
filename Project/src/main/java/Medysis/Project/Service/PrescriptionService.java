@@ -125,11 +125,7 @@ public class PrescriptionService {
             logger.info("Deleting existing PrescribedMedications...");
             prescribedMedicationsRepository.deleteInBatch(existingPrescription.getPrescribedMedications());
             logger.info("Deleted existing PrescribedMedications.");
-            // Clear existing prescribed medications
 
-
-
-            // Update prescription fields
             existingPrescription.setStaff(staffRepository.findById(staffId).orElse(null));
             existingPrescription.setUser(userRepository.findById(userId).orElse(null));
             existingPrescription.setAppointment(appointmentRepository.findById(prescription.getAppointment().getAppointmentID()).orElse(null));

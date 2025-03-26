@@ -116,7 +116,7 @@
             .catch(error => {
                 console.error('Error fetching lab history:', error);
                 const labHistoryDiv = document.getElementById('labHistory');
-                labHistoryDiv.innerHTML = '<p>Failed to load lab history.</p>';
+                labHistoryDiv.innerHTML = '<p>No Lab History Found</p>';
             });
     }
 

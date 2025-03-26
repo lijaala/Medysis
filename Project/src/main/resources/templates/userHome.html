@@ -13,24 +13,20 @@
     <div class="row">
 
         <div class="myHeader p-2" xmlns:th="http://www.thymeleaf.org" th:fragment="header">
-
-        <div class="row py-2 px-5">
-
-            <div class="col-sm-1 p-0">
-                <button class="back" onclick="goBack()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                        <path fill="none" stroke="#currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18l-6-6l6-6" />
-                    </svg>
-                </button>
-            </div>
-            <div class="col-sm-10 w-auto">
+            <button class="back" onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path fill="none" stroke="#currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18l-6-6l6-6" />
+                </svg>
+            </button>
+        <div class="pb-2 px-5">
+            <div class=" w-auto text-center">
                 <h2 id="page-title" >Default Title</h2>
             </div>
             </div>
 
             <div class="row d-flex align-items-center my-2">
-                <div class="search-container mx-3">
-                    <input class="p-1 search-bar" type="text" placeholder="Search...">
+                <div class="search-container">
+                    <input class="px-2 search-bar" type="text" placeholder="Search...">
                 </div>
             </div>
 <script>function setPageTitle() {

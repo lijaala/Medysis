@@ -168,7 +168,7 @@
 
         const formData = new FormData(event.target);
 
-        fetch('http://localhost:8081/api/auth/signup', {
+        fetch('/api/auth/signup', {
             method: 'POST',
             body: formData
         })

@@ -81,7 +81,7 @@ html,body{
 }
 .mainScreen{
 
-    overflow: scroll;
+
     align-items: center;
     -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
     scrollbar-width: none;
@@ -136,12 +136,11 @@ button{
 }
 
 #page-title h2{
-
      text-align: center;
-
 }
 .card div{
     text-wrap: nowrap;
+    text-decoration: none;
 
 }
 .navCard{
@@ -149,7 +148,7 @@ button{
     color:#07104e;
 
 }
-.card-title{
+.card-title {
     text-decoration: none;
 }
 .card-body{

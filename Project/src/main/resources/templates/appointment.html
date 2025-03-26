@@ -17,7 +17,7 @@
 
 <div class="container">
     <div class="row ">
-        <div class="myHeader p-2" th:include="userHome::header"></div>
+        <div class="myHeader p-2" th:replace="patient/userHome::header"></div>
 
         <div class="row mainScreen">
             <div class="col-sm-12 mx-3 my-5 ">
@@ -65,7 +65,7 @@
 
 
 
-                <div class="row mx-1 navFix" th:include="userHome::navBar" >
+                <div class="row mx-1 navFix" th:include="patient/userHome::navBar" >
 
                 </div>
             </div>
@@ -97,7 +97,7 @@
 
                 <div class="mb-3">
                     <button type="submit" class="primary mb-3">Confirm Re-schedule</button>
-                    <button type="submit" class="secondary mb-3">Cancel</button>
+
 
                 </div>
             </form>
@@ -147,6 +147,7 @@
 
                         }).showToast();
                         appointmentForm.reset();
+                        closeAppointmentForm();
                     } else {
                         Toastify({
                             text: "An unexpected error occurred. Please try again.",
@@ -294,10 +295,12 @@
     function openAppointmentForm(){
         document.getElementById('appointmentForm').style.display="block";
         document.getElementById('bookBtn').style.display="none";
+        document.getElementById('appHistory').style.display="none";
     }
     function closeAppointmentForm(){
         document.getElementById('appointmentForm').style.display="none";
         document.getElementById('bookBtn').style.display="block";
+        document.getElementById('appHistory').style.display="block";
     }
     function fetchAppointmentHistory() {
         fetch('/appointment/getByUserID')

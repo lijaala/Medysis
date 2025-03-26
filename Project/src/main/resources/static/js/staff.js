@@ -88,7 +88,7 @@ function addStaff(event) {
 
 
 function openEditStaffModal(staffID) {
-    fetch(`http://localhost:8081/api/staff/all`)
+    fetch(`/api/staff/all`)
         .then(response => response.json())
         .then(data => {
             const staff = data.find(s => s.staffID === staffID);
@@ -128,7 +128,7 @@ function closeEditStaffModal() {
 }
 
 function fetchStaffData() {
-    fetch("http://localhost:8081/api/staff/all") // Replace with your actual API URL
+    fetch("/api/staff/all") // Replace with your actual API URL
         .then(response => {
             if (!response.ok) {
                 throw new Error("Failed to fetch staff data");

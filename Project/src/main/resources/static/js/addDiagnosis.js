@@ -2,6 +2,8 @@ let diagnosisNextHandler, diagnosisDoneHandler, diagnosisLabNextHandler;
 let prescriptionNextHandler, prescriptionDoneHandler, prescriptionBackHandler;
 let prescriptionSubmitHandler;
 let labOrderSubmitHandler,labBackHandler;
+let existingLabOrderId = null;
+let testCount=0;
 
 function startAppointment(appointmentID) {
     console.log("Start Appointment triggered for ID:", appointmentID);
@@ -707,39 +709,124 @@ function printPrescription(appointmentId) {
             alert("Failed to print prescription. Please try again.");
         });
 }
-function openLabReportsModal(){
+async function openLabReportsModal(appointmentId, userId) {
+    console.log("Opening lab reports modal for Appointment ID:", appointmentId, "User ID:", userId);
+
+    document.getElementById('appointmentIdInput').value = appointmentId;
+    document.getElementById('userIdInput').value = userId;
     document.getElementById('orderLabReports').style.display = 'flex';
 
+    // Populate existing dropdowns on modal open
     document.querySelectorAll(".test-dropdown").forEach(select => populateLabTestDropdown(select));
 
-    const existingDropdowns = document.querySelectorAll(".test-dropdown");
-    existingDropdowns.forEach(dropdown => populateLabTestDropdown(dropdown));
-
     const labOrderForm = document.getElementById('labOrder');
-    const prescribeBtn=document.getElementById('saveAndPrescribe');
-    const endLabBtn=document.getElementById('saveAndEndLab');
-    const labBackBtn=document.getElementById('labBack');
-    prescribeBtn.addEventListener('click', saveLabOrderAndPrescribe);
-    endLabBtn.addEventListener('click',saveLabOrderAndFinish);
-    labBackBtn.addEventListener('click',saveAndEditDiagnosis);
+    const prescribeBtn = document.getElementById('saveAndPrescribe');
+    const endLabBtn = document.getElementById('saveAndEndLab');
+    const labBackBtn = document.getElementById('labBack');
 
+    // Remove existing listeners to avoid duplicates
     if (labOrderSubmitHandler) {
         labOrderForm.removeEventListener('submit', labOrderSubmitHandler);
     }
+    if (prescribeBtn) {
+        prescribeBtn.removeEventListener('click', saveLabOrderAndPrescribe);
+    }
+    if (endLabBtn) {
+        endLabBtn.removeEventListener('click', saveLabOrderAndFinish);
+    }
+    if (labBackBtn) {
+        labBackBtn.removeEventListener('click', saveAndEditDiagnosis);
+    }
 
-    // Define new event listener function
+    // Define new event listener functions
     labOrderSubmitHandler = function (event) {
         event.preventDefault();
         submitLabOrder(() => {
             completeAppointment(document.getElementById("appointmentIdInput").value);
         });
     };
+    const saveAndPrescribeHandler = function () {
+        saveLabOrderAndPrescribe();
+    };
+    const saveAndFinishHandler = function () {
+        saveLabOrderAndFinish();
+    };
+    const saveAndDiagnosisHandler = function () {
+        saveAndEditDiagnosis();
+    };
 
-    // Add new event listener
+    // Add new event listeners
     labOrderForm.addEventListener('submit', labOrderSubmitHandler);
-
-
+    if (prescribeBtn) {
+        prescribeBtn.addEventListener('click', saveAndPrescribeHandler);
+    }
+    if (endLabBtn) {
+        endLabBtn.addEventListener('click', saveAndFinishHandler);
+    }
+    if (labBackBtn) {
+        labBackBtn.addEventListener('click', saveAndDiagnosisHandler);
+    }
+    try {
+        const response = await fetch(`/api/LabOrder/appointment/${appointmentId}`);
+        if (!response.ok) {
+            console.warn("No existing lab orders found for this appointment.");
+            return;
+        }
+        const labOrders = await response.json();
+        populateLabOrderForm(labOrders);
+    } catch (error) {
+        console.error("Error fetching lab orders:", error);
+    }
 }
+function populateLabOrderForm(labOrders) {
+    console.log("populateLabOrderForm called with:", labOrders); // Debugging log
+    const container = document.getElementById("labTestsContainer");
+    container.innerHTML = ''; // Clear existing entries
+    testCount = 0; // Initialize testCount at the beginning of the function
+
+    if (labOrders && labOrders.length > 0) {
+        labOrders.forEach(order => {
+            console.log("Processing lab order:", order); // Debugging log
+            if (order.labResults && order.labResults.length > 0) { // Iterate over labResults
+                order.labResults.forEach(result => { // Process each lab result (test)
+                    console.log("Adding test:", result.testID); // Debugging log
+                    addLabTestInternal(result.testID); // Use result.testID
+                });
+            }
+        });
+    } else {
+        console.log("No existing lab orders, adding initial test."); // Debugging log
+        // Add an initial empty test if no existing orders
+        addLabTestInternal(); // Use addLabTestInternal to ensure testCount is incremented
+    }
+}
+async function addLabTestInternal(selectedTestId = "") {
+    console.log("addLabTestInternal called with:", selectedTestId);
+    const container = document.getElementById("labTestsContainer");
+    const testEntry = document.createElement("div");
+    testEntry.classList.add("lab-test-entry");
+
+    testEntry.innerHTML = `
+            <div class="form-row">
+                <label for="testName"> Test Name </label>
+                <select class="form-select test-dropdown" id="testName${testCount}" name="testName[]">
+                    <option value="">Select</option>
+                </select>
+            </div>
+            <button type="button" class="remove-medication" onclick="removeLabTest(this)">Remove</button>
+        `;
+
+    container.appendChild(testEntry);
+    const newDropdown = testEntry.querySelector(".test-dropdown");
+    await populateLabTestDropdown(newDropdown);
+    if (selectedTestId) {
+        newDropdown.value = selectedTestId;
+    }
+    console.log(`🆕 New test added. Total dropdowns now: ${document.querySelectorAll('.test-dropdown').length}`);
+    testCount++;
+}
+
+
 function closeLabReportsModal(){
     document.getElementById('orderLabReports').style.display='none';
 
@@ -747,8 +834,6 @@ function closeLabReportsModal(){
 const closeLabReports=document.getElementById('closeLabReports');
 closeLabReports.addEventListener('click',closeLabReportsModal);
 
-//addLabtest
-let testCount = 1; // Start from 1 since the initial entry is already there
 
 async function addLabTest() {
     const container = document.getElementById("labTestsContainer");
@@ -852,6 +937,17 @@ function submitLabOrder(callback) {
 
 
     }
+    const formData = new URLSearchParams({
+        appointmentID: appointmentIdInput,
+        userID: userId,
+        'urgency[]': urgency,
+        'testName[]': testIds
+    });
+
+    if (existingLabOrderId) {
+        formData.append('orderID', existingLabOrderId); // Append the existing order ID
+        console.log("Sending existing orderID:", existingLabOrderId);
+    }
 
     // Continue with form submission
     fetch('/api/LabOrder/orderRequest', {
@@ -859,12 +955,7 @@ function submitLabOrder(callback) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: new URLSearchParams({
-            appointmentID: appointmentIdInput,
-            userID: userId,
-            'urgency[]': urgency,
-            'testName[]': testIds
-        })
+        body:formData
     })
         .then(response => {
             if (response.ok) {

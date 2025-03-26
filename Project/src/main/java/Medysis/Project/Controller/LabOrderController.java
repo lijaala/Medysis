@@ -8,7 +8,7 @@ import Medysis.Project.Model.User;
 import Medysis.Project.Repository.UserRepository;
 import Medysis.Project.Service.LabOrderService;
 import Medysis.Project.Service.LabResultService;
-import Medysis.Project.Service.UserService;
+
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,18 +33,28 @@ public class LabOrderController {
     private UserRepository userRepository;
 
     @PostMapping("/orderRequest")
-    public String createLabOrder(@RequestParam("appointmentID") int appointmentId,
-                                 @RequestParam("userID") int userId,
-
-                                 @RequestParam("urgency") String urgency,
-                                 @RequestParam("testName[]") List<Integer> testIds,
-                                 HttpSession session) {
+    public ResponseEntity<String> createOrUpdateLabOrder(@RequestParam("appointmentID") int appointmentId,
+                                                         @RequestParam("userID") int userId,
+                                                         @RequestParam("urgency") String urgency,
+                                                         @RequestParam("testName[]") List<Integer> testIds,
+                                                         @RequestParam(value = "orderID", required = false) Integer orderId,
+                                                         HttpSession session) {
 
         String staffId = (String) session.getAttribute("userId");
 
-
-        labOrderService.createLabOrder(appointmentId, userId,staffId, urgency, testIds);
-        return "redirect:/success"; // Or redirect as needed
+        try {
+            if (orderId != null) {
+                labOrderService.updateLabOrder(orderId, appointmentId, userId, staffId, urgency, testIds);
+                return ResponseEntity.ok("Lab Order updated successfully");
+            } else {
+                labOrderService.createLabOrder(appointmentId, userId, staffId, urgency, testIds);
+                return ResponseEntity.status(HttpStatus.CREATED).body("Lab Order created successfully");
+            }
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create/update lab order: " + e.getMessage());
+        }
     }
 
 
@@ -87,6 +97,12 @@ public class LabOrderController {
                 .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + finalUserId));
 
         List<LabOrderDTO> labOrders = labOrderService.getLabOrdersByUserId(user);
+        return ResponseEntity.ok(labOrders);
+    }
+
+    @GetMapping("/appointment/{appointmentId}")
+    public ResponseEntity<List<LabOrderDTO>> getLabOrdersByAppointmentId(@PathVariable int appointmentId) {
+        List<LabOrderDTO> labOrders = labOrderService.getLabOrdersByAppointmentId(appointmentId);
         return ResponseEntity.ok(labOrders);
     }
 }
