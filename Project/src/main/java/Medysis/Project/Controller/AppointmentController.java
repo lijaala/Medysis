@@ -73,36 +73,51 @@ public class AppointmentController {
     @PostMapping("/edit")
     public String editAppointment(
             @RequestParam("appointmentID") Integer appointmentID,
-            @RequestParam("date") String appDateStr,
-            @RequestParam("time") String appTimeStr,
-            @RequestParam(value = "status",required = false) String status,
+            @RequestParam(value = "date", required = false) String appDateStr,
+            @RequestParam(value = "time", required = false) String appTimeStr,
+            @RequestParam(value = "status", required = false) String status,
             HttpSession session) {
 
-        // Get the doctor ID from the session
+        // Get the user ID from the session
         String updatedBy = (String) session.getAttribute("userId");
 
         if (updatedBy == null) {
             return "Error: User ID not found in session.";
         }
         System.out.println("Edit request received for appointment ID: " + appointmentID);
-        try{
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm[:ss]");
 
+        LocalDate appDate = null;
+        LocalTime appTime = null;
 
-            // Parse the date and time
-        LocalDate appDate = LocalDate.parse(appDateStr, dateFormatter);
-        LocalTime appTime = LocalTime.parse(appTimeStr, timeFormatter);
-
-        // Call service to edit the appointment
-        Appointment appointment = appointmentService.editAppointment(appointmentID, updatedBy, appDate, appTime, status);
-
+        if (appDateStr != null && !appDateStr.isEmpty()) {
+            try {
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                appDate = LocalDate.parse(appDateStr, dateFormatter);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Handle invalid date format error, maybe return an error message to the user
+            }
         }
-        catch (Exception e) {
+
+        if (appTimeStr != null && !appTimeStr.isEmpty()) {
+            try {
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH);
+                appTime = LocalTime.parse(appTimeStr, timeFormatter);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Handle invalid time format error, maybe return an error message to the user
+            }
+        }
+
+        try {
+            // Call service to edit the appointment
+            appointmentService.editAppointment(appointmentID, updatedBy, appDate, appTime, status);
+        } catch (Exception e) {
             e.printStackTrace();
+            // Handle other potential errors during appointment update
+            return "Error updating appointment.";
         }
         return "Appointment updated successfully";
-
     }
 
     @PostMapping("/complete")
@@ -134,41 +149,28 @@ public class AppointmentController {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date = LocalDate.parse(dateStr, dateFormatter);
 
-
-
-        // Fetch the doctor's availability from the repository
         Optional<Staff> doctorOpt = staffRepository.findById(doctorID);
         if (doctorOpt.isEmpty()) {
             System.out.println("Doctor not found in database: " + doctorID);
             return List.of("Doctor not found");
         }
-
-
-
         Staff doctor = doctorOpt.get();
         LocalTime startTime = doctor.getStartTime();
         LocalTime endTime = doctor.getEndTime();
 
-
-
         if (startTime == null || endTime == null) {
             return List.of("Doctor's availability not set");
         }
-
-        // Generate time slots (e.g., every 30 minutes)
         List<String> timeSlots = new ArrayList<>();
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
-
         LocalTime slot = startTime;
         while (slot.isBefore(endTime)) {
             timeSlots.add(slot.format(timeFormatter));
             slot = slot.plusMinutes(8); // Adjust slot duration as needed
         }
 
-        // Fetch existing appointments for the doctor on the given date
         List<Appointment> bookedAppointments = appointmentService.getAppointmentsByDoctorAndDate(doctorID, date);
 
-        // Remove already booked slots
         timeSlots.removeIf(slotTime -> bookedAppointments.stream()
                 .anyMatch(appt -> appt.getAppTime().format(timeFormatter).equals(slotTime)));
 
@@ -206,9 +208,11 @@ public class AppointmentController {
         return appointmentService.getAppointmentByUserId(patientID);
     }
     @PostMapping("/cancel/{appointmentID}")
-    public ResponseEntity<String> cancelAppointment(@PathVariable Integer appointmentID) {
+    public ResponseEntity<String> cancelAppointment(@PathVariable Integer appointmentID, HttpSession session) {
+
         try {
-            appointmentService.cancelAppointment(appointmentID);
+            String userID= (String)session.getAttribute("userId");
+            appointmentService.cancelAppointment(appointmentID, userID);
             return ResponseEntity.ok("Appointment cancelled successfully.");
         } catch (Exception e) {
             e.printStackTrace();

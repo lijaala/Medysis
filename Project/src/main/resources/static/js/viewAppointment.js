@@ -1,3 +1,5 @@
+let userRole;
+
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const roleResponse = await fetch('api/auth/role', { method: 'GET', credentials: 'same-origin' });
@@ -5,9 +7,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Failed to fetch role:", roleResponse.status);
             return;
         }
-        const userRole = await roleResponse.text();
+        userRole = await roleResponse.text();
         console.log("User Role:", userRole);
 
+        fetchAppointments(userRole);
+        populateDoctorDropdownForAdd(); // Ensure doctor dropdown is populated for adding
+
+    } catch (error) {
+        console.error("Error on page load:", error);
+    }
+});
+
+async function fetchAppointments(userRole) {
+    try {
         const appointmentResponse = await fetch('/appointment/list', { method: 'GET' });
         if (!appointmentResponse.ok) {
             console.error("Failed to fetch appointments:", appointmentResponse.status);
@@ -16,7 +28,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const appointments = await appointmentResponse.json();
         console.log("Appointments data:", appointments); // Inspect data
         const tbody = document.getElementById('appointmentTableBody');
-        const doctorColumnIndex = 1;
 
         tbody.innerHTML = ''; // Clear the table before adding new rows
 
@@ -31,6 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const row = document.createElement('tr');
                 row.setAttribute('data-id', appointment.appointmentID);
                 row.setAttribute('data-user-id', appointment.patientID.userID);
+                row.setAttribute('data-doctor-id', appointment.doctorID?.staffID); // Store doctor ID for editing
 
                 row.innerHTML = `
                         <td>${appointment.patientID?.name || 'Unknown Patient'}</td>
@@ -39,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <td>${appointment.appTime || 'N/A'}</td>
                         <td>${appointment.status || 'N/A'}</td>
                         <td class="actions">
-                            <button type="button" class="edit" onclick="openEditModal('${appointment.appointmentID}', '${appointment.appDate}', '${appointment.appTime}', '${appointment.status}')">
+                            <button type="button" class="edit" onclick="openEditModal('${appointment.appointmentID}', '${appointment.appDate}', '${appointment.appTime}', '${appointment.status}', '${appointment.doctorID?.staffID}')">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                                     <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -61,25 +73,51 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
-
-
         } else {
             tbody.innerHTML = `<tr><td colspan="6">No appointments found</td></tr>`;
         }
     } catch (error) {
         console.error("Error fetching data:", error);
     }
-});
+}
+
 /*function for opening appointmnet editing modal*/
-function openEditModal(id, appDate, appTime, status) {
-
-
+async function openEditModal(id, appDate, appTime, status, doctorId) {
     document.getElementById('editAppointmentID').value = id;
     document.getElementById('editAppDate').value = appDate;
-    document.getElementById('editAppTime').value = appTime;
-    document.getElementById('editStatus').value = status;
-    document.getElementById('editModal').style.display = 'flex';
+
+    const editAppTimeDropdown = document.getElementById('editAppTime');
+    editAppTimeDropdown.innerHTML = '<option value="">Select Time Slot</option>';
+
+    try {
+        const encodedDoctorId = encodeURIComponent(doctorId);
+        const response = await fetch(`/appointment/availableSlots?doctorID=${encodedDoctorId}&date=${appDate}`);
+        if (!response.ok) {
+            console.error("Failed to fetch available slots for edit:", response.status);
+            return;
+        }
+        const availableSlots = await response.json();
+        console.log(availableSlots);
+
+        if (Array.isArray(availableSlots) && availableSlots.length > 0) {
+            availableSlots.forEach(slot => {
+                const option = document.createElement('option');
+                option.value = slot;
+                option.textContent = slot;
+                option.selected = (slot === appTime); // Select the current time
+                editAppTimeDropdown.appendChild(option);
+            });
+        } else {
+            editAppTimeDropdown.innerHTML = '<option value="">No Slots Available</option>';
+        }
+
+        document.getElementById('editStatus').value = status;
+        document.getElementById('editModal').style.display = 'flex';
+    } catch (error) {
+        console.error("Error fetching slots for edit:", error);
+    }
 }
+
 //function to close editing modal
 function closeEditModal() {
     document.getElementById('editModal').style.display = 'none';
@@ -95,17 +133,27 @@ closeAddApp.addEventListener('click', closeAddAppointment);
 //function to save appointment changes
 function saveAppointmentChanges() {
     const appointmentID = document.getElementById("editAppointmentID").value;
-    const appDate = document.getElementById("editAppDate").value;
-    const appTime = document.getElementById("editAppTime").value;
-    const status = document.getElementById("editStatus").value;
-    const modalContent= document.querySelector(".modal-content");
+    const editAppDateInput = document.getElementById("editAppDate");
+    const editAppTimeSelect = document.getElementById("editAppTime");
+    const editStatusSelect = document.getElementById("editStatus");
 
-    // Prepare the form data
+    const appDate = editAppDateInput.value;
+    const appTime = editAppTimeSelect.value;
+    const status = editStatusSelect.value;
+
+    // Get the original values (you might need to store these when the modal opens)
+    const originalRow = document.querySelector(`tr[data-id='${appointmentID}']`);
+    const originalDate = originalRow ? originalRow.children[2].textContent : '';
+    const originalTimeFormatted = originalRow ? originalRow.children[3].textContent : '';
+    // You might need to convert originalTimeFormatted back to a format suitable for comparison
+    // Or, a better approach is to store the original data in the modal when it opens.
+
     const data = new URLSearchParams();
     data.append("appointmentID", appointmentID);
-    data.append("date", appDate || '');  // Send empty string if no date is selected
-    data.append("time", appTime || '');  // Send empty string if no time is selected
-    data.append("status", status || '');  // Send empty string if no status is selected
+    data.append("date", appDate || ''); // If empty, backend will keep old
+    data.append("time", appTime || ''); // If empty, backend will keep old
+    data.append("status", status || ''); // If empty, backend will keep old
+
 
     fetch("/appointment/edit", {
         method: "POST",
@@ -118,19 +166,7 @@ function saveAppointmentChanges() {
         .then(data => {
             console.log(data);
 
-// Update the table row dynamically
-            const row = document.querySelector(`tr[data-id='${appointmentID}']`);
-            if (row) {
-                row.children[2].textContent = appDate || 'N/A';  // Update Date column
-                row.children[3].textContent = appTime || 'N/A';  // Update Time column
-                row.children[4].textContent = status || 'N/A';   // Update Status column
-            }
-//update status modal
-            modalContent.innerHTML = `
-
-            <h3>${status === "Cancelled" ? "Appointment Cancelled" : "Appointment Updated"}</h3>
-            <p>${status === "Cancelled" ? "This appointment has been successfully cancelled." : "The appointment details have been updated successfully."}</p>
-        `;
+            fetchAppointments(userRole)
 
             Toastify({
                 text:  "Appointment Edited Successfully!",
@@ -150,8 +186,8 @@ function saveAppointmentChanges() {
             setTimeout(() => {
 
                 closeEditModal();
-
-            }, 5000);
+                fetchAppointments(userRole); // Refresh appointment list
+            }, 3000);
         })
         .catch(error => {
             console.error("Error editing appointment:", error);
@@ -161,17 +197,26 @@ function saveAppointmentChanges() {
 function openAddAppointment(){
     const addApp=document.getElementById("addAppModal");
     addApp.style.display="flex";
-    populateDropdowns();
+    populateDropdownsForAdd();
 }
 const openAddApp=document.getElementById('openAddApp');
 openAddApp.addEventListener("click", openAddAppointment);
 
 function closeAddAppointment(){
     const addApp=document.getElementById("addAppModal");
-    addApp.style.display="none";}
+    addApp.style.display="none";
+    resetAddAppointmentForm();
+}
+
+function resetAddAppointmentForm() {
+    const addAppointmentForm = document.getElementById("addAppointmentForm");
+    addAppointmentForm.reset();
+    const timeDropdown = document.getElementById("appTime");
+    timeDropdown.innerHTML = '<option value="">Select Time Slot</option>';
+}
 
 
-async function populateDropdowns() {
+async function populateDropdownsForAdd() {
     try {
         // Fetch patients
         const patientResponse = await fetch('/api/user/all', { method: 'GET' });
@@ -181,7 +226,7 @@ async function populateDropdowns() {
         }
         const patients = await patientResponse.json();
         const patientDropdown = document.getElementById("patientDropdown");
-        patientDropdown.innerHTML = '<option value="">Select Patient</option>';
+        patientDropdown.innerHTML = '<option value=""> Select Patient</option>';
 
         patients.forEach(patient => {
             const option = document.createElement("option");
@@ -198,7 +243,7 @@ async function populateDropdowns() {
         }
         const doctors = await doctorResponse.json();
         const doctorDropdown = document.getElementById("doctorDropdown");
-        doctorDropdown.innerHTML = '<option value="">Select Doctor</option>';
+        doctorDropdown.innerHTML = '<option value=""> Select Doctor</option>';
 
         doctors.forEach(doctor => {
             const option = document.createElement("option");
@@ -212,7 +257,7 @@ async function populateDropdowns() {
         console.error("Error fetching dropdown data:", error);
     }
 
-    async function generateTimeSlots(doctorID) {
+    async function generateTimeSlotsForAdd(doctorID) {
         if (!doctorID) return;
 
         const date = document.getElementById("appDate").value;
@@ -251,15 +296,15 @@ async function populateDropdowns() {
     }
 
 
-// Event listeners to trigger slot generation
+// Event listeners to trigger slot generation for Add
     document.getElementById("doctorDropdown").addEventListener("change", function () {
-        generateTimeSlots(this.value);
+        generateTimeSlotsForAdd(this.value);
     });
 
     document.getElementById("appDate").addEventListener("change", function () {
         const doctorID = document.getElementById("doctorDropdown").value;
         if (doctorID) {
-            generateTimeSlots(doctorID);
+            generateTimeSlotsForAdd(doctorID);
         }
     });
 
@@ -368,7 +413,3 @@ async function handleAddAppointmentSubmit(event) {
 }
 
 addAppointmentForm.addEventListener("submit", handleAddAppointmentSubmit);
-
-
-
-
