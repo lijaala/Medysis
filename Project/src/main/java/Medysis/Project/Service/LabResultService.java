@@ -2,20 +2,15 @@ package Medysis.Project.Service;
 
 import Medysis.Project.DTO.LabOrderDTO;
 import Medysis.Project.DTO.LabResultDTO;
-import Medysis.Project.Model.LabOrder;
-import Medysis.Project.Model.LabResults;
-import Medysis.Project.Model.LabTests;
-import Medysis.Project.Model.Staff;
-import Medysis.Project.Repository.LabOrderRepository;
-import Medysis.Project.Repository.LabResultRepository;
-import Medysis.Project.Repository.LabTestRepository;
-import Medysis.Project.Repository.StaffRepository;
+import Medysis.Project.Model.*;
+import Medysis.Project.Repository.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +27,11 @@ public class LabResultService {
 
     @Autowired
     private LabTestRepository labTestRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private NotificationService notificationService;
 
 
 
@@ -78,8 +78,8 @@ public class LabResultService {
 
         // ✅ Fix: Handle Optional<LabResults>
         LabResults labResult = labResultRepository.findByOrderIDAndTestID(labOrder, labTest)
-                .orElse(new LabResults(labOrder, labTest));
-
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Lab Result not found for Order ID: " + orderId + " and Test ID: " + testId));
         labResult.setOrderID(labOrder);
         labResult.setTestID(labTest);
 
@@ -95,6 +95,7 @@ public class LabResultService {
             labResult.setNotes(notes);
             labResult.setLabTechnicianID(labTechnician);
             labResultRepository.save(labResult);
+            sendLabResultNotification(labResult);
         }
 
 
@@ -110,10 +111,18 @@ public class LabResultService {
         System.out.println("Updating Order Status for Order ID " + orderId + " to: " + newStatus);
         labOrderRepository.save(labOrder);
     }
+    private void sendLabResultNotification(LabResults labResult) {
+        User patient = userRepository.findById(labResult.getUserID().getUserID())
+                .orElse(null); // Handle case where user might not be found
 
-
-
-
+        if (patient != null) {
+            String message = String.format("Lab result updated for Order ID: %d, Test: %s. Please check your reports.",
+                    labResult.getOrderID().getOrderID(), labResult.getTestID().getTestName());
+            notificationService.createUserNotifications(patient.getUserID(), message, "lab_result");
+        } else {
+            System.err.println("Could not find patient for Lab Result ID: " + labResult.getReportId());
+        }
+    }
 
 
 

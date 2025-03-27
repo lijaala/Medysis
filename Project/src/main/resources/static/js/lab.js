@@ -1,3 +1,4 @@
+let currentLabOrderForResults = null;
 document.addEventListener('DOMContentLoaded', () => {
     const labRequestTable = document.getElementById('labRequestTable');
     const modal = document.getElementById('labDetailsModal');
@@ -122,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleAddResultsClick(event) {
         const orderId = event.target.dataset.orderId;
+        currentLabOrderForResults = orderId; // Store the orderId
 
         fetch(`/api/LabOrder/details/${orderId}`)
             .then(response => response.json())
@@ -133,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Error fetching lab order details:", error);
             });
     }
-
     function populateLabResultsModal(labOrderDetails) {
         if (!labOrderDetails) return;
 
@@ -229,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Send the lab results to the backend as query parameters
         labResults.forEach(result => {
             const { orderId, resultValue, resultNotes, testId } = result;
+            console.log(result);
 
             // Construct the URL with query parameters
             const url = `/labResult/update/${orderId}/${testId}?resultValue=${resultValue}&notes=${resultNotes}`;
@@ -304,15 +306,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (submitButton) {
         submitButton.addEventListener('click', function () {
-            const orderId = document.querySelector('.add-results').dataset.orderId;  // Get the order ID from the button
-
-            if (!orderId) {
-                console.error('Order ID not found!');
+            if (!currentLabOrderForResults) {
+                console.error('Current Lab Order ID not set!');
                 return;
             }
 
-            submitLabResults(orderId);  // Pass the orderId directly to the function
-            displayLabOrders();  // Reload lab orders
+            submitLabResults(currentLabOrderForResults); // Use the stored orderId
+            displayLabOrders();
+            currentLabOrderForResults = null; // Reset after submission (optional, depending on workflow)
         });
     } else {
         console.error('submitSingleResult button not found!');

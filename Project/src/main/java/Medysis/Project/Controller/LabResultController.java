@@ -22,6 +22,7 @@ public class LabResultController {
             HttpSession session) {
 
         try {
+            System.out.println(orderId+ testId);
             labResultService.updateLabResult(orderId, testId, resultValue, notes, session);
             return ResponseEntity.ok("Lab result updated successfully.");
         } catch (Exception e) {
