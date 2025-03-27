@@ -783,10 +783,14 @@ function populateLabOrderForm(labOrders) {
     const container = document.getElementById("labTestsContainer");
     container.innerHTML = ''; // Clear existing entries
     testCount = 0; // Initialize testCount at the beginning of the function
-
+    existingLabOrderId=null;
     if (labOrders && labOrders.length > 0) {
         labOrders.forEach(order => {
             console.log("Processing lab order:", order); // Debugging log
+            if (order.orderID) {
+                existingLabOrderId = order.orderID;
+                console.log("Existing Lab Order ID found:", existingLabOrderId);
+            }
             if (order.labResults && order.labResults.length > 0) { // Iterate over labResults
                 order.labResults.forEach(result => { // Process each lab result (test)
                     console.log("Adding test:", result.testID); // Debugging log
@@ -883,9 +887,7 @@ async function populateLabTestDropdown(selectElement) {
         console.error("Error fetching lab tests:", error);
     }
 }
-
-
-function submitLabOrder(callback) {
+async function submitLabOrder(callback) {
     console.log(" Submitting lab order...");
 
     const appointmentIdInput = document.getElementById('appointmentIdInput').value;
@@ -934,9 +936,8 @@ function submitLabOrder(callback) {
             callback();
         }
         return;
-
-
     }
+
     const formData = new URLSearchParams({
         appointmentID: appointmentIdInput,
         userID: userId,
@@ -959,51 +960,36 @@ function submitLabOrder(callback) {
     })
         .then(response => {
             if (response.ok) {
-                closeLabReportsModal();
-                Toastify({
-                    text: "Lab Order Created Successfully",
-                    duration: 1500,
-                    backgroundColor: "rgba(200,253,223,0.5)",
-                    gravity: "top",
-                    position: "right",
-
-                    style:{
-
-                        color:"rgb(15,94,27)",
-                        borderRadius:"8px"
-                    },onClick: function(){}
-                }).showToast();
-                if (callback) {
-                    callback();
-                }
+                // Access the response body as text
+                return response.text();
             } else {
-                console.error("Error creating lab order:", response);
-                Toastify({
-                    text: "Error creating lab order. Please try again.",
-                    duration: 3000,
-                    backgroundColor: "rgb(253,200,200)",
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    borderRadius:"8px",
-                    style:{
-                        color:"rgb(167,6,14)",
-                        borderRadius:"8px"
-                    },onClick: function(){}
-                }).showToast();
-                if (callback) {
-                    callback();
-                }
-
-
+                // If the response is not ok, still try to get the error message
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage || "Error creating lab order. Please try again.");
+                });
+            }
+        })
+        .then(message => { // 'message' will contain the backend response body
+            closeLabReportsModal();
+            Toastify({
+                text: message, // Use the message from the backend
+                duration: 3000,
+                backgroundColor: "rgba(200,253,223,0.5)",
+                gravity: "top",
+                position: "right",
+                style:{
+                    color:"rgb(15,94,27)",
+                    borderRadius:"8px"
+                },onClick: function(){}
+            }).showToast();
+            if (callback) {
+                callback();
             }
         })
         .catch(error => {
-            console.error("Error creating lab order:", error);
-
-
+            console.error("Error creating/updating lab order:", error);
             Toastify({
-                text: "An error occurred. Please try again later.",
+                text: error.message || "An error occurred. Please try again later.",
                 duration: 3000,
                 backgroundColor: "rgb(253,200,200)",
                 close: true,
@@ -1018,13 +1004,10 @@ function submitLabOrder(callback) {
             if (callback) {
                 callback();
             }
-
-
-
         });
 }
-function saveLabOrderAndPrescribe(){
-    submitLabOrder(() => {
+async function saveLabOrderAndPrescribe(){
+    await submitLabOrder(() => {
         const appointmentId = document.getElementById("appointmentIdInput")?.value;
         const userId = document.getElementById("userIdInput")?.value;
 
@@ -1039,9 +1022,9 @@ function saveLabOrderAndPrescribe(){
     });
 }
 
-function saveLabOrderAndFinish() {
+async function saveLabOrderAndFinish() {
     console.log("saveLabOrderAndFinish called.");
-    submitLabOrder(() => {
+    await submitLabOrder(() => {
         console.log("Callback in saveLabOrderAndFinish is executing.");
         const appointmentId = document.getElementById("appointmentIdInput")?.value;
         if (!appointmentId) {
@@ -1053,8 +1036,8 @@ function saveLabOrderAndFinish() {
         completeAppointment(appointmentId);
     });
 }
-function saveAndEditDiagnosis(){
-    submitLabOrder(() => {
+async function saveAndEditDiagnosis(){
+    await submitLabOrder(() => {
         const appointmentId = document.getElementById("appointmentIdInput")?.value;
         const userId = document.getElementById("userIdInput")?.value;
 

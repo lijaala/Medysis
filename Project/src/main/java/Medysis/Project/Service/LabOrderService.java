@@ -54,17 +54,17 @@ public class LabOrderService {
     @Transactional
     public LabOrder createLabOrder(int appointmentId, int userId, String staffId, String urgency, List<Integer> testIds) {
         Appointment appointment = appointmentRepository.findById(appointmentId).orElse(null);
-
+        LabOrder labOrder;
         // Check if a LabOrder already exists for this appointment
         List<LabOrder> existingLabOrders = labOrderRepository.findByAppointmentID(appointment);
 
         if (!existingLabOrders.isEmpty()) {
             // If a LabOrder exists, update the first one found
-            LabOrder existingLabOrder = existingLabOrders.get(0);
-            return updateExistingLabOrder(existingLabOrder, userId, staffId, urgency, testIds);
-        } else {
+            labOrder = updateExistingLabOrder(existingLabOrders.get(0), userId, staffId, urgency, testIds);
+            sendUpdatedLabOrderNotification(labOrder); // Send notification on update via create endpoint
+        }  else {
             // If no LabOrder exists, create a new one
-            LabOrder labOrder = new LabOrder();
+            labOrder = new LabOrder();
             User user = userRepository.findById(userId).orElse(null);
             Staff staffID = staffRepository.findById(staffId)
                     .orElseThrow(() -> new RuntimeException("Staff not found for ID: " + staffId));
@@ -80,15 +80,19 @@ public class LabOrderService {
             // Create LabResults
             createLabResults(labOrder, userId, staffId, appointment, testIds);
             sendNewLabOrderNotification(labOrder);
-            return labOrder;
+
         }
+        return labOrder;
     }
 
-    @Transactional
+
     public LabOrder updateLabOrder(int orderId, int appointmentId, int userId, String staffId, String urgency, List<Integer> testIds) {
+        System.out.println("updateLabOrder method called for orderId: " + orderId); // Add this
+
         LabOrder existingLabOrder = labOrderRepository.findById(orderId)
                 .orElseThrow(() -> new NoSuchElementException("Lab Order not found with ID: " + orderId));
         LabOrder updatedLabOrder = updateExistingLabOrder(existingLabOrder, userId, staffId, urgency, testIds);
+        System.out.println(updatedLabOrder);
         sendUpdatedLabOrderNotification(updatedLabOrder);
         return updatedLabOrder;
     }
@@ -113,8 +117,6 @@ public class LabOrderService {
 
         // Add new lab results based on the provided test IDs
         createLabResults(labOrder, userId, staffId, appointment, testIds);
-
-
         return labOrder;
     }
 
@@ -128,6 +130,8 @@ public class LabOrderService {
     }
 
     private void sendUpdatedLabOrderNotification(LabOrder labOrder) {
+        System.out.println("sendUpdatedLabOrderNotification method called for orderId: " + labOrder.getOrderID()); // Add this
+
         List<Staff> labTechnicians = staffRepository.findByRoleRoleID(3);
         String message = String.format("Lab order updated for patient %s (Order ID: %d, Appointment ID: %d).",
                 labOrder.getUserID().getName(), labOrder.getOrderID(), labOrder.getAppointmentID().getAppointmentID());
