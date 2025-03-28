@@ -114,14 +114,25 @@ public class RecordService {
 
             // Calculate the follow-up date based on the appointment date
             LocalDate appointmentDate = appointment.getAppDate(); // Get the actual appointment date
-            LocalDate followUpDate = appointmentDate.plusMonths(followUpMonths); // Add the follow-up months
+            LocalDate followUpDate = null; // Add the follow-up months
 
             // Update the appointment's follow-up date
-            appointmentService.editAppointment(appointmentID, doctorID, appointmentDate, appointment.getAppTime(), status); // Call editAppointment to update the appointment
-            appointment.setFollowUpDate(followUpDate); // Set the follow-up date
-            appointmentRepository.save(appointment);  // Save the updated appointment
+            if (followUpMonths != null) {
+                System.out.println(followUpMonths);
+                followUpDate = appointmentDate.plusMonths(followUpMonths);
+                System.out.println(followUpDate);
 
-            return "Diagnosis added successfully!";  // Return success message
+                // Update the appointment's follow-up date and send notifications
+                appointmentService.setFollowUpAppointment(appointmentID, followUpDate);
+            } else {
+                // If no followUpMonths are provided, ensure followUpDate is null in the appointment
+                appointment.setFollowUpDate(null);
+                appointmentRepository.save(appointment);
+            }
+            appointment.setStatus(status);
+            appointmentRepository.save(appointment);
+            return "Diagnosis added successfully!";
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,9 +166,10 @@ public class RecordService {
 
     public String updateDiagnosis(Integer recordId, Integer userID, String doctorID, String conditionName, String treatmentPlan, Integer appointmentID, Integer followUpMonths) {
         Optional<MedicalRecord> optionalRecord = medicalRecordsRepository.findById(recordId);
-        User user=userRepository.findById(userID).orElse(null);
-        Staff doctor= staffRepository.findById(doctorID).orElse(null);
+        User user = userRepository.findById(userID).orElse(null);
+        Staff doctor = staffRepository.findById(doctorID).orElse(null);
         Appointment appointment = appointmentRepository.findById(appointmentID).orElse(null);
+
         if (optionalRecord.isPresent()) {
             MedicalRecord record = optionalRecord.get();
 
@@ -168,11 +180,17 @@ public class RecordService {
             record.setTreatmentPlan(treatmentPlan);
             record.setAppointment(appointment);
 
-            LocalDate followUpDate = LocalDate.now().plusMonths(followUpMonths); // Add the follow-up months
+            LocalDate followUpDate = null;
 
-            appointment.setFollowUpDate(followUpDate);
-            appointmentRepository.save(appointment);
-
+            if (followUpMonths != null) {
+                followUpDate = appointment.getAppDate().plusMonths(followUpMonths);
+                // Update the appointment's follow-up date and send notifications
+                appointmentService.setFollowUpAppointment(appointmentID, followUpDate);
+            } else {
+                // If followUpMonths is null, ensure followUpDate is null in the appointment
+                appointment.setFollowUpDate(null);
+                appointmentRepository.save(appointment);
+            }
 
             medicalRecordsRepository.save(record);
             return "Diagnosis updated successfully!";

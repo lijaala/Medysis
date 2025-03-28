@@ -8,10 +8,12 @@ import Medysis.Project.Repository.AppointmentRepository;
 import Medysis.Project.Repository.StaffRepository;
 import Medysis.Project.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,6 +33,9 @@ public class AppointmentService {
     @Autowired
     private NotificationService notificationService;
 
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
+    private final ZoneId nepalTimeZone = ZoneId.of("Asia/Kathmandu");
 
     public Appointment bookAppointment(Integer patientID, String doctorID, LocalDate appDate, LocalTime appTime) {
         User patient = userRepository.findById(patientID)
@@ -48,8 +53,7 @@ public class AppointmentService {
         Appointment savedAppointment = appointmentRepository.save(appointment);
         // Create notification for the patient
 
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
+
         String patientNotificationMessage = String.format("Appointment for %s at %s with Dr. %s has been booked. Please arrive 5 minutes before the appointment time.",
                 savedAppointment.getAppDate().format(dateFormatter),
                 savedAppointment.getAppTime().format(timeFormatter),
@@ -64,11 +68,69 @@ public class AppointmentService {
         notificationService.createStaffNotifications(doctorID, doctorNotificationMessage, "appointment");
 
 
+
         // Save appointment to database
         return savedAppointment;
     }
+    public Appointment setFollowUpAppointment(Integer appointmentID, LocalDate followUpDate) {
+        Appointment appointment = appointmentRepository.findById(appointmentID)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
+        appointment.setFollowUpDate(followUpDate);
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
 
+        // Send immediate follow-up notification
+        sendFollowUpNotification(updatedAppointment);
+
+        sendFollowUpReminderNotification(updatedAppointment); // Schedule/send reminder
+
+        return updatedAppointment;
+    }
+    private void sendFollowUpNotification(Appointment appointment) {
+        User patient = userRepository.findById(appointment.getPatientID().getUserID())
+                .orElse(null);
+
+        if (patient != null && appointment.getFollowUpDate() != null) {
+            String formattedDate = appointment.getFollowUpDate().format(dateFormatter);
+            String message = String.format("A follow-up appointment has been scheduled for %s.", formattedDate);
+            notificationService.createUserNotifications(patient.getUserID(), message, "appointment_followup");
+        } else {
+            System.err.println("Could not send initial follow-up notification for Appointment ID: " + appointment.getAppointmentID() + ". Patient or follow-up date is missing.");
+        }
+    }
+
+    private void sendFollowUpReminderNotification(Appointment appointment) {
+        User patient = userRepository.findById(appointment.getPatientID().getUserID())
+                .orElse(null);
+
+        if (patient != null && appointment.getFollowUpDate() != null) {
+            LocalDate reminderDate = appointment.getFollowUpDate().minusWeeks(1);
+            LocalDate nowInNepal = LocalDate.now(nepalTimeZone); // Explicitly use Nepal Time Zone
+
+            if (reminderDate.isEqual(nowInNepal)) {
+                String formattedDate = appointment.getFollowUpDate().format(dateFormatter);
+                String message = String.format("Reminder: Your follow-up appointment is scheduled for %s next week.", formattedDate);
+                notificationService.createUserNotifications(patient.getUserID(), message, "appointment_followup_reminder");
+            }
+        } else {
+            System.err.println("Could not send follow-up reminder notification for Appointment ID: " + appointment.getAppointmentID() + ". Patient or follow-up date is missing.");
+        }
+    }
+
+    @Scheduled(cron = "0 45 8 * * *") // Run every day at 8:00 AM (server's time)
+    public void checkAndSendFollowUpReminders() {
+        LocalDate todayInNepal = LocalDate.now(nepalTimeZone); // Explicitly use Nepal Time Zone
+        LocalDate reminderDate = todayInNepal.plusWeeks(1);
+        System.out.println("Checking for follow-up reminders for " + reminderDate + " at " + java.time.LocalTime.now(nepalTimeZone) + " (Nepal Time)");
+
+        List<Appointment> appointmentsForReminder = appointmentRepository.findByFollowUpDate(reminderDate);
+
+        for (Appointment appointment : appointmentsForReminder) {
+            sendFollowUpReminderNotification(appointment);
+        }
+
+        System.out.println("Checked for follow-up reminders for " + reminderDate + " at " + java.time.LocalTime.now(nepalTimeZone) + " (Nepal Time)");
+    }
 
     public List<Appointment> getAppointmentsByRole(String userRole, String userId) {
 

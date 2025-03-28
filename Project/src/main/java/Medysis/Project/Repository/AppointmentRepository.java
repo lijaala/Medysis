@@ -47,4 +47,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     boolean existsByPatientIDAndDoctorIDAndAppDateAndAppTime(User patient, Staff doctor, LocalDate appDate, LocalTime appTime);
 
     List<Appointment> getAppointmentByPatientID(User patientID);
+
+    List<Appointment> findByFollowUpDate(LocalDate reminderDate);
 }
