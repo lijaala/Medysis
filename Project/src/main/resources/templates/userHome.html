@@ -29,40 +29,54 @@
                     <input class="px-2 search-bar" type="text" placeholder="Search...">
                 </div>
             </div>
-<script>function setPageTitle() {
-    const pageTitle = document.getElementById('page-title');
-    const path = window.location.pathname;
+<script>
+    function setPageTitleAndActiveNav() {
+        const pageTitle = document.getElementById('page-title');
+        const path = window.location.pathname;
+        const navLinks = document.querySelectorAll('.navFix .nav-link');
 
-    // Set different titles based on the URL path
-    if (path.includes('userHome')) {
-        pageTitle.textContent = 'HOME PAGE';
-    } else if (path.includes('appointment')) {
-        pageTitle.textContent = 'APPOINTMENTS';
-    } else if (path.includes('medical')) {
-        pageTitle.textContent = 'MEDICAL RECORDS';
-    }else if (path.includes('prescription')) {
-        pageTitle.textContent = 'PRESCRIPTION';
-    }else if (path.includes('lab')) {
-        pageTitle.textContent = 'LAB REPORTS';
-    } else if (path.includes('settings')) {
-        pageTitle.textContent = 'SETTINGS';
-    }else if (path.includes('notification')) {
-        pageTitle.textContent = 'NOTIFICATION';
-    } else {
-        pageTitle.textContent = 'WELCOME'; // Fallback title
+        // Remove active class from all links
+        navLinks.forEach(link => link.classList.remove('active'));
+
+        // Set different titles and highlight active link based on the URL path
+        if (path === '/userHome' || path === '/') { // Assuming '/' is also the home page
+            pageTitle.textContent = 'HOME PAGE';
+            navLinks[0].classList.add('active');
+        } else if (path.includes('appointment')) {
+            pageTitle.textContent = 'APPOINTMENTS';
+            // You might not have a direct nav link for appointments in this structure
+        } else if (path.includes('medical')) {
+            pageTitle.textContent = 'MEDICAL RECORDS';
+            // You might not have a direct nav link for medical records
+        } else if (path.includes('prescription')) {
+            pageTitle.textContent = 'PRESCRIPTION';
+            // You might not have a direct nav link for prescription
+        } else if (path.includes('lab')) {
+            pageTitle.textContent = 'LAB REPORTS';
+            // You might not have a direct nav link for lab reports
+        } else if (path.includes('settings')) {
+            pageTitle.textContent = 'SETTINGS';
+            navLinks[2].classList.add('active');
+        } else if (path.includes('notification')) {
+            pageTitle.textContent = 'NOTIFICATION';
+            navLinks[1].classList.add('active');
+        } else {
+            pageTitle.textContent = 'WELCOME'; // Fallback title
+            // No nav link will be active
+        }
     }
+
+    // Ensure the function runs on page load
+    document.addEventListener('DOMContentLoaded', setPageTitleAndActiveNav);
+
+    // If you have client-side routing (SPA) or dynamic content loading, you can listen for URL changes:
+    window.onpopstate = function() {
+        setPageTitleAndActiveNav();
+    };
+
+    function goBack() {
+        window.history.back();
     }
-
-        // Ensure the function runs on page load
-        document.addEventListener('DOMContentLoaded', setPageTitle);
-
-        // If you have client-side routing (SPA) or dynamic content loading, you can listen for URL changes:
-        window.onpopstate = function() {
-        setPageTitle();
-            };
-function goBack() {
-    window.history.back();
-}
         </script>
         </div>
 
@@ -114,27 +128,29 @@ function goBack() {
 
     </div>
         </div>
-            <div class="row mx-4  navFix" xmlns:th="http://www.thymeleaf.org" th:fragment="navBar" >
+            <div class="d-flex justify-content-evenly navFix" xmlns:th="http://www.thymeleaf.org" th:fragment="navBar" >
 
-                <div class="col" >
-                    <a href="/userHome" class="nav-link active">
+                <div >
+                    <a href="/userHome" class="nav-link ">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
                                 <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
                                 <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                             </g>
                         </svg>
                     </a>
                 </div>
-                <div class="col">
+                <div >
                     <a href="/notification" class="nav-link position-relative">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                                   d="M10.268 21a2 2 0 0 0 3.464 0m-10.47-5.674A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
                         </svg>
+                        <span id="unreadCount" class="unread-badge"></span>
+
                     </a>
                 </div>
-                <div class="col" >
+                <div >
                     <a href="/settings" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
@@ -144,11 +160,43 @@ function goBack() {
                             </g>
                         </svg>
                     </a>
+                    <script>
+                        function fetchUserNotifications() {
+                            fetch('/api/notification/user')
+                                .then(response => response.json())
+                                .then(notifications => {
+                                    displayNotifications(notifications);
+                                })
+                                .catch(error => console.error('Error fetching notifications:', error));
+                        }
+
+                        function updateUnreadCount() {
+                            fetch('/api/notification/user/unread/count')
+                                .then(response => response.json())
+                                .then(count => {
+                                    const unreadCountElement = document.getElementById('unreadCount');
+                                    if (unreadCountElement) {
+                                        unreadCountElement.textContent = count > 0 ? `${count}` : '';
+                                    }
+                                })
+                                .catch(error => console.error('Error fetching unread count:', error));
+                        }
+
+
+                        document.addEventListener('DOMContentLoaded', function() {
+                            fetchUserNotifications();
+                            updateUnreadCount(); // Initial load of unread count
+
+                            const markAllReadBtn = document.getElementById('markAllReadBtn');
+                            if (markAllReadBtn) {
+                                markAllReadBtn.addEventListener('click', markAllAsRead);
+                                updateUnreadCount(); // Update after marking all as read
+                            }
+                        });
+                    </script>
                 </div>
-
-
-
             </div>
+
         </div>
 
 

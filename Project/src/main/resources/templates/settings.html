@@ -40,7 +40,7 @@
 <div class="container">
     <div class="row">
         <div class="myHeader p-2" th:include="userHome::header"></div>
-        <div class="row mainScreen">
+        <div class="d-flex justify-content-evenly mainScreen">
             <div class="col-sm-12  my-5">
                 <ul class="nav flex-column settingBar px-4">
                     <li class="nav-item py-4">
@@ -186,9 +186,10 @@
                 <p>Are you sure you want to delete your account? This action cannot be undone.</p>
             </div>
 
-            <div class="row mx-2 mb-1 navFix" th:include="userHome::navBar" >
-            </div>
+
         </div>
+            <div class="d-flex justify-content-evenly navFix" th:include="userHome::navBar" >
+            </div>
         </div>
 
 

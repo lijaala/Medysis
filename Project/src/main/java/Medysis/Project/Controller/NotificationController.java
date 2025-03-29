@@ -79,7 +79,7 @@ public class NotificationController {
         String staffId = (String) session.getAttribute("userId");
         String userRole = (String) session.getAttribute("userRole");
 
-        if (staffId != null && userRole != null && (userRole.equalsIgnoreCase("doctor") || userRole.equalsIgnoreCase("lab_technician"))) {
+        if (staffId != null && userRole != null && (userRole.equalsIgnoreCase("ROLE_DOCTOR") || userRole.equalsIgnoreCase("ROLE_LAB TECHNICIAN"))) {
             List<Notifications> notifications = notificationService.getNotificationsForStaffUser(staffId, userRole);
             return ResponseEntity.ok(notifications);
         }
@@ -91,7 +91,7 @@ public class NotificationController {
         String staffId = (String) session.getAttribute("userId");
         String userRole = (String) session.getAttribute("userRole");
 
-        if (staffId != null && userRole != null && (userRole.equalsIgnoreCase("doctor") || userRole.equalsIgnoreCase("lab_technician"))) {
+        if (staffId != null && userRole != null && (userRole.equalsIgnoreCase("ROLE_DOCTOR") || userRole.equalsIgnoreCase("ROLE_LAB TECHNICIAN"))) {
             long count = notificationService.getUnreadNotificationsCountForStaffUser(staffId, userRole);
             return ResponseEntity.ok(count);
         }
@@ -109,7 +109,7 @@ public class NotificationController {
         String staffId = (String) session.getAttribute("userId");
         String userRole = (String) session.getAttribute("userRole");
 
-        if (staffId != null && userRole != null && (userRole.equalsIgnoreCase("doctor") || userRole.equalsIgnoreCase("lab_technician"))) {
+        if (staffId != null && userRole != null && (userRole.equalsIgnoreCase("ROLE_DOCTOR") || userRole.equalsIgnoreCase("ROLE_LAB TECHNICIAN"))) {
             notificationService.markAllNotificationsAsReadForStaff(staffId);
             return ResponseEntity.ok("All notifications marked as read");
         }

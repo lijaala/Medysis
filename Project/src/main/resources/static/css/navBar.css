@@ -27,7 +27,7 @@
 }
 
 .nav-link.active {
-    svg path{
+    svg path, circle{
         stroke:rgb(255, 10, 124);;
     }
     background-color: rgba(255, 219, 237, 0.92);
@@ -45,13 +45,24 @@
 }
 
 .badge {
-    position: absolute;
-    top: 5px;
-    right: 15px;
     font-size: 0.75rem;
+    color:rgba(103, 43, 71, 0.81);
+}
+.view{
+    color:rgb(255, 10, 124);
+    text-decoration: underline;
 }
 svg path{
     stroke:#07104e;
 }
-
+.unread-badge {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    background-color: #07104e;
+    color:white;
+    border-radius: 50%;
+    padding: 3px 8px;
+    font-size: 0.7em;
+}
 

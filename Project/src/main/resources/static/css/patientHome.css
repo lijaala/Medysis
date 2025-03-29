@@ -239,3 +239,7 @@ button{
 .back{
     font-size: 1.5rem;
 }
+.unread{
+    background-color: #f5f9ff;
+    color: rgba(103, 43, 71, 0.81) ;
+}

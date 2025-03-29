@@ -44,7 +44,7 @@
 .notification {
     display: flex;
     flex-direction: row;
-    gap: 2vw;
+    gap: 4vw;
     align-items: center;
 
 }
@@ -62,5 +62,101 @@
     border-radius: 50%;
     object-fit: cover;
     filter: brightness(.75);
+
+}
+.notification-area {
+    position: relative;
+    display: inline-block;
+    margin-left: 20px;
+}
+svg{
+    path,g{
+        stroke: rgba(103, 43, 71, 0.81) ;
+    }
+}
+.notification-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+}
+
+
+
+.notification-panel {
+    position: absolute;
+    top: 50px; /* Adjust as needed */
+    right: -5vw;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 400px; /* Adjust width as needed */
+    max-height: 400px; /* Adjust max height as needed */
+    overflow-y: auto;
+    z-index: 1000; /* Ensure it's on top */
+    display: none; /* Initially hidden */
+    border-radius: 10px;
+}
+
+.notification-panel.open {
+    display: block;
+}
+
+.notification-panel h2 {
+    padding: 15px;
+    margin: 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1.2em;
+}
+
+.notification-panel .list-group {
+    margin-bottom: 0;
+}
+
+.notification-panel .list-group-item {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 2px rgba(103, 43, 71, 0.81);
+    margin:5%;
+    color:#07104E;
+}
+
+.notification-panel .list-group-item strong {
+    font-size: 1em;
+}
+
+.notification-panel .list-group-item small {
+    color: #777;
+    font-size: 0.8em;
+}
+
+
+
+.notification-panel button#markAllStaffReadBtnHeader {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border-top: 1px solid #eee;
+    border-radius: 0;
+    margin-top: 10px;
+}
+.unread{
+    background-color: #f5f9ff;
+    color: rgba(103, 43, 71, 0.81) ;
+
+}
+.notification-badge {
+    position: absolute;
+    top: -14px;
+    right: -15px;
+    background-color: rgba(255, 219, 237, 0.72);
+    color: rgb(255, 10, 124);
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 0.8em;
 
 }

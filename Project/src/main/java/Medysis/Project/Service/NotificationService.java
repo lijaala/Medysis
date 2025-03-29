@@ -53,9 +53,9 @@ public class NotificationService {
     public List<Notifications> getNotificationsForStaffUser(String staffId, String role) {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-            if (role.equalsIgnoreCase("doctor")) {
+            if (role.equalsIgnoreCase("ROLE_DOCTOR")) {
                 return notificationRepository.findByStaffIdOrderByCreatedAtDesc(staff);
-            } else if (role.equalsIgnoreCase("lab_technician")) {
+            } else if (role.equalsIgnoreCase("ROLE_LAB TECHNICIAN")) {
                 return notificationRepository.findByType("lab_order");
             }
         }
@@ -74,9 +74,9 @@ public class NotificationService {
     public long getUnreadNotificationsCountForStaffUser(String staffId, String role) {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-            if (role.equalsIgnoreCase("doctor")) {
+            if (role.equalsIgnoreCase("ROLE_DOCTOR")) {
                 return notificationRepository.countByStaffIdAndStatus(staff, "unread");
-            } else if (role.equalsIgnoreCase("lab_technician")) {
+            } else if (role.equalsIgnoreCase("ROLE_LAB TECHNICIAN")) {
                 return notificationRepository.findByType("lab_order").stream()
                         .filter(notification -> notification.getStatus().equalsIgnoreCase("unread"))
                         .count();
