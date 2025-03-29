@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/navBar.css"/>
+    <link rel="stylesheet" href="css/patientHome.css"/>
+    <style>
+        .list-group-item{
+            background-color: #f5f9ff ;
+            color:#07104e ;
+            border-radius: 8px !important;
+
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="myHeader p-2" th:include="userHome::header"></div>
+        <div class="row mainScreen">
+            <div class="col-md-12 mt-4 mb-5 ">
+                <button id="markAllReadBtn" class="btn btn-sm btn-outline-secondary mb-2">Mark All as Read</button>
+
+
+                <ul id="notificationList" class="list-group">
+                    <li class="list-group-item" th:if="${#lists.isEmpty(notifications)}">No notifications yet.</li>
+                </ul>
+            </div>
+
+
+        </div>
+        <div class="row mx-4 navFix" th:include="userHome::navBar" >
+
+        </div>
+    </div>
+</div>
+<script>
+
+    function fetchUserNotifications() {
+        fetch('/api/notification/user')
+            .then(response => response.json())
+            .then(notifications => {
+                displayNotifications(notifications);
+            })
+            .catch(error => console.error('Error fetching notifications:', error));
+    }
+
+    function displayNotifications(notifications) {
+        const notificationList = document.getElementById('notificationList');
+        notificationList.innerHTML = ''; // Clear existing list
+
+        if (notifications && notifications.length > 0) {
+            notifications.forEach(notification => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item','my-2');
+
+                let displayType = '';
+                switch (notification.type) {
+                    case 'appointment':
+                        displayType = 'Appointment';
+                        break;
+                    case 'appointment_followup':
+                        displayType = 'Appointment Follow Up';
+                        break;
+                    case 'appointment_followup_reminder':
+                        displayType = 'Follow Up Reminder';
+                        break;
+                    case 'lab_result':
+                        displayType = 'Lab Result';
+                        break;
+                    case 'prescription':
+                        displayType = 'Prescription';
+                        break;
+                    case 'account':
+                        displayType = 'Account Update';
+                        break;
+                    default:
+                        displayType = notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Fallback
+                }
+
+                listItem.innerHTML = `
+                    <p> ${notification.message}
+                    </p>
+                    <small class="text-muted">${formatDateTime(notification.createdAt)}</small>
+                    ${notification.status === 'unread' ?
+                    `<button class="btn btn-sm btn-outline-secondary float-end mark-read-btn" data-notification-id="${notification.id}">Mark as Read</button>` :
+                    '<span class="badge bg-secondary float-end">Read</span>'
+                }
+                `;
+                notificationList.appendChild(listItem);
+            });
+
+            // Add event listeners to the "Mark as Read" buttons (only for unread)
+            const markReadButtons = document.querySelectorAll('.mark-read-btn');
+            markReadButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const notificationId = this.getAttribute('data-notification-id');
+                    markNotificationAsRead(notificationId);
+                });
+            });
+        } else {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item');
+            listItem.textContent = 'No notifications yet.';
+            notificationList.appendChild(listItem);
+        }
+    }
+    function markNotificationAsRead(notificationId) {
+        fetch(`/api/notification/markAsRead/${notificationId}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log(`Notification ${notificationId} marked as read`);
+                    fetchUserNotifications(); // Reload notifications after marking as read
+                    updateUnreadCount(); // Update the unread count in the navbar
+                } else {
+                    console.error('Failed to mark as read');
+                }
+            })
+            .catch(error => console.error('Error marking as read:', error));
+    }
+
+    function markAllAsRead() {
+        fetch('/api/notification/markAllAsRead', {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log('All notifications marked as read');
+                    fetchUserNotifications(); // Reload notifications
+                    updateUnreadCount(); // Update unread count in navbar
+                } else {
+                    console.error('Failed to mark all as read');
+                }
+            })
+            .catch(error => console.error('Error marking all as read:', error));
+    }
+
+    function formatDateTime(dateTimeString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+        return new Date(dateTimeString).toLocaleDateString(undefined, options);
+    }
+
+    // Function to update the unread notification count in the navbar (assuming you have an element with id 'unreadCount')
+    function updateUnreadCount() {
+        fetch('/api/notification/user/unread/count')
+            .then(response => response.json())
+            .then(count => {
+                const unreadCountElement = document.getElementById('unreadCount');
+                if (unreadCountElement) {
+                    unreadCountElement.textContent = count > 0 ? `(${count})` : '';
+                }
+            })
+            .catch(error => console.error('Error fetching unread count:', error));
+    }
+
+    // Call fetchUserNotifications when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchUserNotifications();
+        updateUnreadCount(); // Initial load of unread count
+
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', markAllAsRead);
+        }
+    });
+</script>
+</body>
+</html>

@@ -37,15 +37,17 @@
     if (path.includes('userHome')) {
         pageTitle.textContent = 'HOME PAGE';
     } else if (path.includes('appointment')) {
-        pageTitle.textContent = 'Appointments';
+        pageTitle.textContent = 'APPOINTMENTS';
     } else if (path.includes('medical')) {
-        pageTitle.textContent = 'Medical Records';
+        pageTitle.textContent = 'MEDICAL RECORDS';
     }else if (path.includes('prescription')) {
-        pageTitle.textContent = 'Prescription';
+        pageTitle.textContent = 'PRESCRIPTION';
     }else if (path.includes('lab')) {
-        pageTitle.textContent = 'Lab Reports';
+        pageTitle.textContent = 'LAB REPORTS';
     } else if (path.includes('settings')) {
         pageTitle.textContent = 'SETTINGS';
+    }else if (path.includes('notification')) {
+        pageTitle.textContent = 'NOTIFICATION';
     } else {
         pageTitle.textContent = 'WELCOME'; // Fallback title
     }
@@ -125,7 +127,7 @@ function goBack() {
                     </a>
                 </div>
                 <div class="col">
-                    <a href="notifications.html" class="nav-link position-relative">
+                    <a href="/notification" class="nav-link position-relative">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                                   d="M10.268 21a2 2 0 0 0 3.464 0m-10.47-5.674A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />

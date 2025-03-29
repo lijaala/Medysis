@@ -53,6 +53,10 @@ public class HomeController {
     public String settings() {
         return "settings";
     }
+    @GetMapping("/notification")
+    public String notification() {
+        return "notification";
+    }
 
 }
 

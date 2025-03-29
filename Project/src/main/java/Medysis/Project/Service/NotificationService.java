@@ -1,7 +1,11 @@
 package Medysis.Project.Service;
 
 import Medysis.Project.Model.Notifications;
+import Medysis.Project.Model.Staff;
+import Medysis.Project.Model.User;
 import Medysis.Project.Repository.NotificationRepository;
+import Medysis.Project.Repository.StaffRepository;
+import Medysis.Project.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,57 +15,103 @@ import java.util.List;
 public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private StaffRepository staffRepository;
 
     // Methods to create notifications
     public void createUserNotifications(Integer userId, String message, String type) {
-        Notifications notification = new Notifications(userId, message, type);
-        notificationRepository.save(notification);
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            Notifications notification = new Notifications(user, message, type);
+            notificationRepository.save(notification);
+        } else {
+            System.err.println("Could not create notification for User ID: " + userId + " - User not found.");
+        }
     }
 
     public void createStaffNotifications(String staffId, String message, String type) {
-        Notifications notification = new Notifications(staffId, message, type);
-        notificationRepository.save(notification);
+        Staff staff = staffRepository.findById(staffId).orElse(null);
+        if (staff != null) {
+            Notifications notification = new Notifications(staff, message, type);
+            notificationRepository.save(notification);
+        } else {
+            System.err.println("Could not create notification for Staff ID: " + staffId + " - Staff not found.");
+        }
     }
 
     // Methods to get notifications
     public List<Notifications> getNotificationsForUser(Integer userId) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            return notificationRepository.findByUserIdOrderByCreatedAtDesc(user);
+        }
+        return List.of();
     }
 
-    public List<Notifications> getNotificationsForStaff(String staffId) {
-        return notificationRepository.findByStaffIdOrderByCreatedAtDesc(staffId);
+    public List<Notifications> getNotificationsForStaffUser(String staffId, String role) {
+        Staff staff = staffRepository.findById(staffId).orElse(null);
+        if (staff != null) {
+            if (role.equalsIgnoreCase("doctor")) {
+                return notificationRepository.findByStaffIdOrderByCreatedAtDesc(staff);
+            } else if (role.equalsIgnoreCase("lab_technician")) {
+                return notificationRepository.findByType("lab_order");
+            }
+        }
+        return List.of();
     }
 
     // Methods to get unread notification count
     public long getUnreadNotificationsCountForUser(Integer userId) {
-        return notificationRepository.countByUserIdAndStatus(userId, "unread");
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            return notificationRepository.countByUserIdAndStatus(user, "unread");
+        }
+        return 0;
     }
 
-    public long getUnreadNotificationsCountForStaff(String staffId) {
-        return notificationRepository.countByStaffIdAndStatus(staffId, "unread");
+    public long getUnreadNotificationsCountForStaffUser(String staffId, String role) {
+        Staff staff = staffRepository.findById(staffId).orElse(null);
+        if (staff != null) {
+            if (role.equalsIgnoreCase("doctor")) {
+                return notificationRepository.countByStaffIdAndStatus(staff, "unread");
+            } else if (role.equalsIgnoreCase("lab_technician")) {
+                return notificationRepository.findByType("lab_order").stream()
+                        .filter(notification -> notification.getStatus().equalsIgnoreCase("unread"))
+                        .count();
+            }
+        }
+        return 0;
     }
 
     // Methods to mark notifications as read
-    public void markNotificationsAsRead(Integer notificationId) {
+    public void markNotificationsAsRead(Long notificationId) {
         Notifications notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notifications not found with ID: " + notificationId));
         notification.setStatus("read");
         notificationRepository.save(notification);
     }
 
-    public void markAllNotificationssAsReadForUser(Integer userId) {
-        List<Notifications> unreadNotificationss = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .filter(notification -> notification.getStatus().equals("unread"))
-                .toList();
-        unreadNotificationss.forEach(notification -> notification.setStatus("read"));
-        notificationRepository.saveAll(unreadNotificationss);
+    public void markAllNotificationsAsReadForUser(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            List<Notifications> unreadNotifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(user).stream()
+                    .filter(notification -> notification.getStatus().equals("unread"))
+                    .toList();
+            unreadNotifications.forEach(notification -> notification.setStatus("read"));
+            notificationRepository.saveAll(unreadNotifications);
+        }
     }
 
-    public void markAllNotificationssAsReadForStaff(String staffId) {
-        List<Notifications> unreadNotificationss = notificationRepository.findByStaffIdOrderByCreatedAtDesc(staffId).stream()
-                .filter(notification -> notification.getStatus().equals("unread"))
-                .toList();
-        unreadNotificationss.forEach(notification -> notification.setStatus("read"));
-        notificationRepository.saveAll(unreadNotificationss);
+    public void markAllNotificationsAsReadForStaff(String staffId) {
+        Staff staff = staffRepository.findById(staffId).orElse(null);
+        if (staff != null) {
+            List<Notifications> unreadNotifications = notificationRepository.findByStaffIdOrderByCreatedAtDesc(staff).stream()
+                    .filter(notification -> notification.getStatus().equals("unread"))
+                    .toList();
+            unreadNotifications.forEach(notification -> notification.setStatus("read"));
+            notificationRepository.saveAll(unreadNotifications);
+        }
     }
 }

@@ -10,11 +10,13 @@ public class Notifications {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Integer userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "userID")
+    private User userId;
 
-    @Column(name = "staff_id")
-    private String staffId;
+    @ManyToOne
+    @JoinColumn(name = "staff_id",referencedColumnName = "staffID")
+    private Staff staffId;
 
     private String message;
 
@@ -24,22 +26,24 @@ public class Notifications {
 
     private String status = "unread"; // "unread", "read"
 
+
     // Constructors
     public Notifications() {
+        this.createdAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Kathmandu")); // Set Nepal time on creation
     }
 
-    public Notifications(Integer userId, String message, String type) {
-        this.userId = userId;
+    public Notifications(User user, String message, String type) {
+        this.userId = user;
         this.message = message;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Kathmandu"));
     }
 
-    public Notifications(String staffId, String message, String type) {
-        this.staffId = staffId;
+    public Notifications(Staff staff, String message, String type) {
+        this.staffId = staff;
         this.message = message;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(java.time.ZoneId.of("Asia/Kathmandu"));
     }
 
     // Getters and Setters
@@ -51,21 +55,7 @@ public class Notifications {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(String staffId) {
-        this.staffId = staffId;
-    }
 
     public String getMessage() {
         return message;
@@ -95,7 +85,35 @@ public class Notifications {
         return status;
     }
 
+    public User getUserId() {
+        return userId;
+    }
+
+    public void setUserId(User userId) {
+        this.userId = userId;
+    }
+
+    public Staff getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Staff staffId) {
+        this.staffId = staffId;
+    }
+
     public void setStatus(String status) {
         this.status = status;
+    }
+    @Override
+    public String toString() {
+        return "Notifications{" +
+                "id=" + id +
+                ", userId=" + (userId != null ? userId.getUserID() : null) +
+                ", staffId='" + (staffId != null ? staffId.getStaffID() : null) + '\'' +
+                ", message='" + message + '\'' +
+                ", createdAt=" + createdAt +
+                ", type='" + type + '\'' +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

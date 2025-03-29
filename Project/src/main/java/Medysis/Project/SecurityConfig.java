@@ -48,9 +48,9 @@ public class SecurityConfig {
                         .requestMatchers("/home","api/admin/**","api/dashboard/admin","/api/user/update/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("api/LabOrder/orderRequest","api/LabOrder/labResults","api/LabOrder/appointment/**" ,"api/labTests/availableTests").hasAnyAuthority("ROLE_DOCTOR","ROLE_LAB TECHNICIAN")
                         .requestMatchers("/home","api/dashboard/doctor","api/medicalRecords/saveDiagnosis","/api/prescriptions/**","api/staff", "api/medicalRecords/getByAppointmentId/**").hasAuthority("ROLE_DOCTOR")
-                        .requestMatchers("api/medicalRecords/getByUserId","api/medicalRecords/updateStatus","/api/prescriptions/getByUserId","/api/prescriptions/getByAppointmentID").hasAnyAuthority("ROLE_DOCTOR", "ROLE_PATIENTS")
+                        .requestMatchers("api/medicalRecords/getByUserId","api/medicalRecords/updateStatus","/api/prescriptions/getByUserId","/api/prescriptions/getByAppointmentID","/api/notification/").hasAnyAuthority("ROLE_DOCTOR", "ROLE_PATIENTS")
                         .requestMatchers("/home","api/dashboard/lab-tech", "api/LabOrder/**","api/labTests/**").hasAuthority("ROLE_LAB TECHNICIAN")
-                        .requestMatchers("api/user/reset-password","api/medicalRecords/history","/userHome","/addPastmedical","/appointment","/settings").hasAuthority("ROLE_PATIENTS")
+                        .requestMatchers("api/user/reset-password","api/medicalRecords/history","/userHome","/addPastmedical","/appointment","/settings","/notification").hasAuthority("ROLE_PATIENTS")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
