@@ -9,9 +9,9 @@
 
     <div class="search-Header">
         <input type="text" id="search" placeholder="Search.."/>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
             <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
-                <circle cx="11" cy="11" r="8" />
+                <circle cx="11" cy="11" r="7" />
                 <path d="m21 21l-4.3-4.3" />
             </g>
         </svg>
@@ -26,10 +26,11 @@
         </button>
         <div id="notificationPanel" class="notification-panel">
             <h2>Notifications</h2>
+            <button id="markAllStaffReadBtnHeader" class="primary mt-2 ">Mark All as Read</button>
+
             <ul id="staffNotificationListHeader" class="list-group">
                 <li class="list-group-item">Loading notifications...</li>
             </ul>
-            <button id="markAllStaffReadBtnHeader" class="btn btn-sm btn-outline-secondary mt-2">Mark All as Read</button>
         </div>
     </div>
         <div class="loggedProfile">
@@ -124,7 +125,7 @@
                     <br>
                     <small class="text-muted">${formatDateTime(notification.createdAt)}</small>
                     ${notification.status === 'unread' ?
-                    `<button class="btn btn-sm btn-outline-secondary float-end staff-mark-read-btn-header" data-notification-id="${notification.id}">Mark as Read</button>` :
+                    `<button class=" secondary float-end staff-mark-read-btn-header" data-notification-id="${notification.id}">Mark as Read</button>` :
                     '<span class="badge bg-secondary float-end">Read</span>'
                 }
                 `;

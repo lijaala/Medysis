@@ -6,6 +6,7 @@ import Medysis.Project.Model.User;
 import Medysis.Project.Repository.NotificationRepository;
 import Medysis.Project.Repository.StaffRepository;
 import Medysis.Project.Repository.UserRepository;
+import Medysis.Project.WebSocket.NotificationWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,12 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
     @Autowired
-    private UserRepository userRepository;
+    private  UserRepository userRepository;
     @Autowired
     private StaffRepository staffRepository;
+    @Autowired
+    private NotificationWebSocketHandler notificationWebSocketHandler; // Autowire the WebSocket handler
+
 
     // Methods to create notifications
     public void createUserNotifications(Integer userId, String message, String type) {
@@ -26,6 +30,8 @@ public class NotificationService {
         if (user != null) {
             Notifications notification = new Notifications(user, message, type);
             notificationRepository.save(notification);
+            notificationWebSocketHandler.sendNotificationToPatient(userId, notification); // Send real-time update
+
         } else {
             System.err.println("Could not create notification for User ID: " + userId + " - User not found.");
         }
@@ -36,6 +42,8 @@ public class NotificationService {
         if (staff != null) {
             Notifications notification = new Notifications(staff, message, type);
             notificationRepository.save(notification);
+            notificationWebSocketHandler.sendNotificationToStaff(staffId, notification); // Send real-time update
+
         } else {
             System.err.println("Could not create notification for Staff ID: " + staffId + " - Staff not found.");
         }

@@ -163,7 +163,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token or password reset failed.");
         }
     }
+    @GetMapping("/session")
+    public ResponseEntity<Map<String, Object>> getSessionAttributes(HttpSession session) {
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("userId", session.getAttribute("userId"));
+        attributes.put("userRole", session.getAttribute("userRole"));
+        // Add other session attributes you need
 
+        return ResponseEntity.ok(attributes);
+    }
 
 }
 

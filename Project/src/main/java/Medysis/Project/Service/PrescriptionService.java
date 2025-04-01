@@ -44,7 +44,7 @@ public class PrescriptionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found for ID: " + userId));
 
-        // 2. Handle Medications (Crucial: Save Medications FIRST)
+        // 2. Handle Medications
         List<Medication> medicationsToSave = new ArrayList<>();
         for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
             String medicationName = prescribedMedication.getMedication().getMedicationName();
@@ -86,7 +86,7 @@ public class PrescriptionService {
         for (PrescribedMedications prescribedMedication : prescription.getPrescribedMedications()) {
             prescribedMedication.setPrescription(savedPrescription); // Link to the saved prescription
 
-            // Validation (same as before)
+            // Validation
             String medicationName = prescribedMedication.getMedication().getMedicationName();
             if (prescribedMedication.getDosage() == null || prescribedMedication.getDosage().isEmpty()) {
                 throw new IllegalArgumentException("Dosage is required for medication: " + medicationName);

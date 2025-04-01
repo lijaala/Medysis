@@ -20,7 +20,7 @@
         <div class="myHeader p-2" th:include="userHome::header"></div>
         <div class="d-flex flex-column mainScreen">
             <div class="col-md-12 mt-4 mb-5 ">
-                <button id="markAllReadBtn" class="btn btn-sm btn-outline-secondary mb-2">Mark All as Read</button>
+                <button id="markAllReadBtn" class="primary mb-2">Mark All as Read</button>
 
 
                 <ul id="notificationList" class="list-group">
@@ -36,7 +36,127 @@
         </div>
     </div>
 </div>
-<script>
+<script th:inline="javascript"  >
+    let websocket;
+    let userId;
+    let userRole;
+
+    function fetchSessionData() {
+        fetch('/api/auth/session')
+            .then(response => response.json())
+            .then(data => {
+                userId = data.userId;
+                userRole = data.userRole;
+                connectWebSocket(); // Connect WebSocket after fetching session data
+            })
+            .catch(error => console.error('Error fetching session data:', error));
+    }
+
+    function connectWebSocket() {
+        if (userId) {
+            let wsUrl = `ws://localhost:8081/ws/notifications?`;
+            if (userRole === 'ROLE_PATIENT') {
+                wsUrl += `userId=${userId}`;
+            } else if (userRole.startsWith('ROLE_')) { // Assuming other roles are staff
+                wsUrl += `staffId=${userId}`; // You are storing staffId as userId in session
+            }
+            websocket = new WebSocket(wsUrl);
+
+            websocket.onopen = function() {
+                console.log('WebSocket connection established.');
+            };
+
+            websocket.onmessage = function(event) {
+                const notification = JSON.parse(event.data);
+                console.log('Received real-time notification:', notification);
+                displayNewRealTimeNotification(notification);
+                updateUnreadCount(); // Assuming this function is defined elsewhere (e.g., header)
+            };
+
+            websocket.onclose = function() {
+                console.log('WebSocket connection closed.');
+                setTimeout(connectWebSocket, 5000); // Attempt reconnect
+            };
+
+            websocket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+        }
+    }
+
+    function displayNewRealTimeNotification(notification) {
+        const notificationList = document.getElementById('notificationList');
+        if (notificationList) {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item', 'my-2', 'notification-item', 'd-flex', 'flex-column', 'align-items-start', 'unread');
+
+            let displayType = '';
+            let linkUrl = null;
+            let actionElement = '';
+
+            switch (notification.type) {
+                case 'appointment':
+                    displayType = 'Appointment';
+                    linkUrl = '/appointment';
+                    break;
+                case 'appointment_followup':
+                    displayType = 'Appointment Follow Up';
+                    linkUrl = '/appointment';
+                    break;
+                case 'appointment_followup_reminder':
+                    displayType = 'Follow Up Reminder';
+                    linkUrl = '/appointment';
+                    break;
+                case 'lab_result':
+                    displayType = 'Lab Result';
+                    linkUrl = '/labView';
+                    break;
+                case 'prescription':
+                    displayType = 'Prescription';
+                    linkUrl = '/prescription';
+                    break;
+                case 'account':
+                    displayType = 'Account Update';
+                    linkUrl = '/settings';
+                    break;
+                default:
+                    displayType = notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            listItem.innerHTML = `
+                <p class="mb-1"> ${notification.message}
+                </p>
+                <small class="text-muted mb-1">${formatDateTime(notification.createdAt)}</small>
+            `;
+
+            if (notification.status === 'unread' && linkUrl === null) {
+                actionElement = `<button class="btn btn-sm btn-outline-secondary mark-read-btn mt-1" data-notification-id="${notification.id}">Mark as Read</button>`;
+            } else if (notification.status === 'unread' && linkUrl !== null) {
+                actionElement = `<span class="badge view align-items-END">View</span>`;
+                listItem.style.cursor = 'pointer';
+                listItem.addEventListener('click', function() {
+                    markNotificationAsRead(notification.id, linkUrl);
+                });
+            } else {
+                actionElement = '<p class="badge text-muted">Read</p>';
+            }
+
+            listItem.innerHTML += actionElement;
+            notificationList.prepend(listItem); // Add new notifications at the top
+            // Re-attach event listener for dynamically added "Mark as Read" button
+            if (notification.status === 'unread' && linkUrl === null) {
+                const markReadButton = listItem.querySelector('.mark-read-btn');
+                if (markReadButton) {
+                    markReadButton.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        const notificationId = this.getAttribute('data-notification-id');
+                        markNotificationAsRead(notificationId);
+                    });
+                }
+            }
+        }
+    }
+
     function displayNotifications(notifications) {
         const notificationList = document.getElementById('notificationList');
         notificationList.innerHTML = ''; // Clear existing list
@@ -44,10 +164,10 @@
         if (notifications && notifications.length > 0) {
             notifications.forEach(notification => {
                 const listItem = document.createElement('li');
-                listItem.classList.add('list-group-item', 'my-2', 'notification-item', 'd-flex', 'flex-column', 'align-items-start'); // Added flex layout classes
+                listItem.classList.add('list-group-item', 'my-2', 'notification-item', 'd-flex', 'flex-column', 'align-items-start');
 
                 if (notification.status === 'unread') {
-                    listItem.classList.add('unread'); // Add the 'unread' class
+                    listItem.classList.add('unread');
                 }
                 let displayType = '';
                 let linkUrl = null;
@@ -56,30 +176,30 @@
                 switch (notification.type) {
                     case 'appointment':
                         displayType = 'Appointment';
-                        linkUrl = '/appointment'; // Replace with your actual appointment page URL
+                        linkUrl = '/appointment';
                         break;
                     case 'appointment_followup':
                         displayType = 'Appointment Follow Up';
-                        linkUrl = '/appointment'; // Or a specific follow-up page
+                        linkUrl = '/appointment';
                         break;
                     case 'appointment_followup_reminder':
                         displayType = 'Follow Up Reminder';
-                        linkUrl = '/appointment'; // Or a reminders page
+                        linkUrl = '/appointment';
                         break;
                     case 'lab_result':
                         displayType = 'Lab Result';
-                        linkUrl = '/labView'; // Replace with your actual lab results page URL
+                        linkUrl = '/labView';
                         break;
                     case 'prescription':
                         displayType = 'Prescription';
-                        linkUrl = '/prescription'; // Replace with your actual prescription page URL
+                        linkUrl = '/prescription';
                         break;
                     case 'account':
                         displayType = 'Account Update';
-                        linkUrl = '/settings'; // Or a specific account settings page
+                        linkUrl = '/settings';
                         break;
                     default:
-                        displayType = notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Fallback
+                        displayType = notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                 }
 
                 listItem.innerHTML = `
@@ -91,13 +211,13 @@
                 if (notification.status === 'unread' && linkUrl === null) {
                     actionElement = `<button class="btn btn-sm btn-outline-secondary mark-read-btn mt-1" data-notification-id="${notification.id}">Mark as Read</button>`;
                 } else if (notification.status === 'unread' && linkUrl !== null) {
-                    actionElement = `<span class="badge view align-items-start">View</span>`;
-                    listItem.style.cursor = 'pointer'; // Indicate it's clickable
+                    actionElement = `<span class="badge view align-items-END">View</span>`;
+                    listItem.style.cursor = 'pointer';
                     listItem.addEventListener('click', function() {
-                        markNotificationAsRead(notification.id, linkUrl); // Pass the URL
+                        markNotificationAsRead(notification.id, linkUrl);
                     });
                 } else {
-                    actionElement = '<p class="badge">Read</p>';
+                    actionElement = '<p class="badge text-muted">Read</p>';
                 }
 
                 listItem.innerHTML += actionElement;
@@ -107,7 +227,7 @@
                     const markReadButton = listItem.querySelector('.mark-read-btn');
                     if (markReadButton) {
                         markReadButton.addEventListener('click', function(event) {
-                            event.stopPropagation(); // Prevent listItem click if it had one
+                            event.stopPropagation();
                             const notificationId = this.getAttribute('data-notification-id');
                             markNotificationAsRead(notificationId);
                         });
@@ -129,11 +249,11 @@
             .then(response => {
                 if (response.ok) {
                     console.log(`Notification ${notificationId} marked as read`);
-                    updateUnreadCount(); // Update the unread count in the navbar
+                    updateUnreadCount();
                     if (redirectUrl) {
-                        window.location.href = redirectUrl; // Redirect to the specific page
+                        window.location.href = redirectUrl;
                     } else {
-                        fetchUserNotifications(); // Reload notifications if no redirect
+                        fetchUserNotifications();
                     }
                 } else {
                     console.error('Failed to mark as read');
@@ -149,8 +269,8 @@
             .then(response => {
                 if (response.ok) {
                     console.log('All notifications marked as read');
-                    fetchUserNotifications(); // Reload notifications
-                    updateUnreadCount(); // Update unread count in navbar
+                    fetchUserNotifications();
+                    updateUnreadCount();
                 } else {
                     console.error('Failed to mark all as read');
                 }
@@ -162,6 +282,25 @@
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
         return new Date(dateTimeString).toLocaleDateString(undefined, options);
     }
+
+    function fetchUserNotifications() {
+        fetch('/api/notification/user')
+            .then(response => response.json())
+            .then(notifications => {
+                displayNotifications(notifications);
+            })
+            .catch(error => console.error('Error fetching notifications:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchUserNotifications(); // Load initial notifications
+        fetchSessionData(); // Fetch session data and then connect WebSocket
+
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', markAllAsRead);
+        }
+    });
 
 </script>
 </body>

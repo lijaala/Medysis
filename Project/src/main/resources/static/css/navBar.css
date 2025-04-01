@@ -45,8 +45,10 @@
 }
 
 .badge {
+    width: 100%;
+    text-align: right;
     font-size: 0.75rem;
-    color:rgba(103, 43, 71, 0.81);
+    font-weight: 600;
 }
 .view{
     color:rgb(255, 10, 124);

@@ -1,4 +1,4 @@
-package Medysis.Project;
+package Medysis.Project.Config;
 
 import Medysis.Project.Service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;

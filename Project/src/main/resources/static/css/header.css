@@ -26,7 +26,7 @@
 .search-Header input {
     width: 100%;
     padding: 4px 12px;
-    height:50px;
+    height: 30px;
     border-radius: 20px;
     outline: none;
     border: none;
@@ -37,8 +37,8 @@
 
 .search-Header svg{
     position: absolute;
-    right: 4px;
-    top: 25%;
+    right: 1vw;
+    top: 15%;
 }
 
 .notification {
@@ -82,8 +82,6 @@ svg{
     position: relative;
 }
 
-
-
 .notification-panel {
     position: absolute;
     top: 50px; /* Adjust as needed */
@@ -101,6 +99,7 @@ svg{
 
 .notification-panel.open {
     display: block;
+    justify-items: center;
 }
 
 .notification-panel h2 {
@@ -138,11 +137,13 @@ svg{
 
 .notification-panel button#markAllStaffReadBtnHeader {
     display: block;
-    width: 100%;
+    width: 90%;
+    align-self: center;
     padding: 10px;
     border-top: 1px solid #eee;
-    border-radius: 0;
+
     margin-top: 10px;
+
 }
 .unread{
     background-color: #f5f9ff;
@@ -151,12 +152,18 @@ svg{
 }
 .notification-badge {
     position: absolute;
-    top: -14px;
-    right: -15px;
-    background-color: rgba(255, 219, 237, 0.72);
-    color: rgb(255, 10, 124);
+    top: -7px;
+    right: -7px;
+    background-color: #07104E;
+    color: white;
+align-content: center;
+
     border-radius: 50%;
-    padding: 5px;
+    width: 15px;
+    height: 15px;
     font-size: 0.8em;
 
+}
+.float-end{
+    text-align: right;
 }

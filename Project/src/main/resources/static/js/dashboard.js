@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 doctorCalendarData = Object.entries(data.appointmentsPerDay).map(([date, appointments]) => [date, appointments, 0]);
             }
 
+
             // Correctly call the doctor's render function
             if (doctorCalendarData.length > 0) {
                 renderDoctorCalendar(  // Call the correct function
@@ -284,7 +285,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (i === 0 && j < startDay) {
                         // Empty cells
                     } else if (dayCounter > daysInMonth) {
-                        // Empty cells
+
                     } else {
                         const date = new Date(year, month, dayCounter);
                         const dateStr = date.toISOString().slice(0, 10);
