@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         userRole = await roleResponse.text();
         console.log("User Role:", userRole);
 
-        fetchAppointments(userRole);
+        await fetchAppointments(userRole);
         populateDoctorDropdownForAdd(); // Ensure doctor dropdown is populated for adding
 
     } catch (error) {

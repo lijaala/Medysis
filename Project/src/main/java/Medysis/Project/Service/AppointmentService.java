@@ -10,6 +10,8 @@ import Medysis.Project.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
 
     @Autowired
     private AppointmentRepository appointmentRepository;
@@ -52,8 +56,6 @@ public class AppointmentService {
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
         // Create notification for the patient
-
-
         String patientNotificationMessage = String.format("Appointment for %s at %s with Dr. %s has been booked. Please arrive 5 minutes before the appointment time.",
                 savedAppointment.getAppDate().format(dateFormatter),
                 savedAppointment.getAppTime().format(timeFormatter),
@@ -65,11 +67,8 @@ public class AppointmentService {
                 patient.getName(),
                 savedAppointment.getAppDate().format(dateFormatter),
                 savedAppointment.getAppTime().format(timeFormatter));
-        notificationService.createStaffNotifications(doctorID, doctorNotificationMessage, "appointment");
-
-
-
-        // Save appointment to database
+        notificationService.createStaffNotifications(doctorID, doctorNotificationMessage, "appointment_booked"); // Specific type
+        logger.info("Appointment booked for patient {} with doctor {}", patientID, doctorID);
         return savedAppointment;
     }
     public Appointment setFollowUpAppointment(Integer appointmentID, LocalDate followUpDate) {
@@ -83,7 +82,7 @@ public class AppointmentService {
         sendFollowUpNotification(updatedAppointment);
 
         sendFollowUpReminderNotification(updatedAppointment); // Schedule/send reminder
-
+        logger.info("Follow-up set for appointment {}", appointmentID);
         return updatedAppointment;
     }
     private void sendFollowUpNotification(Appointment appointment) {
@@ -94,8 +93,9 @@ public class AppointmentService {
             String formattedDate = appointment.getFollowUpDate().format(dateFormatter);
             String message = String.format("A follow-up appointment has been scheduled for %s.", formattedDate);
             notificationService.createUserNotifications(patient.getUserID(), message, "appointment_followup");
+            logger.info("Follow-up notification sent to patient {}", patient.getUserID());
         } else {
-            System.err.println("Could not send initial follow-up notification for Appointment ID: " + appointment.getAppointmentID() + ". Patient or follow-up date is missing.");
+            logger.error("Could not send initial follow-up notification for Appointment ID: {}. Patient or follow-up date is missing.", appointment.getAppointmentID());
         }
     }
 
@@ -111,9 +111,10 @@ public class AppointmentService {
                 String formattedDate = appointment.getFollowUpDate().format(dateFormatter);
                 String message = String.format("Reminder: Your follow-up appointment is scheduled for %s next week.", formattedDate);
                 notificationService.createUserNotifications(patient.getUserID(), message, "appointment_followup_reminder");
+                logger.info("Follow-up reminder sent to patient {}", patient.getUserID());
             }
         } else {
-            System.err.println("Could not send follow-up reminder notification for Appointment ID: " + appointment.getAppointmentID() + ". Patient or follow-up date is missing.");
+            logger.error("Could not send follow-up reminder notification for Appointment ID: {}. Patient or follow-up date is missing.", appointment.getAppointmentID());
         }
     }
 
@@ -121,7 +122,7 @@ public class AppointmentService {
     public void checkAndSendFollowUpReminders() {
         LocalDate todayInNepal = LocalDate.now(nepalTimeZone); // Explicitly use Nepal Time Zone
         LocalDate reminderDate = todayInNepal.plusWeeks(1);
-        System.out.println("Checking for follow-up reminders for " + reminderDate + " at " + java.time.LocalTime.now(nepalTimeZone) + " (Nepal Time)");
+        logger.info("Checking for follow-up reminders for {} at {} (Nepal Time)", reminderDate, java.time.LocalTime.now(nepalTimeZone));
 
         List<Appointment> appointmentsForReminder = appointmentRepository.findByFollowUpDate(reminderDate);
 
@@ -129,7 +130,7 @@ public class AppointmentService {
             sendFollowUpReminderNotification(appointment);
         }
 
-        System.out.println("Checked for follow-up reminders for " + reminderDate + " at " + java.time.LocalTime.now(nepalTimeZone) + " (Nepal Time)");
+        logger.info("Checked for follow-up reminders for {} at {} (Nepal Time)", reminderDate, java.time.LocalTime.now(nepalTimeZone));
     }
 
     public List<Appointment> getAppointmentsByRole(String userRole, String userId) {
@@ -199,53 +200,51 @@ public class AppointmentService {
                     doctor.getStaffName(),
                     originalDate.format(dateFormatter));
             notificationService.createUserNotifications(patient.getUserID(), patientNotificationMessage, "appointment");
-
             String doctorNotificationMessage = String.format("Appointment for patient %s on %s has been cancelled.",
                     patient.getName(),
                     originalDate.format(dateFormatter));
-            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, "appointment");
+            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, "appointment_cancelled"); // Specific type
+            logger.info("Appointment {} cancelled by {}", appointmentID, updatedBy);
 
-        } else if (dateChanged && timeChanged) {
-            String patientNotificationMessage = String.format("Your appointment on %s has been rescheduled to %s at %s.",
-                    originalDate.format(dateFormatter),
-                    updatedAppointment.getAppDate().format(dateFormatter),
-                    updatedAppointment.getAppTime().format(timeFormatter));
+        } else if (dateChanged || timeChanged) {
+            String patientNotificationMessage;
+            String doctorNotificationMessage;
+            String type = "appointment_rescheduled";
+
+            if (dateChanged && timeChanged) {
+                patientNotificationMessage = String.format("Your appointment on %s has been rescheduled to %s at %s.",
+                        originalDate.format(dateFormatter),
+                        updatedAppointment.getAppDate().format(dateFormatter),
+                        updatedAppointment.getAppTime().format(timeFormatter));
+                doctorNotificationMessage = String.format("Appointment for patient %s on %s has been rescheduled to %s at %s.",
+                        patient.getName(),
+                        originalDate.format(dateFormatter),
+                        updatedAppointment.getAppDate().format(dateFormatter),
+                        updatedAppointment.getAppTime().format(timeFormatter));
+            } else if (dateChanged) {
+                patientNotificationMessage = String.format("Your appointment on %s has been rescheduled to %s for %s.",
+                        originalDate.format(dateFormatter),
+                        updatedAppointment.getAppDate().format(dateFormatter),
+                        originalTime.format(timeFormatter));
+                doctorNotificationMessage = String.format("Appointment for patient %s on %s has been rescheduled to %s for %s.",
+                        patient.getName(),
+                        originalDate.format(dateFormatter),
+                        updatedAppointment.getAppDate().format(dateFormatter),
+                        originalTime.format(timeFormatter));
+            } else { // timeChanged
+                patientNotificationMessage = String.format("Your appointment on %s has been rescheduled from %s to %s.",
+                        originalDate.format(dateFormatter),
+                        originalTime.format(timeFormatter),
+                        updatedAppointment.getAppTime().format(timeFormatter));
+                doctorNotificationMessage = String.format("Appointment for patient %s on %s has been rescheduled from %s to %s.",
+                        patient.getName(),
+                        originalDate.format(dateFormatter),
+                        originalTime.format(timeFormatter),
+                        updatedAppointment.getAppTime().format(timeFormatter));
+            }
             notificationService.createUserNotifications(patient.getUserID(), patientNotificationMessage, "appointment");
-
-            String doctorNotificationMessage = String.format("Appointment for patient %s on %s has been rescheduled to %s at %s.",
-                    patient.getName(),
-                    originalDate.format(dateFormatter),
-                    updatedAppointment.getAppDate().format(dateFormatter),
-                    updatedAppointment.getAppTime().format(timeFormatter));
-            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, "appointment");
-
-        } else if (dateChanged) {
-            String patientNotificationMessage = String.format("Your appointment on %s has been rescheduled to %s for %s.",
-                    originalDate.format(dateFormatter),
-                    updatedAppointment.getAppDate().format(dateFormatter),
-                    originalTime.format(timeFormatter));
-            notificationService.createUserNotifications(patient.getUserID(), patientNotificationMessage, "appointment");
-
-            String doctorNotificationMessage = String.format("Appointment for patient %s on %s has been rescheduled to %s for %s.",
-                    patient.getName(),
-                    originalDate.format(dateFormatter),
-                    updatedAppointment.getAppDate().format(dateFormatter),
-                    originalTime.format(timeFormatter));
-            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, "appointment");
-
-        } else if (timeChanged) {
-            String patientNotificationMessage = String.format("Your appointment on %s has been rescheduled from %s to %s.",
-                    originalDate.format(dateFormatter),
-                    originalTime.format(timeFormatter),
-                    updatedAppointment.getAppTime().format(timeFormatter));
-            notificationService.createUserNotifications(patient.getUserID(), patientNotificationMessage, "appointment");
-
-            String doctorNotificationMessage = String.format("Appointment for patient %s on %s has been rescheduled from %s to %s.",
-                    patient.getName(),
-                    originalDate.format(dateFormatter),
-                    originalTime.format(timeFormatter),
-                    updatedAppointment.getAppTime().format(timeFormatter));
-            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, "appointment");
+            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, type);
+            logger.info("Appointment {} rescheduled by {}", appointmentID, updatedBy);
         }
 
         return updatedAppointment;
@@ -265,6 +264,7 @@ public class AppointmentService {
 
         appointment.setStatus("Completed"); // Update the status
         appointmentRepository.save(appointment); // Save the changes
+        logger.info("Appointment {} completed by staff {}", appointmentID, staffId);
     }
 
     public boolean appointmentExists(Integer patientID, String doctorID, LocalDate appDate, LocalTime appTime) {
@@ -277,9 +277,9 @@ public class AppointmentService {
 
 
 
-     public List<Appointment> getAllAppointments(){
+    public List<Appointment> getAllAppointments(){
         return appointmentRepository.findAll();
-     }
+    }
 
     public List<Appointment> getAppointmentsByDoctorAndDate(String doctorID, LocalDate date) {
         // Fetch the Staff entity from the repository
@@ -325,7 +325,8 @@ public class AppointmentService {
                     patient.getName(),
                     appDate.format(dateFormatter),
                     appTime.format(timeFormatter));
-            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, "appointment");
+            notificationService.createStaffNotifications(doctor.getStaffID(), doctorNotificationMessage, "appointment_cancelled"); // Specific type
+            logger.info("Appointment {} cancelled by {}", appointmentID, userID);
         } else {
             throw new RuntimeException("Appointment not found");
         }

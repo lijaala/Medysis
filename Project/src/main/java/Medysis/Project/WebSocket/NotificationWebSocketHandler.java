@@ -1,6 +1,7 @@
 package Medysis.Project.WebSocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import Medysis.Project.Model.Notifications;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,10 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -20,8 +24,12 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(NotificationWebSocketHandler.class);
     private final Map<Integer, WebSocketSession> patientSessions = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> staffSessions = new ConcurrentHashMap<>(); // Map for staff sessions
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final String instanceId = UUID.randomUUID().toString(); // Add this
 
+    public NotificationWebSocketHandler() {
+        logger.info("NotificationWebSocketHandler instance created: {}", instanceId); // Log creation
+    }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String uri = session.getUri().toString();
@@ -31,9 +39,17 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
         if (userId != null) {
             patientSessions.put(userId, session);
             logger.info("WebSocket connection established for patient ID: {}", userId);
+            logger.debug("Current patientSessions: {}", patientSessions.keySet());
+            logger.debug("Patient URI: {}", uri); // Log the full URI for patient
+            logger.debug("Extracted userId: {}", userId); // Log the extracted userId
+            logger.debug("Current patientSessions keys: {}", patientSessions.keySet()); // Log the keys in patientSessions
         } else if (staffId != null) {
             staffSessions.put(staffId, session);
             logger.info("WebSocket connection established for staff ID: {}", staffId);
+            logger.debug("Current staffSessions: {}", staffSessions.keySet());
+            logger.debug("Staff URI: {}", uri); // Log the full URI for staff
+            logger.debug("Extracted staffId: {}", staffId); // Log the extracted staffId
+            logger.debug("Current staffSessions keys: {}", staffSessions.keySet()); // Log the keys in staffSessions
         }
     }
 
@@ -45,9 +61,11 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
         if (userId != null) {
             patientSessions.remove(userId);
             logger.info("WebSocket connection closed for patient ID: {}", userId);
+            logger.debug("Current patientSessions after removal: {}", patientSessions.keySet()); // TROUBLESHOOTING
         } else if (staffId != null) {
             staffSessions.remove(staffId);
             logger.info("WebSocket connection closed for staff ID: {}", staffId);
+            logger.debug("Current staffSessions after removal: {}", staffSessions.keySet()); // TROUBLESHOOTING
         }
     }
 
@@ -86,7 +104,12 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
         try {
             int index = uri.indexOf("staffId=");
             if (index > -1) {
-                return uri.substring(index + "staffId=".length());
+                String staffIdEncoded = uri.substring(index + "staffId=".length());
+                int endIndex = staffIdEncoded.indexOf('&');
+                if (endIndex > -1) {
+                    staffIdEncoded = staffIdEncoded.substring(0, endIndex);
+                }
+                return URLDecoder.decode(staffIdEncoded, StandardCharsets.UTF_8); // Decode here
             }
         } catch (StringIndexOutOfBoundsException e) {
             logger.warn("staffId parameter not found in WebSocket URI: {}", uri);
@@ -96,6 +119,7 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
 
     public void sendNotificationToPatient(Integer userId, Notifications notification) {
         WebSocketSession session = patientSessions.get(userId);
+        logger.debug("Attempting to send to patient ID: {}, Session found: {}, Session open: {}", userId, (session != null), (session != null && session.isOpen())); // TROUBLESHOOTING
         if (session != null && session.isOpen()) {
             try {
                 String jsonNotification = objectMapper.writeValueAsString(notification);
@@ -104,11 +128,14 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
             } catch (IOException e) {
                 logger.error("Error sending WebSocket message to patient ID {}: {}", userId, e.getMessage());
             }
+        } else {
+            logger.warn("No open WebSocket session found for patient ID: {}", userId);
         }
     }
 
     public void sendNotificationToStaff(String staffId, Notifications notification) {
         WebSocketSession session = staffSessions.get(staffId);
+        logger.debug("Attempting to send to staff ID: {} on instance: {}, Session found: {}, Session open: {}", staffId, instanceId, (session != null), (session != null && session.isOpen()));
         if (session != null && session.isOpen()) {
             try {
                 String jsonNotification = objectMapper.writeValueAsString(notification);
@@ -117,6 +144,8 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
             } catch (IOException e) {
                 logger.error("Error sending WebSocket message to staff ID {}: {}", staffId, e.getMessage());
             }
+        } else {
+            logger.warn("No open WebSocket session found for staff ID: {}", staffId);
         }
     }
 }

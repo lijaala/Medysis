@@ -43,157 +43,232 @@
 
 </section>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
 
+    <script>
+        let websocket;
+        let userId;
+        let userRole;
 
-        fetch("/api/staff/current")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Staff not logged in");
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Fetched Data:", data);
-
-                document.getElementById("staffName").textContent = data.name || "Guest Staff";
-
-                if (data.profilePicture) {
-                    document.getElementById("profilePic").src = data.profilePicture;
-                    document.getElementById("profilePic").style.display = "block";
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching session data:", error);
-                document.getElementById("staffName").textContent = "Guest Staff";
-            });
-        const notificationToggle = document.getElementById('notificationToggle');
-        const notificationPanel = document.getElementById('notificationPanel');
-
-        notificationToggle.addEventListener('click', () => {
-            notificationPanel.classList.toggle('open');
-            if (notificationPanel.classList.contains('open')) {
-                fetchStaffNotificationsHeader();
-            }
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!notificationPanel.contains(event.target) && !notificationToggle.contains(event.target)) {
-                notificationPanel.classList.remove('open');
-            }
-        });
-
-        updateStaffUnreadCountHeader(); // Initial load of unread count
-        const markAllReadBtnHeader = document.getElementById('markAllStaffReadBtnHeader');
-        if (markAllReadBtnHeader) {
-            markAllReadBtnHeader.addEventListener('click', markAllStaffAsReadHeader);
+        function fetchSessionData() {
+            fetch('/api/auth/session')
+                .then(response => response.json())
+                .then(data => {
+                    userId = data.userId;
+                    userRole = data.userRole;
+                    console.log('Header: Fetched session data - userId:', userId, 'userRole:', userRole); // TROUBLESHOOTING
+                    connectWebSocket(); // Connect WebSocket after fetching session data
+                })
+                .catch(error => console.error('Header: Error fetching session data:', error));
         }
 
-    });
-    function fetchStaffNotificationsHeader() {
-        fetch('/api/notification/staff')
-            .then(response => response.json())
-            .then(notifications => {
-                console.log("Notification Fetched",notifications);
-                displayStaffNotificationsHeader(notifications);
-            })
-            .catch(error => console.error('Error fetching staff notifications:', error));
-    }
+        function connectWebSocket() {
+            if (userId) {
+                let wsUrl = `ws://localhost:8081/ws/notifications?`;
+                if (userRole === 'ROLE_PATIENT') {
+                    wsUrl += `userId=${encodeURIComponent(userId)}`;
+                } else if (userRole.startsWith('ROLE_')) { // Assuming other roles are staff
+                    wsUrl += `staffId=${encodeURIComponent(userId)}`; // Encode the staffId HERE
+                }
+                console.log('Header: Attempting WebSocket connection to:', wsUrl); // TROUBLESHOOTING
+                try {
+                    websocket = new WebSocket(wsUrl);
+                } catch (error) {
+                    console.error('Header: Error creating WebSocket:', error);
+                }
 
-    function displayStaffNotificationsHeader(notifications) {
-        const notificationList = document.getElementById('staffNotificationListHeader');
-        notificationList.innerHTML = '';
+                websocket.onopen = function () {
+                    console.log('Header: WebSocket connection established.');
+                    console.log('Header: WebSocket onopen - userId:', userId, 'userRole:', userRole); // TROUBLESHOOTING
+                    updateStaffUnreadCountHeader(); // Update unread count in header on open
+                };
 
-        if (notifications && notifications.length > 0) {
-            notifications.forEach(notification => {
+                websocket.onmessage = function (event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('Header: Received WebSocket message:', data);
+                        displayNewRealTimeNotification(data); // Using your original method name
+                    } catch (error) {
+                        console.error('Header: Error processing WebSocket message:', error);
+                    }
+                };
+
+                websocket.onclose = function (event) {
+                    console.log('Header: WebSocket connection closed.');
+                    console.log('Header: WebSocket onclose - code:', event.code, 'reason:', event.reason); // TROUBLESHOOTING
+                    setTimeout(connectWebSocket, 5000); // Attempt reconnect
+                };
+
+                websocket.onerror = function (error) {
+                    console.error('Header: WebSocket error:', error);
+                };
+            }
+        }
+        function fetchStaffNotificationsHeader() {
+            fetch('/api/notification/staff')
+                .then(response => response.json())
+                .then(notifications => {
+                    console.log("Notification Fetched",notifications);
+                    displayStaffNotificationsHeader(notifications);
+                })
+                .catch(error => console.error('Error fetching staff notifications:', error));
+        }
+
+        function displayNewRealTimeNotification(notification) {
+            const staffNotificationListHeader = document.getElementById('staffNotificationListHeader');
+            if (staffNotificationListHeader) {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item', 'my-1', 'notification-item-header');
+                if (notification.status === 'unread') {
+                    listItem.classList.add('unread');
+                }
+                listItem.innerHTML = `<p class="mb-0">${notification.message}</p><small class="text-muted">${formatDateTime(notification.createdAt)}</small>`;
+                staffNotificationListHeader.prepend(listItem);
+                updateStaffUnreadCountHeader();
+            }
+        }
+
+        function displayStaffNotificationsHeader(notifications) {
+            const notificationList = document.getElementById('staffNotificationListHeader');
+            notificationList.innerHTML = '';
+
+            if (notifications && notifications.length > 0) {
+                notifications.forEach(notification => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('list-group-item');
+                    if (notification.status === 'unread') {
+                        listItem.classList.add('unread'); // Add the 'unread' class
+                    }
+                    let displayType = '';
+                    switch (notification.type) {
+                        case 'lab_order':
+                            displayType = 'Lab Order';
+                            break;
+                        default:
+                            displayType = notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    }
+                    listItem.innerHTML = `
+                        <strong>${displayType}:</strong> ${notification.message}
+                        <br>
+                        <small class="text-muted">${formatDateTime(notification.createdAt)}</small>
+                        ${notification.status === 'unread' ?
+                        `<button class=" secondary float-end staff-mark-read-btn-header" data-notification-id="${notification.id}">Mark as Read</button>` :
+                        '<span class="badge bg-secondary float-end">Read</span>'
+                    }
+                    `;
+                    notificationList.appendChild(listItem);
+                });
+
+                const markReadButtons = document.querySelectorAll('.staff-mark-read-btn-header');
+                markReadButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const notificationId = this.getAttribute('data-notification-id');
+                        markStaffNotificationAsReadHeader(notificationId);
+                    });
+                });
+            } else {
                 const listItem = document.createElement('li');
                 listItem.classList.add('list-group-item');
-                if (notification.status === 'unread') {
-                    listItem.classList.add('unread'); // Add the 'unread' class
-                }
-                let displayType = '';
-                switch (notification.type) {
-                    case 'lab_order':
-                        displayType = 'Lab Order';
-                        break;
-                    default:
-                        displayType = notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                }
-                listItem.innerHTML = `
-                    <strong>${displayType}:</strong> ${notification.message}
-                    <br>
-                    <small class="text-muted">${formatDateTime(notification.createdAt)}</small>
-                    ${notification.status === 'unread' ?
-                    `<button class=" secondary float-end staff-mark-read-btn-header" data-notification-id="${notification.id}">Mark as Read</button>` :
-                    '<span class="badge bg-secondary float-end">Read</span>'
-                }
-                `;
+                listItem.textContent = 'No new notifications.';
                 notificationList.appendChild(listItem);
-            });
-
-            const markReadButtons = document.querySelectorAll('.staff-mark-read-btn-header');
-            markReadButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const notificationId = this.getAttribute('data-notification-id');
-                    markStaffNotificationAsReadHeader(notificationId);
-                });
-            });
-        } else {
-            const listItem = document.createElement('li');
-            listItem.classList.add('list-group-item');
-            listItem.textContent = 'No new notifications.';
-            notificationList.appendChild(listItem);
+            }
         }
-    }
 
-    function markStaffNotificationAsReadHeader(notificationId) {
-        fetch(`/api/notification/staff/markAsRead/${notificationId}`, {
-            method: 'POST'
-        })
-            .then(response => {
-                if (response.ok) {
-                    console.log(`Staff Notification ${notificationId} marked as read`);
-                    fetchStaffNotificationsHeader();
-                    updateStaffUnreadCountHeader();
-                } else {
-                    console.error('Failed to mark staff notification as read');
+        function markStaffNotificationAsReadHeader(notificationId) {
+            fetch(`/api/notification/staff/markAsRead/${notificationId}`, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`Staff Notification ${notificationId} marked as read`);
+                        fetchStaffNotificationsHeader();
+                        updateStaffUnreadCountHeader();
+                    } else {
+                        console.error('Failed to mark staff notification as read');
+                    }
+                })
+                .catch(error => console.error('Error marking staff notification as read:', error));
+        }
+
+        function markAllStaffAsReadHeader() {
+            fetch('/api/notification/staff/markAllAsRead', {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('All staff notifications marked as read');
+                        fetchStaffNotificationsHeader();
+                        updateStaffUnreadCountHeader();
+                    } else {
+                        console.error('Failed to mark all staff notifications as read');
+                    }
+                })
+                .catch(error => console.error('Error marking all staff notifications as read:', error));
+        }
+
+        function updateStaffUnreadCountHeader() {
+            fetch('/api/notification/staff/unread/count')
+                .then(response => response.json())
+                .then(count => {
+                    const badge = document.getElementById('notificationBadge');
+                    badge.textContent = count > 0 ? count : '';
+                    badge.style.display = count > 0 ? 'inline-block' : 'none';
+                })
+                .catch(error => console.error('Error fetching staff unread count:', error));
+        }
+
+        function formatDateTime(dateTimeString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+            return new Date(dateTimeString).toLocaleDateString(undefined, options);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Fetch staff profile information
+            fetch("/api/staff/current")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Staff not logged in");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Fetched Staff Data:", data);
+                    document.getElementById("staffName").textContent = data.name || "Guest Staff";
+                    if (data.profilePicture) {
+                        document.getElementById("profilePic").src = data.profilePicture;
+                        document.getElementById("profilePic").style.display = "block";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching staff data:", error);
+                    document.getElementById("staffName").textContent = "Guest Staff";
+                });
+
+            fetchSessionData(); // Fetch session data and then connect WebSocket
+
+            const notificationToggle = document.getElementById('notificationToggle');
+            const notificationPanel = document.getElementById('notificationPanel');
+
+            notificationToggle.addEventListener('click', () => {
+                notificationPanel.classList.toggle('open');
+                if (notificationPanel.classList.contains('open')) {
+                    fetchStaffNotificationsHeader(); // Fetch notifications when panel opens
                 }
-            })
-            .catch(error => console.error('Error marking staff notification as read:', error));
-    }
+            });
 
-    function markAllStaffAsReadHeader() {
-        fetch('/api/notification/staff/markAllAsRead', {
-            method: 'POST'
-        })
-            .then(response => {
-                if (response.ok) {
-                    console.log('All staff notifications marked as read');
-                    fetchStaffNotificationsHeader();
-                    updateStaffUnreadCountHeader();
-                } else {
-                    console.error('Failed to mark all staff notifications as read');
+            document.addEventListener('click', (event) => {
+                if (!notificationPanel.contains(event.target) && !notificationToggle.contains(event.target)) {
+                    notificationPanel.classList.remove('open');
                 }
-            })
-            .catch(error => console.error('Error marking all staff notifications as read:', error));
-    }
+            });
 
-    function updateStaffUnreadCountHeader() {
-        fetch('/api/notification/staff/unread/count')
-            .then(response => response.json())
-            .then(count => {
-                const badge = document.getElementById('notificationBadge');
-                badge.textContent = count > 0 ? count : '';
-                badge.style.display = count > 0 ? 'inline-block' : 'none';
-            })
-            .catch(error => console.error('Error fetching staff unread count:', error));
-    }
+            updateStaffUnreadCountHeader(); // Initial load of unread count
+            const markAllReadBtnHeader = document.getElementById('markAllStaffReadBtnHeader');
+            if (markAllReadBtnHeader) {
+                markAllReadBtnHeader.addEventListener('click', markAllStaffAsReadHeader);
+            }
+        });
+    </script>
 
-    function formatDateTime(dateTimeString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
-        return new Date(dateTimeString).toLocaleDateString(undefined, options);
-    }
 
-</script>
+
 </header>

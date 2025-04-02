@@ -9,11 +9,16 @@ import Medysis.Project.Repository.UserRepository;
 import Medysis.Project.WebSocket.NotificationWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Service
 public class NotificationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+
     @Autowired
     private NotificationRepository notificationRepository;
     @Autowired
@@ -30,10 +35,10 @@ public class NotificationService {
         if (user != null) {
             Notifications notification = new Notifications(user, message, type);
             notificationRepository.save(notification);
+            logger.info("Attempting to send notification to patient ID: {}, Type: {}", userId, type);
             notificationWebSocketHandler.sendNotificationToPatient(userId, notification); // Send real-time update
-
         } else {
-            System.err.println("Could not create notification for User ID: " + userId + " - User not found.");
+            logger.error("Could not create notification for User ID: {} - User not found.", userId);
         }
     }
 
@@ -41,11 +46,11 @@ public class NotificationService {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
             Notifications notification = new Notifications(staff, message, type);
-            notificationRepository.save(notification);
+            notificationRepository.save(notification); // Save first
+            logger.info("Attempting to send notification to staff ID: {}, Type: {}", staffId, type);
             notificationWebSocketHandler.sendNotificationToStaff(staffId, notification); // Send real-time update
-
         } else {
-            System.err.println("Could not create notification for Staff ID: " + staffId + " - Staff not found.");
+            logger.error("Could not create notification for Staff ID: {} - Staff not found.", staffId);
         }
     }
 
