@@ -46,8 +46,8 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
         } else if (staffId != null) {
             staffSessions.put(staffId, session);
             logger.info("WebSocket connection established for staff ID: {}", staffId);
-            logger.debug("Current staffSessions: {}", staffSessions.keySet());
-            logger.debug("Staff URI: {}", uri); // Log the full URI for staff
+            logger.debug("Current Sessions: {}", staffSessions.keySet());
+            logger.debug("URI: {}", uri); // Log the full URI for staff
             logger.debug("Extracted staffId: {}", staffId); // Log the extracted staffId
             logger.debug("Current staffSessions keys: {}", staffSessions.keySet()); // Log the keys in staffSessions
         }

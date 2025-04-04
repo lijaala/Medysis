@@ -36,72 +36,7 @@
         </div>
     </div>
 </div>
-<script th:inline="javascript"  >
-
-    let websocket;
-    let userId;
-    let userRole;
-    document.addEventListener('DOMContentLoaded', function() {
-        fetchUserNotifications(); // Load initial notifications
-        fetchSessionData(); // Fetch session data and then connect WebSocket
-
-        const markAllReadBtn = document.getElementById('markAllReadBtn');
-        if (markAllReadBtn) {
-            markAllReadBtn.addEventListener('click', markAllAsRead);
-        }
-    });
-
-    function fetchSessionData() {
-        fetch('/api/auth/session')
-            .then(response => response.json())
-            .then(data => {
-                userId = data.userId;
-                userRole = data.userRole;
-                connectWebSocket(); // Connect WebSocket after fetching session data
-            })
-            .catch(error => console.error('Error fetching session data:', error));
-    }
-
-    function connectWebSocket() {
-        if (userId) {
-            let wsUrl = `ws://localhost:8081/ws/notifications?`;
-            if (userRole === 'ROLE_PATIENT') {
-                wsUrl += `userId=${userId}`;
-            } else if (userRole.startsWith('ROLE_')) { // Assuming other roles are staff
-                wsUrl += `staffId=${userId}`; // You are storing staffId as userId in session
-            }
-            websocket = new WebSocket(wsUrl);
-
-            websocket.onopen = function() {
-                console.log('WebSocket connection established.');
-            };
-
-            websocket.onmessage = function (event) {
-                try {
-                    const data = JSON.parse(event.data);
-                    console.log('Received WebSocket message:', data);
-
-                    // Assuming the WebSocket message itself contains the notification object
-                    if (data) {
-                        displayNewRealTimeNotification(data); // Display the new notification
-                        updateUnreadCount(); // Update the unread count on any new notification
-                    }
-                } catch (error) {
-                    console.error('Error processing WebSocket message:', error);
-                }
-            };
-
-            websocket.onclose = function() {
-                console.log('WebSocket connection closed.');
-                setTimeout(connectWebSocket, 5000); // Attempt reconnect
-            };
-
-            websocket.onerror = function(error) {
-                console.error('WebSocket error:', error);
-            };
-        }
-    }
-
+<script>
     function displayNewRealTimeNotification(notification) {
         const notificationList = document.getElementById('notificationList');
         if (notificationList) {
@@ -300,18 +235,6 @@
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
         return new Date(dateTimeString).toLocaleDateString(undefined, options);
     }
-
-    function fetchUserNotifications() {
-        fetch('/api/notification/user')
-            .then(response => response.json())
-            .then(notifications => {
-                displayNotifications(notifications);
-            })
-            .catch(error => console.error('Error fetching notifications:', error));
-    }
-
-
-
 </script>
 </body>
 </html>
