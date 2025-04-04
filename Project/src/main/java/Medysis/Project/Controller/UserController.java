@@ -35,6 +35,8 @@ public class UserController {
             @RequestParam(required = false) Integer age,
             @RequestParam(required = false) String gender,
             @RequestParam(required = false) String address,
+            @RequestParam(required = false) Double weight,
+            @RequestParam(required = false) String bloodType,
             @RequestParam(required = false) MultipartFile image,
             HttpSession session) {
 
@@ -49,10 +51,11 @@ public class UserController {
             String user=(String) session.getAttribute("userId");
             userID=Integer.parseInt(user);
 
+
         }
 
         try {
-            boolean isUpdated = userService.updateUser(userID, name, phone, age, gender, address, image, editorId);
+            boolean isUpdated = userService.updateUser(userID, name, phone, age, gender, address, image, editorId, weight, bloodType);
 
             if (isUpdated) {
                 return ResponseEntity.ok(Map.of("message", "User updated successfully."));
@@ -65,7 +68,37 @@ public class UserController {
                     .body(Map.of("error", "Error updating user: " + e.getMessage()));
         }
     }
+    @GetMapping("/current")
+    public ResponseEntity<?> getLoggedPatient(HttpSession session) {
+        String patientIdStr = (String) session.getAttribute("userId");
 
+        if (patientIdStr == null || patientIdStr.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Patient not logged in");
+        }
+
+        try {
+            Integer patientId = Integer.parseInt(patientIdStr);
+            User patient = userService.getUserById(patientId);
+
+            if (patient == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found");
+            }
+
+            String profilePicturePath = patient.getImage();
+            if (profilePicturePath != null && !profilePicturePath.isEmpty()) {
+                profilePicturePath = "/image/" + profilePicturePath; // Add the image path prefix
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("name", patient.getName());
+            response.put("profilePicture", profilePicturePath);
+
+            return ResponseEntity.ok(response);
+
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid user ID format in session");
+        }
+    }
 
     @GetMapping("/{userID}")
     public ResponseEntity<User> getUserById(@PathVariable Integer userID) {

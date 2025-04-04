@@ -103,7 +103,7 @@ public class UserService {
 
     @Transactional
     public boolean updateUser(Integer userID, String name, String phone, Integer age,
-                              String gender, String address, MultipartFile image, String editorId) {
+                              String gender, String address, MultipartFile image, String editorId, Double weight, String bloodType) {
         Optional<User> existingUserOpt = userRepository.findById(userID);
 
         if (existingUserOpt.isEmpty()) {
@@ -118,6 +118,8 @@ public class UserService {
         if (age != null) existingUser.setAge(age);
         if (gender != null) existingUser.setGender(gender);
         if (address != null) existingUser.setAddress(address);
+        if (weight!= null) existingUser.setWeight(weight);
+        if (bloodType!= null) existingUser.setBloodType(bloodType);
 
         // Handle image upload
         if (image != null && !image.isEmpty()) {
