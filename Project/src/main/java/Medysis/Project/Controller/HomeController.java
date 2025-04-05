@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
 
+
     @GetMapping("/register")
     public String register() {
         return "register";
@@ -33,16 +34,15 @@ public class HomeController {
         return "addPastmedical";
     }
 
-    @GetMapping("/patientHome")
-    public String patientHome() {
-        return "patientHome";
-    }
+
      @GetMapping("/forgotPassword")
     public String forgotPassword() {  return "forgotPassword"; }
+
     @GetMapping("/userHome")
     public String userHome() {
         return "userHome";
     }
+
     @GetMapping("/prescription")
     public String prescription() {
         return "prescriptionView";
