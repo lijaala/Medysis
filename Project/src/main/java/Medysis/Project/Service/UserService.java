@@ -185,6 +185,27 @@ public class UserService {
         userRepository.save(user);
         return true; // Password successfully updated
     }
+    public boolean softDeleteUser(Integer userId) {
+        try {
+            Optional<User> userOptional = userRepository.findById(userId);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                System.out.println("Found user: " + user.getEmail()); // Add logging
+                user.setDeleted(true);
+                user.setUpdated_at(LocalDateTime.now(java.time.Clock.systemDefaultZone().withZone(java.time.ZoneId.of("Asia/Kathmandu"))));
+                userRepository.save(user);
+                System.out.println("User soft deleted successfully: " + user.getEmail()); // Add logging
+                return true;
+            } else {
+                System.out.println("User not found with ID: " + userId); // Add logging
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error during soft delete for user ID " + userId + ": " + e.getMessage()); // Print the error message
+            e.printStackTrace(); // Print the full stack trace
+            return false;
+        }
+    }
 }
 
 

@@ -131,7 +131,40 @@ public class UserController {
         }
     }
 
+    @PutMapping("/delete/{userID}")
+    public ResponseEntity<Map<String, String>> softDeleteUser(
+            @PathVariable Integer userID,
+            HttpSession session) {
 
+        String loggedInUserIdStr = (String) session.getAttribute("userId");
+        if (loggedInUserIdStr == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Unauthorized: User not logged in."));
+        }
+
+        try {
+            Integer loggedInUserId = Integer.parseInt(loggedInUserIdStr);
+            if (!loggedInUserId.equals(userID)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Forbidden: You can only delete your own account."));
+            }
+
+            boolean isDeleted = userService.softDeleteUser(userID);
+            if (isDeleted) {
+                session.invalidate(); // Logout the user after successful soft delete
+                return ResponseEntity.ok(Map.of("message", "Account deleted successfully. Redirecting to login...", "redirectUrl", "/login"));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "User not found or deletion failed."));
+            }
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid user ID format."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error deleting account: " + e.getMessage()));
+        }
+    }
 
 
 }

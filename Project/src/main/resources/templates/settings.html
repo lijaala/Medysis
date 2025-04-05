@@ -187,9 +187,18 @@
                     </div>
                 </div>
 
-                <div id="deleteAccount" class="link-section">
-                    <h2>Delete Account</h2>
-                    <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                <div id="deleteAccount" class=" row px-4 w-100 link-section">
+                    <div class="d-flex mb-3">
+                        <span class=" align-self-start me-5 back-to-settings" aria-label="Back">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024">
+                                <path fill="currentColor" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64" stroke-width="25.5" stroke="currentColor" />
+                                <path fill="currentColor" d="m237.248 512l265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312z" stroke-width="25.5" stroke="currentColor" />
+                            </svg>
+                        </span>
+                        <h4>Delete Account</h4>
+                    </div>
+                    <p>Are you sure you want to delete your account? This action is irreversible.</p>
+                    <button class="btn btn-danger"  id="deleteAcc">Delete Account</button>
                 </div>
             </div>
 
@@ -570,6 +579,75 @@
                     }
                 });
         };
+        document.getElementById('deleteAcc').addEventListener('click',performSoftDelete);
+        function performSoftDelete() {
+            getLoggedInUserId()
+                .then(userId => {
+                    if (userId) {
+                        fetch(`/api/user/delete/${userId}`, { // Assuming you have an endpoint for soft delete
+                            method: 'PUT', // Or PATCH, depending on your API design
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ deleted: true }) // Send the 'deleted' flag
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.message) {
+                                    Toastify({
+                                        text: data.message,
+                                        duration: 3000,
+                                        backgroundColor: "rgba(200,253,223)",
+                                        gravity: "top",
+                                        position: "right",
+                                        style:{
+                                            color:"rgb(15,94,27)",
+                                            borderRadius:"8px"
+                                        },
+                                        onClick: function(){}
+                                    }).showToast();
+                                    // Optionally redirect the user after successful soft delete
+                                    setTimeout(() => {
+                                        window.location.href = '/login'; // Redirect to login page
+                                    }, 3000);
+                                } else if (data.error) {
+                                    Toastify({
+                                        text: data.error,
+                                        duration: 3000,
+                                        backgroundColor: "rgba(253,200,200)",
+                                        close: true,
+                                        gravity: "top",
+                                        position: "right",
+                                        borderRadius:"8px",
+                                        style:{
+                                            color:"rgb(167,6,14)",
+                                            borderRadius:"8px"
+                                        },
+                                        onClick: function(){}
+                                    }).showToast();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error performing soft delete:', error);
+                                Toastify({
+                                    text: 'An error occurred while trying to delete your account.',
+                                    duration: 3000,
+                                    backgroundColor: "rgba(253,200,200)",
+                                    close: true,
+                                    gravity: "top",
+                                    position: "right",
+                                    borderRadius:"8px",
+                                    style:{
+                                        color:"rgb(167,6,14)",
+                                        borderRadius:"8px"
+                                    },
+                                    onClick: function(){}
+                                }).showToast();
+                            })
+
+                    }
+                });
+        }
 
     });
 
@@ -615,6 +693,8 @@
                 }).showToast();
             });
     }
+
+
     document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
         event.preventDefault();
 

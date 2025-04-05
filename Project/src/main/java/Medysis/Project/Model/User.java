@@ -45,6 +45,7 @@ public class User {
     @Column(name = "verificationCode", length = 64)
     private String verificationCode;
 
+
     private boolean verified=false;
 
     @Column
@@ -67,6 +68,9 @@ public class User {
 
     @Column(name = "bloodType")
     private String bloodType;
+
+    @Column(name = "deleted")
+    private Boolean deleted = false;
 
     public void setId(Integer id) {
         this.userID = userID;
@@ -229,5 +233,13 @@ public class User {
 
     public void setBloodType(String bloodType) {
         this.bloodType = bloodType;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }
