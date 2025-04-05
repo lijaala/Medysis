@@ -39,7 +39,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/forgot-password","/forgotPassword","/api/auth/reset-password").permitAll()
+                        .requestMatchers("/api/auth/forgot-password","/forgotPassword","/api/auth/reset-password","/manifest.json").permitAll()
                         .requestMatchers("/register", "/login", "/css/**", "/js/**", "appointment/availableSlots","/image/**", "api/auth/**","appointment/fetchDoctors").permitAll()
                         .requestMatchers("/home","api/staff/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_DOCTOR", "ROLE_LAB TECHNICIAN")
                         .requestMatchers("api/LabOrder/getByUserId","api/LabOrder/details/**","/api/notification/").hasAnyAuthority("ROLE_PATIENTS", "ROLE_DOCTOR", "ROLE_LAB TECHNICIAN")

@@ -1,7 +1,7 @@
 {
   "name": "MedysisDerma",
   "short_name": "Medysis",
-  "description": "A dermatology-centric hospotal management system with features for appointment booking, digital prescription and lan Management ",
+  "description": "A dermatology-centric hospital management system with features for appointment booking, digital prescription and lab Management ",
   "start_url": "/login",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,13 +9,9 @@
   "icons": [
     {
       "src": "/image/logoSmall.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/image/logoSmall.png",
-      "sizes": "512x512",
+      "sizes": "636x176",
       "type": "image/png"
     }
+
   ]
 }

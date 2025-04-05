@@ -47,7 +47,7 @@ public class HomeController {
     public String prescription() {
         return "prescriptionView";
     }
-    @GetMapping("labView")
+    @GetMapping("/labView")
     public String labView() {
         return "labHistory";
     }
