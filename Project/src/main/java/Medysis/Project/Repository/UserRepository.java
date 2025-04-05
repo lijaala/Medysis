@@ -7,20 +7,33 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findByEmail(String email);
-    User findByVerificationCode(String verificationCode);
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.deleted = false")
+    Optional<User> findByEmail( @Param("email")  String email);
+
+    @Query("SELECT u FROM User u WHERE u.verificationCode = :verificationCode AND u.deleted = false")
+    User findByVerificationCode(@Param("verificationCode")  String verificationCode);
     long count();
 
 
     // Count new patients in the last month
-    @Query("SELECT COUNT(u) FROM User u WHERE u.created_at > :lastMonth")
+    @Query("SELECT COUNT(u) FROM User u WHERE u.created_at > :lastMonth AND u.deleted = false ")
     int countNewPatientsLastMonth(@Param("lastMonth") LocalDateTime lastMonth);
 
+    @Query("SELECT u FROM User u WHERE u.resetToken = :token AND u.deleted = false")
     Optional<User> findByResetToken(String token);
+
+    @Override
+    @Query("SELECT u FROM User u WHERE u.userID = :id AND u.deleted = false")
+    Optional<User> findById(@Param("id") Integer id);
+
+    @Override
+    @Query("SELECT u FROM User u WHERE u.deleted = false")
+    List<User> findAll();
 }
 
