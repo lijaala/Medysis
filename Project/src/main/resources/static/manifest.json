@@ -6,12 +6,44 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
+  "screenshots": [
+    {
+      "src": "/image/desktopScreen.png",
+      "type": "image/png",
+      "form_factor": "wide",
+      "sizes": "1919x1079"
+    },
+    {
+      "src": "/image/desktopScreen2.png",
+      "type": "image/png",
+      "form_factor": "wide",
+      "sizes": "1919x1079"
+    },
+
+    {
+      "src": "/image/iphoneSE.png",
+      "type": "image/png",
+      "sizes": "402x712"
+    },
+
+    {
+      "src": "/image/SamsungGalaxyS8.png",
+      "type": "image/png",
+      "sizes": "329x676"
+    }
+
+  ],
   "icons": [
     {
       "src": "/image/logoSmall.png",
       "sizes": "636x176",
       "type": "image/png"
+    },{
+      "src": "/image/logoSquare1.png",
+      "sizes": "144x144",
+      "type": "image/png"
     }
+
 
   ]
 }
