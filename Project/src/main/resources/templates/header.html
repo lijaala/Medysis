@@ -36,7 +36,10 @@
         <div class="loggedProfile">
 
             <img id="profilePic" class="profile-picture" src="" alt="Profile Picture"  />
+            <div>
             <p id="staffName">Loading...</p>
+            <p id="staffRole" class="mt-2 text-muted">Loading...</p>
+            </div>
         </div>
     </div>
 
@@ -233,6 +236,15 @@
                 .then(data => {
                     console.log("Fetched Staff Data:", data);
                     document.getElementById("staffName").textContent = data.name || "Guest Staff";
+                    let displayedRole = data.role || "Guest";
+                    if (data.role === "ROLE_ADMIN") {
+                        displayedRole = "Admin";
+                    } else if (data.role === "ROLE_DOCTOR") {
+                        displayedRole = "Doctor";
+                    } else if (data.role === "ROLE_LAB_TECHNICIAN") {
+                        displayedRole = "Lab Technician";
+                    }
+                    document.getElementById("staffRole").textContent = displayedRole;
                     if (data.profilePicture) {
                         document.getElementById("profilePic").src = data.profilePicture;
                         document.getElementById("profilePic").style.display = "block";

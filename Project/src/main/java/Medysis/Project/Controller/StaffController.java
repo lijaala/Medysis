@@ -66,6 +66,7 @@ public class StaffController {
         Map<String, Object> response = new HashMap<>();
         response.put("name", staff.getStaffName());
         response.put("profilePicture", profilePicturePath);
+        response.put("role", session.getAttribute("userRole"));
 
         return ResponseEntity.ok(response);
     }

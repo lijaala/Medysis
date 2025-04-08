@@ -169,3 +169,7 @@ align-content: center;
 .float-end{
     text-align: right;
 }
+#staffRole{
+    font-size: 0.7rem;
+    color: gray;
+}
