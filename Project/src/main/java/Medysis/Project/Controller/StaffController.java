@@ -134,6 +134,22 @@ public class StaffController {
             return ResponseEntity.badRequest().body(Map.of("message", "Incorrect current password or update failed."));
         }
     }
-
+    @DeleteMapping("/delete/{staffId}")
+    public ResponseEntity<?> softDeleteStaff(@PathVariable String staffId, HttpSession session) {
+        String loggedInStaffId = (String) session.getAttribute("userId");
+        if (loggedInStaffId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User not logged in."));
+        }
+        try {
+            boolean isDeleted = staffService.softDeleteStaff(staffId, loggedInStaffId);
+            if (isDeleted) {
+                return ResponseEntity.ok(Map.of("message", "Staff account soft deleted successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Staff account not found or already deleted."));
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Error during soft deletion: " + e.getMessage()));
+        }
+    }
 
 }

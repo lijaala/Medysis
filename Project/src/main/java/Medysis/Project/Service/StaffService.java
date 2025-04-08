@@ -3,6 +3,7 @@ package Medysis.Project.Service;
 
 import Medysis.Project.DTO.StaffDTO;
 import Medysis.Project.Model.Staff;
+import Medysis.Project.Model.User;
 import Medysis.Project.Repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -94,7 +95,7 @@ public class StaffService {
         String digits = String.format("%03d", random.nextInt(1000));
 
         // Generate two random special characters
-        String specialChars = "!@#$%^&*";
+        String specialChars = "!@#$^&*";
         char specialChar1 = specialChars.charAt(random.nextInt(specialChars.length()));
         char specialChar2 = specialChars.charAt(random.nextInt(specialChars.length()));
 
@@ -121,11 +122,11 @@ public class StaffService {
     }
     // get all staff
     public List<Staff> getAllStaff() {
-        return staffRepository.findAll();
+        return staffRepository.findAllActiveStaff();
     }
     //updating available time of staff
     public Staff updateStaffAvailability(String staffID, Staff updatedStaff) {
-        Optional<Staff> existingStaffOpt = staffRepository.findById(staffID);
+        Optional<Staff> existingStaffOpt = staffRepository.findActiveById(staffID);
 
         if (existingStaffOpt.isPresent()) {
             Staff existingStaff = existingStaffOpt.get();
@@ -141,11 +142,11 @@ public class StaffService {
     }
     //getting staff by ID
     public Staff getProfile(String staffId) {
-        return staffRepository.findById(staffId).orElse(null);
+        return staffRepository.findActiveById(staffId).orElse(null);
     }
     // staff uopdat eprofile
     public Staff updateProfile(String staffId, Staff updatedStaff) {
-        Optional<Staff> optionalStaff = staffRepository.findById(staffId);
+        Optional<Staff> optionalStaff = staffRepository.findActiveById(staffId);
 
         if (optionalStaff.isEmpty()) {
             throw new RuntimeException("Staff not found");
@@ -188,7 +189,7 @@ public class StaffService {
 
 
     public boolean updateProfilePicture(String staffId, MultipartFile photo) {
-        Optional<Staff> optionalStaff = staffRepository.findById(staffId);
+        Optional<Staff> optionalStaff = staffRepository.findActiveById(staffId);
 
         if (optionalStaff.isEmpty()) {
             return false; // Staff not found
@@ -231,7 +232,7 @@ public class StaffService {
         return false;
     }
     public boolean resetPassword(String staffId, String currentPassword, String newPassword) {
-        Optional<Staff> optionalStaff = staffRepository.findById(staffId);
+        Optional<Staff> optionalStaff = staffRepository.findActiveById(staffId);
 
         if (optionalStaff.isEmpty()) {
             return false; // Staff not found
@@ -246,6 +247,31 @@ public class StaffService {
         staff.setPassword(passwordEncoder.encode(newPassword));
         staffRepository.save(staff);
         return true; // Password successfully updated
+    }
+
+    public boolean softDeleteStaff(String staffIdToDelete, String deletedByUserId) {
+        try {
+            Optional<Staff> staffToDeleteOptional = staffRepository.findActiveById(staffIdToDelete);
+            if (staffToDeleteOptional.isPresent()) {
+                Staff staffToDelete = staffToDeleteOptional.get();
+                System.out.println("Found staff to delete: " + staffToDelete.getStaffEmail() + " (ID: " + staffToDelete.getStaffID() + ")"); // Add logging
+                staffToDelete.setDeleted(true);
+                staffToDelete.setLastUpdated(LocalDateTime.now(java.time.Clock.systemDefaultZone().withZone(java.time.ZoneId.of("Asia/Kathmandu"))));
+                staffToDelete.setLastUpdatedBy(deletedByUserId); // Record who deleted the account
+                staffRepository.save(staffToDelete);
+                System.out.println("Staff soft deleted successfully: " + staffToDelete.getStaffEmail() + " (ID: " + staffToDelete.getStaffID() + ") by user: " + deletedByUserId); // Add logging
+                // emailService.sendAccountDeletionEmail(staffToDelete); // Call EmailService
+
+                return true;
+            } else {
+                System.out.println("Staff not found with ID: " + staffIdToDelete); // Add logging
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error during soft delete for staff ID " + staffIdToDelete + " by user " + deletedByUserId + ": " + e.getMessage()); // Print the error message
+            e.printStackTrace(); // Print the full stack trace
+            return false;
+        }
     }
 
 }

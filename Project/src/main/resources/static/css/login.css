@@ -82,9 +82,10 @@ h1 {
     background-color: rgba(0, 0, 0, 0.7);  /* Dark background */
     display: none;  /* Initially hidden */
     z-index: 9999;
-    align-items: center; /* Center horizontally */
-    justify-content: center; /* Center vertically */
+    cursor: pointer;
     transition: all 0.3s ease;
+    align-content: center;
+    justify-items: center;
 
 }
 

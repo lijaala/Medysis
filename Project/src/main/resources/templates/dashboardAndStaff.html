@@ -173,9 +173,21 @@
                 
             </tbody>
         </table>
+    <div id="softDeleteModal" class="modal" >
+        <div class="modal-content" style="height:fit-content;">
+            <span class="close-button" id="closeSoftDeleteModalBtn">&times;</span>
+            <h2>Confirm Soft Delete</h2>
+            <p>Are you sure you want to delete the staff member: <strong id="modalStaffName"></strong>?</p>
+            <p>This action will not  delete the account.</p>
+            <div class="action-buttons">
+                <button id="confirmSoftDeleteBtn" class="remove-medication">Confirm Delete</button>
+                <button id="cancelSoftDeleteModalBtn" class="secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div class="main" th:include="addStaff::addStaffForm"></div>
 
-    <script src="js/populateRoles.js"></script>
     <script src="js/dashboard.js"></script>
 
 </section>

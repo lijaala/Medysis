@@ -35,5 +35,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Override
     @Query("SELECT u FROM User u WHERE u.deleted = false")
     List<User> findAll();
+
+    // Method to find a user by ID where deleted is false
+    @Query("SELECT u FROM User u WHERE u.userID = :id AND u.deleted = false")
+    Optional<User> findActiveById(@Param("id") Integer id);
+
+    // Method to find all users where deleted is false
+    @Query("SELECT u FROM User u WHERE u.deleted = false")
+    List<User> findAllActiveUsers();
 }
 

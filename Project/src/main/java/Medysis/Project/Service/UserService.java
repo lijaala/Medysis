@@ -101,13 +101,13 @@ public class UserService {
 
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllActiveUsers();
     }
 
     @Transactional
     public boolean updateUser(Integer userID, String name, String phone, Integer age,
                               String gender, String address, MultipartFile image, String editorId, Double weight, String bloodType) {
-        Optional<User> existingUserOpt = userRepository.findById(userID);
+        Optional<User> existingUserOpt = userRepository.findActiveById(userID);
 
         if (existingUserOpt.isEmpty()) {
             return false; // User not found
@@ -170,7 +170,7 @@ public class UserService {
 
 
     public User getUserById(Integer userID) {
-        return userRepository.findById(userID).orElse(null);
+        return userRepository.findActiveById(userID).orElse(null);
     }
 
     public void generatePasswordResetToken(User user) {
@@ -200,7 +200,7 @@ public class UserService {
         return false;
     }
     public boolean resetPassword(Integer userId, String currentPassword, String newPassword) {
-        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<User> optionalUser = userRepository.findActiveById(userId);
 
         if (optionalUser.isEmpty()) {
             return false; // Staff not found
@@ -220,7 +220,7 @@ public class UserService {
     }
     public boolean softDeleteUser(Integer userId) {
         try {
-            Optional<User> userOptional = userRepository.findById(userId);
+            Optional<User> userOptional = userRepository.findActiveById(userId);
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
                 System.out.println("Found user: " + user.getEmail()); // Add logging

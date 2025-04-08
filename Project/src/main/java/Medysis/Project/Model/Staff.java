@@ -61,6 +61,10 @@ public class Staff {
     @Column(name = "resetTokenExpiry")
     private LocalDateTime resetTokenExpiry;
 
+    @Column(name="deleted")
+    private Boolean deleted=false;
+
+
     public String getStaffID() {
         return staffID;
     }
@@ -197,5 +201,13 @@ public class Staff {
 
     public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
         this.resetTokenExpiry = resetTokenExpiry;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }
