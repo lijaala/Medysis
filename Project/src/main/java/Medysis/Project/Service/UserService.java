@@ -31,18 +31,21 @@ public class UserService {
     AvailabilityRepository availabilityRepository;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private UploadImageService uploadImageService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        EmailService emailService, AvailabilityRepository availabilityRepository,
-                       RoleService roleService) {
+                       RoleService roleService, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
         this.availabilityRepository = availabilityRepository;
         this.roleService = roleService;
+        this.notificationService = notificationService;
     }
 
     public void registerUser(User user) {
@@ -111,33 +114,59 @@ public class UserService {
         }
 
         User existingUser = existingUserOpt.get();
+        boolean updated = false;
 
 
-        if (name != null) existingUser.setName(name);
-        if (phone != null) existingUser.setPhone(phone);
-        if (age != null) existingUser.setAge(age);
-        if (gender != null) existingUser.setGender(gender);
-        if (address != null) existingUser.setAddress(address);
-        if (weight!= null) existingUser.setWeight(weight);
-        if (bloodType!= null) existingUser.setBloodType(bloodType);
+        if (name != null && !name.equals(existingUser.getName())) {
+            existingUser.setName(name);
+            updated = true;
+        }
+        if (phone != null && !phone.equals(existingUser.getPhone())) {
+            existingUser.setPhone(phone);
+            updated = true;
+        }
+        if (age != null && !age.equals(existingUser.getAge())) {
+            existingUser.setAge(age);
+            updated = true;
+        }
+        if (gender != null && !gender.equals(existingUser.getGender())) {
+            existingUser.setGender(gender);
+            updated = true;
+        }
+        if (address != null && !address.equals(existingUser.getAddress())) {
+            existingUser.setAddress(address);
+            updated = true;
+        }
+        if (weight != null && !weight.equals(existingUser.getWeight())) {
+            existingUser.setWeight(weight);
+            updated = true;
+        }
+        if (bloodType != null && !bloodType.equals(existingUser.getBloodType())) {
+            existingUser.setBloodType(bloodType);
+            updated = true;
+        }
 
         // Handle image upload
         if (image != null && !image.isEmpty()) {
             try {
                 String imageUrl = uploadImageService.saveImage(image);
                 existingUser.setImage(imageUrl);
+                updated = true;
             } catch (Exception e) {
                 throw new RuntimeException("Failed to upload image: " + e.getMessage());
             }
         }
 
-        // Track update metadata
-        existingUser.setUpdated_at(LocalDateTime.now());
-        existingUser.setUpdatedBy(editorId);
-
-        userRepository.save(existingUser);
-        return true;
+        if (updated) {
+            existingUser.setUpdated_at(LocalDateTime.now());
+            existingUser.setUpdatedBy(editorId);
+            userRepository.save(existingUser);
+            notificationService.createUserNotifications(userID, "Your account details have been updated.", "account");
+            return true;
+        }
+        return false;
     }
+
 
 
     public User getUserById(Integer userID) {
@@ -157,6 +186,7 @@ public class UserService {
     }
 
     public boolean resetPasswordWithToken(String token, String newPassword) {
+
         Optional<User> userOptional = userRepository.findByResetToken(token);
 
         if (userOptional.isPresent()) {
@@ -164,6 +194,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(newPassword));
             user.setResetToken(null); // Clear the reset token
             userRepository.save(user);
+
             return true;
         }
         return false;
@@ -183,6 +214,8 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+        notificationService.createUserNotifications(userId, "Your password has been changed.", "account");
+
         return true; // Password successfully updated
     }
     public boolean softDeleteUser(Integer userId) {
@@ -195,6 +228,8 @@ public class UserService {
                 user.setUpdated_at(LocalDateTime.now(java.time.Clock.systemDefaultZone().withZone(java.time.ZoneId.of("Asia/Kathmandu"))));
                 userRepository.save(user);
                 System.out.println("User soft deleted successfully: " + user.getEmail()); // Add logging
+                emailService.sendAccountDeletionEmail(user); // Call EmailService
+
                 return true;
             } else {
                 System.out.println("User not found with ID: " + userId); // Add logging
@@ -206,6 +241,7 @@ public class UserService {
             return false;
         }
     }
+
 }
 
 

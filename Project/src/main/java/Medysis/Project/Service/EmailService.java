@@ -46,5 +46,15 @@ public class EmailService {
                 resetUrl + "\n\nThank you!");
         mailSender.send(mailMessage);
     }
+    public void sendAccountDeletionEmail(User user) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Your Medysis Account Has Been Deleted");
+        mailMessage.setText("Dear " + user.getName() + ",\n\n" +
+                "Your Medysis account has been successfully deleted.\n\n" +
+                "If you did not initiate this action, please contact our support team immediately.\n\n" +
+                "Thank you,\nThe Medysis Team");
+        mailSender.send(mailMessage);
+    }
 
 }
