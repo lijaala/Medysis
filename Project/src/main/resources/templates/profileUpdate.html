@@ -5,6 +5,32 @@
             <input type="file" id="profileImageInput" accept="image/*" style="display: none;"> <button type="button" class="primary" id="updateProfileBtn" onclick="updateProfilePicture()">Save</button>
             <button class="cancel" id="deletePhoto">Delete Photo</button>
         </div>
+        <div>
+            <button class="primary" onclick="logout()">Logout</button>
+            <script>
+                function logout() {
+                    fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Redirect to the login page upon successful logout
+                                window.location.href = '/login';
+                            } else {
+                                console.error('Logout failed');
+                                // Optionally display an error message to the user
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error during logout:', error);
+                            // Optionally display an error message to the user
+                        });
+                }
+            </script>
+        </div>
 
         <form class="updateProfile" id="updateProfileForm">
             <div class="form-row">

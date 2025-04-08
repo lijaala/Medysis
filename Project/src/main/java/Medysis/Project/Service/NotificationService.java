@@ -7,10 +7,10 @@ import Medysis.Project.Repository.NotificationRepository;
 import Medysis.Project.Repository.StaffRepository;
 import Medysis.Project.Repository.UserRepository;
 import Medysis.Project.WebSocket.NotificationWebSocketHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class NotificationService {
     public List<Notifications> getNotificationsForStaffUser(String staffId, String role) {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-            if (role.equalsIgnoreCase("ROLE_DOCTOR")) {
+            if (role.equalsIgnoreCase("ROLE_DOCTOR")|| role.equalsIgnoreCase("ROLE_ADMIN")) {
                 return notificationRepository.findByStaffIdOrderByCreatedAtDesc(staff);
             } else if (role.equalsIgnoreCase("ROLE_LAB TECHNICIAN")) {
                 return notificationRepository.findByType("lab_order");
@@ -87,7 +87,7 @@ public class NotificationService {
     public long getUnreadNotificationsCountForStaffUser(String staffId, String role) {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-            if (role.equalsIgnoreCase("ROLE_DOCTOR")) {
+            if (role.equalsIgnoreCase("ROLE_DOCTOR")||role.equalsIgnoreCase("ROLE_ADMIN")) {
                 return notificationRepository.countByStaffIdAndStatus(staff, "unread");
             } else if (role.equalsIgnoreCase("ROLE_LAB TECHNICIAN")) {
                 return notificationRepository.findByType("lab_order").stream()

@@ -1,26 +1,23 @@
 package Medysis.Project.Controller;
 
 
-import Medysis.Project.Model.Availability;
 import Medysis.Project.Model.Role;
 import Medysis.Project.Model.Staff;
-import Medysis.Project.Repository.AvailabilityRepository;
 import Medysis.Project.Repository.RoleRepository;
 import Medysis.Project.Service.RoleService;
 import Medysis.Project.Service.StaffService;
 import Medysis.Project.Service.UploadImageService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -62,6 +59,7 @@ public class AdminController {
         if (userRole == null || !userRole.equals("ROLE_ADMIN")) {
             return "Access denied ";
         }
+        String adminId= session.getAttribute("userId").toString();
         Staff staff;
         try {
             staff = new Staff();
@@ -71,15 +69,16 @@ public class AdminController {
             staff.setStaffAddress(staffAddress);
             staff.setGender(gender);
             staff.setAge(age);
+            staff.setLastUpdatedBy(adminId);
             String imageUrl = uploadImageService.saveImage(image);
             staff.setImage(imageUrl);
 
-
-            Role roleId = roleRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
+           Role roleId = roleRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
             staff.setRole(roleId);
-
-
-            if (startTime != null && !startTime.isEmpty() && endTime != null && !endTime.isEmpty()) {
+            if (roleId.getRole().equalsIgnoreCase("ROLE_DOCTOR")) {
+                if (startTime == null || startTime.isEmpty() || endTime == null || endTime.isEmpty()) {
+                    return "Start and end times are required for doctors.";
+                }
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
                 try {
                     LocalTime start_Time = LocalTime.parse(startTime, formatter);
@@ -89,24 +88,21 @@ public class AdminController {
                     }
                     staff.setStartTime(start_Time);
                     staff.setEndTime(end_Time);
-
                 } catch (DateTimeParseException e) {
-                    return "Invalid time format";
+                    return "Invalid time format for start or end time.";
                 }
-
-                staffService.save(staff);
-                return "Staff added successfully. Generated Staff ID: " + staff.getStaffID();
-
+            } else {
+                staff.setStartTime(null); // Not required for other roles
+                staff.setEndTime(null);
             }
 
+            staffService.save(staff);
+            return "Staff added successfully. Generated Staff ID: " + staff.getStaffID();
 
         } catch (Exception e) {
             return "Error:" + e.getMessage();
         }
-
-        return "Staff added successfully. Generated Staff ID: " + staff.getStaffID();
-
-
     }
+
 
 }

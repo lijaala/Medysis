@@ -1,20 +1,15 @@
 package Medysis.Project.Service;
 
 
-import Medysis.Project.DTO.RoleDTO;
 import Medysis.Project.DTO.StaffDTO;
-import Medysis.Project.Model.Role;
 import Medysis.Project.Model.Staff;
-import Medysis.Project.Model.User;
 import Medysis.Project.Repository.StaffRepository;
-import Medysis.Project.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -33,14 +28,17 @@ public class StaffService {
 
     @Autowired
     private final EmailService emailService;
+    @Autowired
+    private final NotificationService notificationService;
 
 
 
-    public StaffService( StaffRepository staffRepository, PasswordEncoder passwordEncoder, UploadImageService uploadImageService, EmailService emailService) {
+    public StaffService( StaffRepository staffRepository, PasswordEncoder passwordEncoder, UploadImageService uploadImageService, EmailService emailService, NotificationService notificationService) {
         this.staffRepository = staffRepository;
         this.passwordEncoder = passwordEncoder;
         this.uploadImageService = uploadImageService;
         this.emailService = emailService;
+        this.notificationService = notificationService;
     }
 
     //staff registration method
@@ -58,8 +56,18 @@ public class StaffService {
         staff.setAddedOn(now);
         staff.setLastUpdated(now);
 
+        Staff savedStaff = staffRepository.save(staff);
+        notifyAdminsNewStaffAdded(savedStaff);
+
         // Save the staff entity
         return staffRepository.save(staff);
+    }
+    private void notifyAdminsNewStaffAdded(Staff staff) {
+        List<Staff> admins = staffRepository.findByRoleRoleID(1);
+        String notificationMessage = "New staff member '" + staff.getStaffName() + "' has been added.";
+        for (Staff admin : admins) {
+            notificationService.createStaffNotifications(admin.getStaffID(), notificationMessage, "staff_added");
+        }
     }
     //generating unique ids
     private String generateUniqueStaffId(String fullName) {
@@ -166,7 +174,7 @@ public class StaffService {
         }
 
         // Only update availability if the staff is a doctor
-        if ("DOCTOR_DOCTOR".equals(existingStaff.getRole().getRole())) {
+        if ("ROLE_DOCTOR".equals(existingStaff.getRole().getRole())) {
             if (updatedStaff.getStartTime() != null) {
                 existingStaff.setStartTime(updatedStaff.getStartTime());
             }
@@ -178,7 +186,7 @@ public class StaffService {
         return staffRepository.save(existingStaff);
     }
 
-    // ✅ Updated to return boolean
+
     public boolean updateProfilePicture(String staffId, MultipartFile photo) {
         Optional<Staff> optionalStaff = staffRepository.findById(staffId);
 
