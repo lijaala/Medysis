@@ -46,6 +46,7 @@ body {
     color: rgba(103, 43, 71, 0.81);
     transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
     cursor: default;
+    min-width: fit-content;
 
     svg path, svg g {
         stroke: rgba(103, 43, 71, 0.81);
@@ -75,5 +76,38 @@ body {
 
 }
 
+.menu li svg {
+    width: 2em; /* Adjust as needed */
+    height: 2em; /* Maintain aspect ratio */
+    flex-shrink: 0; /* Prevent excessive shrinking */
+}
 
 
+@media (max-width: 768px) {
+    .menu li {
+        gap: 15px; /* Adjust gap when text is hidden */
+        padding: 10px; /* Adjust padding when text is hidden */
+        justify-content: center; /* Center the icon */
+    }
+
+    .menu li span { /* If your text is within a span */
+        display: none;
+    }
+
+    .menu li:last-child { /* Target the Logout text specifically if needed */
+        display: none;
+    }
+
+    .menu li:not(:last-child)::after { /* If you want a visual separator without text */
+        content: "";
+        display: none; /* Hide separator on small screens */
+    }
+}
+
+/* Adjust icon size for smaller screens if needed */
+@media (max-width: 480px) {
+    .menu li svg {
+        width: 1.8em;
+        height: 1.8em;
+    }
+}
