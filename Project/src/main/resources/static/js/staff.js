@@ -248,28 +248,90 @@ function openSoftDeleteModal(staffId, staffName) {
 
 
 function softDeleteStaff(staffId) {
-    fetch(`/api/staff/delete/${staffId}`, {
+    const encodedStaffId = staffId ? encodeURIComponent(staffId) : null;
+    const url = `/api/staff/delete`; // Use the correct base URL
+
+    const requestOptions = {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
             // You might need to include other headers like an authentication token
         }
-    })
+    };
+
+    if (encodedStaffId) {
+        requestOptions.body = JSON.stringify({ staffId: staffId });
+    }
+
+    fetch(url, requestOptions)
         .then(response => {
             if (response.ok) {
-                alert('Staff account soft deleted successfully.');
-                fetchStaffData(); // Reload staff data
-            } else if (response.status === 401) {
-                alert('Unauthorized: You do not have permission to delete staff.');
-            } else if (response.status === 404) {
-                alert('Staff account not found.');
+                return response.json(); // Parse the JSON response body
             } else {
-                alert('Failed to soft delete staff account.');
+                // Handle non-successful responses by parsing the error JSON
+                return response.json().then(errorData => {
+                    let errorMessage = 'Failed to soft delete staff account.';
+                    if (errorData && errorData.message) {
+                        errorMessage = errorData.message;
+                    } else if (response.status === 401) {
+                        errorMessage = 'Unauthorized: You do not have permission to delete staff.';
+                    } else if (response.status === 404) {
+                        errorMessage = 'Staff account not found.';
+                    }
+                    Toastify({
+                        text: errorMessage,
+                        duration: 3000,
+                        backgroundColor: "rgba(255, 200, 200, 0.5)",
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        borderRadius: "8px",
+                        style: {
+                            color: "rgb(167, 6, 14)",
+                            borderRadius: "8px"
+                        },
+                        onClick: function () {}
+                    }).showToast();
+                    throw new Error('Deletion failed'); // Re-throw to stop further processing
+                });
+            }
+        })
+        .then(data => { // 'data' now contains the parsed JSON from the successful response
+            Toastify({
+                text: data.message, // Access the 'message' property from the JSON
+                duration: 3000,
+                backgroundColor: "rgba(200, 255, 200, 0.5)", // Different color for success
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius: "8px",
+                style: {
+                    color: "rgb(6, 167, 14)", // Different color for success
+                    borderRadius: "8px"
+                },
+                onClick: function () {}
+            }).showToast();
+            // Assuming fetchStaffData is defined elsewhere to reload the staff list
+            if (typeof fetchStaffData === 'function') {
+                fetchStaffData();
             }
         })
         .catch(error => {
             console.error('Error deleting staff:', error);
-            alert('An error occurred while trying to delete the staff account.');
+            Toastify({
+                text: 'An error occurred while trying to delete the staff account.',
+                duration: 3000,
+                backgroundColor: "rgba(255, 200, 200, 0.5)",
+                close: true,
+                gravity: "top",
+                position: "right",
+                borderRadius: "8px",
+                style: {
+                    color: "rgb(167, 6, 14)",
+                    borderRadius: "8px"
+                },
+                onClick: function () {}
+            }).showToast();
         });
 }
 

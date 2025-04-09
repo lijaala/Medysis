@@ -86,16 +86,16 @@
             </svg>
             Patients
         </li>
-        <li data-target="staff">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">
-                    <path d="M11 10v4h4" />
-                    <path d="m11 14l1.535-1.605a5 5 0 0 1 8 1.5M16 2v4m5 12l-1.535 1.605a5 5 0 0 1-8-1.5" />
-                    <path d="M21 22v-4h-4m4-9.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4.3M3 10h4m1-8v4" />
-                </g>
-            </svg>
-            Availability
-        </li>
+<!--        <li data-target="staff">-->
+<!--            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">-->
+<!--                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1">-->
+<!--                    <path d="M11 10v4h4" />-->
+<!--                    <path d="m11 14l1.535-1.605a5 5 0 0 1 8 1.5M16 2v4m5 12l-1.535 1.605a5 5 0 0 1-8-1.5" />-->
+<!--                    <path d="M21 22v-4h-4m4-9.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4.3M3 10h4m1-8v4" />-->
+<!--                </g>-->
+<!--            </svg>-->
+<!--            Availability-->
+<!--        </li>-->
         <!-- Using Lucid by Lucid Contributors from iconify -->
         <li data-target="settings">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -105,6 +105,12 @@
                 </g>
             </svg>
             Settings
+        </li>
+        <li data-target="logout">
+            <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24">
+                <path fill="currentColor" d="M5.616 20q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h5.903q.214 0 .357.143t.143.357t-.143.357t-.357.143H5.616q-.231 0-.424.192T5 5.616v12.769q0 .23.192.423t.423.192h5.904q.214 0 .357.143t.143.357t-.143.357t-.357.143zm12.444-7.5H9.692q-.213 0-.356-.143T9.192 12t.143-.357t.357-.143h8.368l-1.971-1.971q-.141-.14-.15-.338q-.01-.199.15-.364q.159-.165.353-.168q.195-.003.36.162l2.614 2.613q.242.243.242.566t-.243.566l-2.613 2.613q-.146.146-.347.153t-.366-.159q-.16-.165-.157-.357t.162-.35z" stroke-width="0.2" stroke="currentColor" />
+            </svg>
+            Logout
         </li>
 
     </ul>
@@ -140,7 +146,39 @@
             </svg>
             Settings
         </li>
+        <li data-target="logout" class="logout">
+            <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24">
+                <path fill="currentColor" d="M5.616 20q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h5.903q.214 0 .357.143t.143.357t-.143.357t-.357.143H5.616q-.231 0-.424.192T5 5.616v12.769q0 .23.192.423t.423.192h5.904q.214 0 .357.143t.143.357t-.143.357t-.357.143zm12.444-7.5H9.692q-.213 0-.356-.143T9.192 12t.143-.357t.357-.143h8.368l-1.971-1.971q-.141-.14-.15-.338q-.01-.199.15-.364q.159-.165.353-.168q.195-.003.36.162l2.614 2.613q.242.243.242.566t-.243.566l-2.613 2.613q-.146.146-.347.153t-.366-.159q-.16-.165-.157-.357t.162-.35z" stroke-width="0.2" stroke="currentColor" />
+            </svg>
+            Logout
+        </li>
 
     </ul>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutLinks = document.querySelectorAll('.menu [data-target="logout"]');
+
+            logoutLinks.forEach(logoutLink => {
+                logoutLink.addEventListener('click', handleLogout);
+            });
+
+            function handleLogout(event) {
+                event.preventDefault();
+
+                // Create a form and submit it (Spring Security's default logout expects a POST)
+                const logoutForm = document.createElement('form');
+                logoutForm.method = 'POST';
+                logoutForm.action = 'api/auth/logout';
+
+
+
+
+                document.body.appendChild(logoutForm);
+                logoutForm.submit();
+            }
+        });
+    </script>
 
 </section>

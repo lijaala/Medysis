@@ -134,14 +134,27 @@ public class StaffController {
             return ResponseEntity.badRequest().body(Map.of("message", "Incorrect current password or update failed."));
         }
     }
-    @DeleteMapping("/delete/{staffId}")
-    public ResponseEntity<?> softDeleteStaff(@PathVariable String staffId, HttpSession session) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> softDeleteStaff(@RequestBody(required = false) Map<String, String> requestBody, HttpSession session) {
+        String staffIdToDelete = null;
         String loggedInStaffId = (String) session.getAttribute("userId");
+
         if (loggedInStaffId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User not logged in."));
         }
+
+        if (requestBody != null && requestBody.containsKey("staffId") && !requestBody.get("staffId").trim().isEmpty()) {
+            staffIdToDelete = requestBody.get("staffId");
+        } else {
+            staffIdToDelete = loggedInStaffId;
+        }
+
+        if (staffIdToDelete == null || staffIdToDelete.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Staff ID to delete is missing."));
+        }
+
         try {
-            boolean isDeleted = staffService.softDeleteStaff(staffId, loggedInStaffId);
+            boolean isDeleted = staffService.softDeleteStaff(staffIdToDelete, loggedInStaffId);
             if (isDeleted) {
                 return ResponseEntity.ok(Map.of("message", "Staff account soft deleted successfully."));
             } else {
