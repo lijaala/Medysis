@@ -198,6 +198,34 @@ public class RecordService {
             return "Record not found!";
         }
     }
+
+
+    public boolean deleteMedicalRecordById(Integer recordId, String userId) {
+        Optional<MedicalRecord> medicalRecordOptional = medicalRecordsRepository.findById(recordId);
+
+        if (medicalRecordOptional.isEmpty()) {
+            return false; // Record not found
+        }
+
+        MedicalRecord medicalRecord = medicalRecordOptional.get();
+
+        // Assuming your MedicalRecord entity has a getUser() method that returns the User object
+        // and the User object has an getId() method that returns the user's ID (as an Integer)
+        String recordOwnerId = String.valueOf(medicalRecord.getUser().getId());
+
+        if (!recordOwnerId.equals(userId)) {
+            return false; // User does not have permission
+        }
+
+        try {
+            medicalRecordsRepository.deleteById(recordId);
+            return true;
+        } catch (Exception e) {
+            // Log the error for debugging
+            e.printStackTrace();
+            return false; // Error during deletion
+        }
+    }
 }
 
 

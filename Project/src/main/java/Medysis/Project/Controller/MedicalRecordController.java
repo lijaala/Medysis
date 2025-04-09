@@ -19,6 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/medicalRecords")
@@ -113,5 +115,20 @@ public class MedicalRecordController {
         return record;
     }
 
+    @DeleteMapping("/delete/{recordId}")
+    public ResponseEntity<?> deleteMedicalRecord(@PathVariable Integer recordId, HttpSession session) {
+        String userId = (String) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User not logged in."));
+        }
+
+        boolean isDeleted = recordService.deleteMedicalRecordById(recordId, userId);
+
+        if (isDeleted) {
+            return ResponseEntity.ok(Map.of("message", "Medical record deleted successfully."));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Medical record not found or you do not have permission to delete it."));
+        }
+    }
 
 }
