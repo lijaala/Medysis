@@ -241,6 +241,21 @@ public class UserService {
             return false;
         }
     }
+    public Map<String, Object> getUserProfileDetails(Integer userId) {
+        Optional<User> userOptional = userRepository.findById(userId); // Assuming your User entity has an ID field
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            Map<String, Object> profileInfo = new HashMap<>();
+            profileInfo.put("gender", user.getGender()); // Assuming User entity has getGender()
+            profileInfo.put("age", user.getAge());       // Assuming User entity has getAge()
+            profileInfo.put("bloodType", user.getBloodType()); // Assuming User entity has getBloodType()
+            profileInfo.put("weight", user.getWeight()); // Assuming User entity has getWeight()
+            return profileInfo;
+        }
+        return null;
+    }
+
 
 }
 

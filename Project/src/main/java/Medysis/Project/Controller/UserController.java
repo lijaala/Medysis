@@ -165,6 +165,23 @@ public class UserController {
                     .body(Map.of("error", "Error deleting account: " + e.getMessage()));
         }
     }
+    @GetMapping("/profile-info")
+    public ResponseEntity<?> getUserProfileInfo(HttpSession session) {
+        Integer userId = Integer.parseInt((String)session.getAttribute("userId")) ;
+
+        if (userId == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "User not logged in."));
+        }
+
+
+        Map<String, Object> profileInfo = userService.getUserProfileDetails(userId);
+
+        if (profileInfo != null) {
+            return ResponseEntity.ok(profileInfo);
+        } else {
+            return ResponseEntity.status(404).body(Map.of("message", "User profile information not found."));
+        }
+    }
 
 
 }
