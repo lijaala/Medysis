@@ -216,8 +216,8 @@ public class RecordService {
 
         try {
             medicalRecord.setAlteredBy(recordOwnerId);
-            medicalRecord.setDeleted(true); // Set the deleted field to true
-            medicalRecordsRepository.save(medicalRecord); // Save the updated record
+            medicalRecord.setDeleted(true);
+            medicalRecordsRepository.save(medicalRecord);
             return true;
         } catch (Exception e) {
             // Log the error for debugging
