@@ -193,11 +193,10 @@ button{
     padding: 20px;
     border-radius: 8px;
     min-width: 40%;
-
-
     position: relative;
     z-index: 10000;
     display: flex;
+    align-items: center;
     flex-direction: column;
     gap:2vh;
     overflow-y: scroll;

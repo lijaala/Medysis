@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Medical Record</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link href="/css/default.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/patientHome.css">
     <link rel="stylesheet" href="/css/navBar.css">
@@ -91,10 +92,12 @@
 
         <div class="modal" id="deleteConfirmationModal">
             <div class="modal-overlay"></div>
-            <div class="modal-content">
+            <div class="modal-content mx-2" style="width:fit-content;">
                 <p>Are you sure you want to delete this medical record?</p>
-                <button type="button" class="btn primary cancel-delete-btn">Cancel</button>
-                <button type="button" class="btn btn-outline-danger" id="confirmDeleteBtn">Delete</button>
+                <div class="d-flex w-100" style="gap:5%;">
+                <button type="button" class="btn primary cancel-delete-btn" style="flex:1;">Cancel</button>
+                <button type="button" class="btn btn-outline-danger" style="flex:1;" id="confirmDeleteBtn">Delete</button>
+                    </div>
             </div>
         </div>
 
@@ -108,6 +111,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 <script>
     const form = document.getElementById('medical-record-form');
     const fileInput = document.getElementById('file-upload');
@@ -135,7 +140,7 @@
 
     function showDeleteConfirmationModal(recordId) {
         recordIdToDelete = recordId;
-        deleteConfirmationModal.style.display = "block";
+        deleteConfirmationModal.style.display = "flex";
     }
 
     function closeDeleteConfirmationModal() {
@@ -224,7 +229,7 @@
 
         medicalRecords.forEach(record => {
             const recordElement = document.createElement("div");
-            recordElement.className = "card mb-3";
+            recordElement.className = "card mb-3 navCard";
 
             let fileContent = "";
             if (record.scans) {
@@ -240,16 +245,17 @@
             }
 
             recordElement.innerHTML = `
-            <div class="card-body">
+            <div class="card-body ">
                 <div class="card-info">
                     <h5 class="card-title">${record.conditionName}</h5>
-                    <p class="card-text"><strong>Diagnosed Date:</strong> ${record.diagnosedDate}</p>
-                    <p class="card-text"><strong>Treated:</strong> ${record.isTreated}</p>
-                    <p class="card-text cardText"><strong>Treatment Plan</strong> ${record.treatmentPlan || 'N/A'}</p>
-                    ${record.doctor ? `<p class="card-text "><strong>Diagnosed By:</strong> ${record.doctor.staffName}</p>` : ""}
+                    <p class="card-text">Diagnosed Date ${record.diagnosedDate}</p>
+                    <p class="card-text">Treated ${record.isTreated}</p>
+                    <p class="card-text cardText">Treatment Plan ${record.treatmentPlan || 'N/A'}</p>
+                    ${record.doctor ? `<p class="card-text ">Diagnosed By: ${record.doctor.staffName}</p>` : ""}
                     <div>${fileContent}</div>
+                                    <button class="btn btn-danger delete-btn" data-record-id="${record.recordID}">Delete</button>
+
                 </div>
-                <button class="delete-btn" data-record-id="${record.recordID}">Delete</button>
             </div>
         `;
             historyContainer.appendChild(recordElement);
@@ -284,7 +290,7 @@
                         Toastify({
                             text: errorMessage,
                             duration: 3000,
-                            backgroundColor: "rgba(255, 200, 200, 0.5)",
+                            backgroundColor: "rgba(255, 200, 200)",
                             close: true,
                             gravity: "top",
                             position: "right",

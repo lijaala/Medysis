@@ -141,14 +141,14 @@ public class RecordService {
     }
     public List<MedicalRecord> getMedicalRecordsByUserId(Integer userID) {
         System.out.println("Service: Retrieving records for userID: " + userID);
-        List<MedicalRecord> records = medicalRecordsRepository.findByUserId(userID); // Assuming your repository method is named findByUserID
+        List<MedicalRecord> records = medicalRecordsRepository.findByUserIdAndDeletedFalse(userID); // Assuming your repository method is named findByUserIdAndDeletedFalse
         System.out.println("Service: Retrieved records: " + records);
         return records;
     }
 
     public void updateTreatmentStatus(List<MedicalRecord> records) {
         for (MedicalRecord record : records) {
-            Optional<MedicalRecord> optionalRecord = medicalRecordsRepository.findById(record.getRecordID());
+            Optional<MedicalRecord> optionalRecord = medicalRecordsRepository.findByIdAndDeletedFalse(record.getRecordID());
             optionalRecord.ifPresent(existingRecord -> {
                 existingRecord.setIsTreated(record.getIsTreated()); // Only update status
                 medicalRecordsRepository.save(existingRecord);
@@ -159,13 +159,13 @@ public class RecordService {
     public MedicalRecord getMedicalRecordByAppointmentId(Integer appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId).orElse(null); // Find Appointment object
         if (appointment != null) {
-            return medicalRecordsRepository.findByAppointment(appointment);
+            return medicalRecordsRepository.findByAppointmentAndDeletedFalse(appointment);
         }
         return null; // Or throw an exception if appointment is not found
     }
 
     public String updateDiagnosis(Integer recordId, Integer userID, String doctorID, String conditionName, String treatmentPlan, Integer appointmentID, Integer followUpMonths) {
-        Optional<MedicalRecord> optionalRecord = medicalRecordsRepository.findById(recordId);
+        Optional<MedicalRecord> optionalRecord = medicalRecordsRepository.findByIdAndDeletedFalse(recordId);
         User user = userRepository.findById(userID).orElse(null);
         Staff doctor = staffRepository.findById(doctorID).orElse(null);
         Appointment appointment = appointmentRepository.findById(appointmentID).orElse(null);
@@ -200,17 +200,14 @@ public class RecordService {
     }
 
 
-    public boolean deleteMedicalRecordById(Integer recordId, String userId) {
-        Optional<MedicalRecord> medicalRecordOptional = medicalRecordsRepository.findById(recordId);
+    public boolean softDeleteMedicalRecordById(Integer recordId, String userId) {
+        Optional<MedicalRecord> medicalRecordOptional = medicalRecordsRepository.findByIdAndDeletedFalse(recordId);
 
         if (medicalRecordOptional.isEmpty()) {
             return false; // Record not found
         }
 
         MedicalRecord medicalRecord = medicalRecordOptional.get();
-
-        // Assuming your MedicalRecord entity has a getUser() method that returns the User object
-        // and the User object has an getId() method that returns the user's ID (as an Integer)
         String recordOwnerId = String.valueOf(medicalRecord.getUser().getId());
 
         if (!recordOwnerId.equals(userId)) {
@@ -218,12 +215,14 @@ public class RecordService {
         }
 
         try {
-            medicalRecordsRepository.deleteById(recordId);
+            medicalRecord.setAlteredBy(recordOwnerId);
+            medicalRecord.setDeleted(true); // Set the deleted field to true
+            medicalRecordsRepository.save(medicalRecord); // Save the updated record
             return true;
         } catch (Exception e) {
             // Log the error for debugging
             e.printStackTrace();
-            return false; // Error during deletion
+            return false; // Error during soft deletion
         }
     }
 }

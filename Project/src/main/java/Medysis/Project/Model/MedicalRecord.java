@@ -42,6 +42,8 @@ public class MedicalRecord {
 
     @Column(name = "alteredBy")
     private String alteredBy;
+    @Column(name="deleted")
+    private Boolean deleted;
 
 
     public Integer getRecordID() {
@@ -118,6 +120,14 @@ public class MedicalRecord {
 
     public String getAlteredBy() {
         return alteredBy;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 
     public void setAlteredBy(String alteredBy) {

@@ -122,7 +122,7 @@ public class MedicalRecordController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User not logged in."));
         }
 
-        boolean isDeleted = recordService.deleteMedicalRecordById(recordId, userId);
+        boolean isDeleted = recordService.softDeleteMedicalRecordById(recordId, userId);
 
         if (isDeleted) {
             return ResponseEntity.ok(Map.of("message", "Medical record deleted successfully."));
