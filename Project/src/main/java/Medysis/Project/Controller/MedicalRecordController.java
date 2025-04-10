@@ -81,24 +81,10 @@ public class MedicalRecordController {
 
 
     @GetMapping("/getByUserId")
-    public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam(value = "userId", required = false) Integer userID, HttpSession session) {
-        if (userID != null) {
-            // userID parameter is provided, use it
-            return recordService.getMedicalRecordsByUserId(userID);
-        }
+    public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam(value = "userId", required = false) Integer userId, HttpSession session) {
+            System.out.print(userId);
+            return recordService.getMedicalRecordsByUserId(userId);
 
-        // userID parameter is NOT provided, use session userId
-        Object userIdFromSession = session.getAttribute("userId");
-        if (userIdFromSession instanceof Integer) {
-            return recordService.getMedicalRecordsByUserId((Integer) userIdFromSession);
-        } else {
-            try {
-                return recordService.getMedicalRecordsByUserId(Integer.parseInt((String) userIdFromSession));
-            } catch (NumberFormatException e) {
-                System.err.println("Error: userId in session is not a valid integer: " + userIdFromSession);
-                return Collections.emptyList();
-            }
-        }
     }
 
     @PostMapping("/updateStatus")

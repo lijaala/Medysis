@@ -241,9 +241,9 @@ closeDiagnosis.addEventListener('click', closeDiagnosisModal);
 // view past medical records
 function viewPastRecords() {
     const userID = document.getElementById("userIdInput").value;
-    console.log(userID);
+    console.log("user ID: to view past medical Records"+userID);
 
-    fetch(`/api/medicalRecords/getByUserId?userID=${userID}`)
+    fetch(`/api/medicalRecords/getByUserId?userId=${userID}`)
     .then(response => response.json())
     .then(data => {
         console.log(data)
