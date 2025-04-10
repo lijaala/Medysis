@@ -178,7 +178,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         // Empty cells after the last day of the month
                     } else {
                         const date = new Date(year, month, dayCounter);
-                        const dateStr = date.toISOString().slice(0, 10); // Format as YYYY-MM-DD
+                        const dateStr = date.toLocaleDateString('en-CA'); // new (gives YYYY-MM-DD in local time)
+                        // Format as YYYY-MM-DD
                         dayDiv.textContent = dayCounter; // Display the day number by default
 
 
@@ -301,7 +302,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     } else {
                         const date = new Date(year, month, dayCounter);
-                        const dateStr = date.toISOString().slice(0, 10);
+                        const dateStr = date.toLocaleDateString('en-CA'); // new (gives YYYY-MM-DD in local time)
+
                         dayDiv.textContent = dayCounter;
 
                         if (dayCounter === today && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
