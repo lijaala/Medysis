@@ -35,10 +35,6 @@
   ],
   "icons": [
     {
-      "src": "/image/logoSmall.png",
-      "sizes": "636x176",
-      "type": "image/png"
-    },{
       "src": "/image/logoSquare1.png",
       "sizes": "144x144",
       "type": "image/png"

@@ -17,7 +17,7 @@
 
 <div class="container">
     <div class="row ">
-        <div class="myHeader p-2" th:replace="userHome::header"></div>
+        <div class="myHeader p-5" th:replace="userHome::header"></div>
 
         <div class="d-flex flex-column mainScreen">
             <div class=" my-5 ">
@@ -60,11 +60,12 @@
 
         </div>
                 <div class="px-4 w-100" id="appHistory">
-                    <div class="d-flex justify-content-around mb-3">
-                        <button class="btn btn-outline-primary" onclick="filterAppointments('Completed')">Complete</button>
-                        <button class="btn btn-outline-primary" onclick="filterAppointments('Upcoming')">Upcoming</button>
-                        <button class="btn btn-outline-primary" onclick="filterAppointments('Cancelled')">Cancelled</button>
+                    <div class="d-flex justify-content-center mb-3" id="filterButtonsContainer">
+                        <button class="filterBtnOutline mx-1" onclick="filterAppointments('Completed', this)">Complete</button>
+                        <button class="filterBtnOutline mx-1" onclick="filterAppointments('Upcoming', this)">Upcoming</button>
+                        <button class="filterBtnOutline mx-1" onclick="filterAppointments('Cancelled', this)">Cancelled</button>
                     </div>
+
                     <div id="appointmentList">
                     </div>
                 </div>
@@ -120,6 +121,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
         fetchDoctors();
         fetchAppointmentHistory();
         if ('serviceWorker' in navigator) {
@@ -185,7 +187,14 @@
                 })
                 .catch(error => console.error('Error:', error));
         })
-        filterAppointments('Upcoming');
+        const upcomingButton = document.querySelector('#filterButtonsContainer button:nth-child(2)'); // Assuming "Upcoming" is the second button
+
+        if (upcomingButton) {
+            upcomingButton.className = 'filterBtn mx-2'; // Apply the selected style
+        }
+
+        filterAppointments('Upcoming', upcomingButton); // Pass the button to filterAppointments
+
         setupAppointmentSearch();
     });
 
@@ -352,10 +361,10 @@
             detailsDiv.classList.add('col');
 
             detailsDiv.innerHTML = `
-                <p>Doctor: ${appointment.doctorID.staffName}</p>
+                <p class="text-nowrap">Doctor: ${appointment.doctorID.staffName}</p>
                 <p>Date:${formattedDate}</p>
                 <p>Time: ${formattedTime}</p>
-                <p>Status: ${appointment.status}</p>
+                <p class="text-nowrap">Status: ${appointment.status}</p>
             `;
 
             const buttonDiv = document.createElement('div');
@@ -527,7 +536,28 @@ function closeEditForm(){
         document.getElementById('editAppointment').style.display="flex";
 
 }
-    function filterAppointments(status) {
+    function filterAppointments(status, clickedButton, isSearch = false) { // Added isSearch parameter
+        if (!isSearch) { // Clear only if not called by search
+            const appHistoryDiv = document.getElementById('appointmentList');
+            appHistoryDiv.innerHTML = '';
+        }
+
+        if (clickedButton && !isSearch) { // Check if clickedButton exists AND not search
+            // Reset all buttons to outline style
+            const buttons = document.querySelectorAll('#filterButtonsContainer button');
+            buttons.forEach(button => {
+                button.className = 'filterBtnOutline mx-2';
+            });
+
+            // Apply filled style to the clicked button
+            clickedButton.className = 'filterBtn mx-2';
+        } else if (isSearch) { // Clear styling on search
+            const buttons = document.querySelectorAll('#filterButtonsContainer button');
+            buttons.forEach(button => {
+                button.className = 'filterBtnOutline mx-2';
+            });
+        }
+
         fetch('/appointment/getByUserID')
             .then(response => response.json())
             .then(appointments => {
@@ -538,38 +568,40 @@ function closeEditForm(){
                         const now = new Date();
                         return appointmentDate > now;
                     });
+                } else if (status === 'Search') {
+                    // No status-based filtering for search
+                    filteredAppointments = appointments;
                 } else {
                     filteredAppointments = appointments.filter(appointment => appointment.status === status);
                 }
+
+                if (status === 'Search') {
+                    const searchInput = document.getElementById('search');
+                    const searchTerm = searchInput.value.toLowerCase();
+                    filteredAppointments = filteredAppointments.filter(appointment => {
+                        const doctorName = appointment.doctorID.staffName.toLowerCase();
+                        const appointmentDate = new Date(appointment.appDate).toLocaleDateString();
+
+                        return doctorName.includes(searchTerm) || appointmentDate.includes(searchTerm);
+                    });
+                }
+
                 displayAppointments(filteredAppointments);
             })
             .catch(error => console.error('Error fetching appointment history:', error));
     }
+
     function setupAppointmentSearch() {
         const searchInput = document.getElementById('search');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const searchTerm = searchInput.value.toLowerCase();
-                filterAppointmentsBySearch(searchTerm);
+                filterAppointments('Search', null, true); // Pass isSearch = true
             });
         }
     }
 
-    // Function to filter appointments based on search term
-    function filterAppointmentsBySearch(searchTerm) {
-        fetch('/appointment/getByUserID')
-            .then(response => response.json())
-            .then(appointments => {
-                const filteredAppointments = appointments.filter(appointment => {
-                    const doctorName = appointment.doctorID.staffName.toLowerCase();
-                    const appointmentDate = new Date(appointment.appDate).toLocaleDateString();
 
-                    return doctorName.includes(searchTerm) || appointmentDate.includes(searchTerm);
-                });
-                displayAppointments(filteredAppointments);
-            })
-            .catch(error => console.error('Error fetching appointments:', error));
-    }
 
 </script>
 </body>

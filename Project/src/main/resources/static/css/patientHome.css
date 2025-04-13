@@ -275,3 +275,17 @@ button{
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
+.filterBtn{
+    background-color: #07104E;
+    color:white;
+    border: none;
+    border-radius: 15px;
+
+}
+.filterBtnOutline{
+    background-color: white;
+    color:#07104E;
+    border: #07104E 1px solid;
+    border-radius: 15px;
+
+}
