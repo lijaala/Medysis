@@ -82,8 +82,17 @@ public class MedicalRecordController {
 
     @GetMapping("/getByUserId")
     public List<MedicalRecord> getMedicalRecordsByUserId(@RequestParam(value = "userId", required = false) Integer userId, HttpSession session) {
+        if(userId!=null)    {
             System.out.print(userId);
-            return recordService.getMedicalRecordsByUserId(userId);
+
+        } else if(userId==null) {
+            String user=(String) session.getAttribute("userId");
+            System.out.print(user);
+            userId=Integer.parseInt(user);
+
+        }
+        return recordService.getMedicalRecordsByUserId(userId);
+
 
     }
 

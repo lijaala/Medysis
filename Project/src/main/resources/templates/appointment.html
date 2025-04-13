@@ -6,30 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointments</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link href="/css/default.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/patientHome.css">
     <link rel="stylesheet" href="/css/navBar.css">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    </head>
+</head>
 
 <body>
 
 <div class="container">
     <div class="row ">
-        <div class="myHeader p-5" th:replace="userHome::header"></div>
+        <div class="myHeader p-2" th:replace="userHome::header"></div>
 
         <div class="d-flex flex-column mainScreen">
-            <div class=" my-5 ">
+            <div class="d-flex flex-column py-2  my-5">
+
                 <div class="row px-4 mb-4  w-100">
                     <button class="primary w-100" id="bookBtn" onclick="openAppointmentForm()">Book Appointment</button>
                 </div>
-                <div class="row px-4 w-100" id="appointmentForm" style="display: none;">
+
+                <div class="row  w-100" id="appHistory">
+                <form action="/appointment/book" method="POST"  id="appointmentFormSubmit" style="display: none;">
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn-close" aria-label="Close" onclick="closeAppointmentForm()"></button>
                     </div>
-                <form action="/appointment/book" method="POST"  id="appointmentFormSubmit">
-
                 <div class="mb-3">
                     <label for="doctor" onchange="updateTimeSlots()">Select Doctor</label>
                     <select class="form-control" id="doctor" name="doctor" required>
@@ -58,8 +59,6 @@
                 </div>
             </form>
 
-        </div>
-                <div class="px-4 w-100" id="appHistory">
                     <div class="d-flex justify-content-center mb-3" id="filterButtonsContainer">
                         <button class="filterBtnOutline mx-1" onclick="filterAppointments('Completed', this)">Complete</button>
                         <button class="filterBtnOutline mx-1" onclick="filterAppointments('Upcoming', this)">Upcoming</button>
@@ -187,13 +186,6 @@
                 })
                 .catch(error => console.error('Error:', error));
         })
-        const upcomingButton = document.querySelector('#filterButtonsContainer button:nth-child(2)'); // Assuming "Upcoming" is the second button
-
-        if (upcomingButton) {
-            upcomingButton.className = 'filterBtn mx-2'; // Apply the selected style
-        }
-
-        filterAppointments('Upcoming', upcomingButton); // Pass the button to filterAppointments
 
         setupAppointmentSearch();
     });
@@ -324,14 +316,14 @@
         return `${formattedHours}:${minutes} ${period}`;
     }
     function openAppointmentForm(){
-        document.getElementById('appointmentForm').style.display="block";
+        document.getElementById('appointmentFormSubmit').style.display="block";
         document.getElementById('bookBtn').style.display="none";
-        document.getElementById('appHistory').style.display="none";
+       // document.getElementById('appointmentList').style.display="none";
     }
     function closeAppointmentForm(){
-        document.getElementById('appointmentForm').style.display="none";
+        document.getElementById('appointmentFormSubmit').style.display="none";
         document.getElementById('bookBtn').style.display="block";
-        document.getElementById('appHistory').style.display="block";
+        //document.getElementById('appointmentList').style.display="block";
     }
     function fetchAppointmentHistory() {
         fetch('/appointment/getByUserID')
@@ -346,25 +338,28 @@
     function displayAppointments(appointments) {
         const appHistoryDiv = document.getElementById('appointmentList');
         appHistoryDiv.innerHTML = '';
-
+        if (!appointments || appointments.length === 0) {
+            appHistoryDiv.innerHTML = "<p>No appointment available.</p>";
+            return;
+        }
         appointments.forEach(appointment => {
             const appointmentDiv = document.createElement('div');
-            appointmentDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'position-relative', 'navCard');
+            appointmentDiv.className="card mb-3 navCard";
 
             const formattedDate = new Date(appointment.appDate).toLocaleDateString();
             const formattedTime = appointment.appTime;
 
             const rowDiv = document.createElement('div'); // Create row div here
-            rowDiv.classList.add('row', 'align-items-center'); // Added align-items-center to align items vertically
+            rowDiv.classList.add( "card-body"); // Added align-items-center to align items vertically
 
             const detailsDiv = document.createElement('div');
-            detailsDiv.classList.add('col');
+            detailsDiv.classList.add('card-info');
 
             detailsDiv.innerHTML = `
-                <p class="text-nowrap">Doctor: ${appointment.doctorID.staffName}</p>
-                <p>Date:${formattedDate}</p>
-                <p>Time: ${formattedTime}</p>
-                <p class="text-nowrap">Status: ${appointment.status}</p>
+                <p class=" card-text text-nowrap">Doctor: ${appointment.doctorID.staffName}</p>
+                <p class="card-text">Date:${formattedDate}</p>
+                <p class="card-text">Time: ${formattedTime}</p>
+                <p class="card-text text-nowrap">Status: ${appointment.status}</p>
             `;
 
             const buttonDiv = document.createElement('div');
@@ -536,56 +531,48 @@ function closeEditForm(){
         document.getElementById('editAppointment').style.display="flex";
 
 }
-    function filterAppointments(status, clickedButton, isSearch = false) { // Added isSearch parameter
-        if (!isSearch) { // Clear only if not called by search
-            const appHistoryDiv = document.getElementById('appointmentList');
-            appHistoryDiv.innerHTML = '';
-        }
+    let selectedFilterStatus = null; // Track selected filter status
 
-        if (clickedButton && !isSearch) { // Check if clickedButton exists AND not search
-            // Reset all buttons to outline style
+    function filterAppointments(status, clickedButton, isSearch = false) {
+        if (!isSearch) {
             const buttons = document.querySelectorAll('#filterButtonsContainer button');
             buttons.forEach(button => {
-                button.className = 'filterBtnOutline mx-2';
+                button.className = 'filterBtnOutline mx-1';
             });
 
-            // Apply filled style to the clicked button
-            clickedButton.className = 'filterBtn mx-2';
-        } else if (isSearch) { // Clear styling on search
+            if (clickedButton) {
+                if (status === selectedFilterStatus) { // Check if already selected
+                    selectedFilterStatus = null; // Clear filter status
+                } else {
+                    clickedButton.className = 'filterBtn mx-1';
+                    selectedFilterStatus = status; // Set filter status
+                }
+            }
+        } else {
             const buttons = document.querySelectorAll('#filterButtonsContainer button');
             buttons.forEach(button => {
-                button.className = 'filterBtnOutline mx-2';
+                button.className = 'filterBtnOutline mx-1';
             });
         }
-
         fetch('/appointment/getByUserID')
             .then(response => response.json())
             .then(appointments => {
-                let filteredAppointments;
-                if (status === 'Upcoming') {
-                    filteredAppointments = appointments.filter(appointment => {
-                        const appointmentDate = new Date(appointment.appDate + 'T' + appointment.appTime);
-                        const now = new Date();
-                        return appointmentDate > now;
-                    });
-                } else if (status === 'Search') {
-                    // No status-based filtering for search
-                    filteredAppointments = appointments;
-                } else {
-                    filteredAppointments = appointments.filter(appointment => appointment.status === status);
+                let filteredAppointments = appointments;
+
+                if (selectedFilterStatus && !isSearch) {
+                    filteredAppointments = appointments.filter(appointment => appointment.status === selectedFilterStatus);
                 }
 
-                if (status === 'Search') {
+                if (isSearch) {
                     const searchInput = document.getElementById('search');
                     const searchTerm = searchInput.value.toLowerCase();
-                    filteredAppointments = filteredAppointments.filter(appointment => {
+                    filteredAppointments = appointments.filter(appointment => {
                         const doctorName = appointment.doctorID.staffName.toLowerCase();
                         const appointmentDate = new Date(appointment.appDate).toLocaleDateString();
 
                         return doctorName.includes(searchTerm) || appointmentDate.includes(searchTerm);
                     });
                 }
-
                 displayAppointments(filteredAppointments);
             })
             .catch(error => console.error('Error fetching appointment history:', error));

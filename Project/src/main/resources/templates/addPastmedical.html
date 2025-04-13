@@ -13,13 +13,7 @@
     <style>
 
 
-        button{
-            width: fit-content !important;
-            height: fit-content;
-            padding: 1%  2% !important;
 
-
-        }
         .upload:hover{
             color: #07104e;
             border: none;
@@ -84,6 +78,16 @@
 
         <div class="col sm-12" id="viewMedicalHistory">
 
+            <div class="d-flex justify-content-center mb-3" id="filterButtonsContainer">
+                <input type="date" id="startDate" placeholder="Start Date" class="mx-2">
+                <input type="date" id="endDate" placeholder="End Date" class="mx-2">
+                <button class="filterBtnOutline mx-2" onclick="filterMedicalRecords('no', this)">No</button>
+                <button class="filterBtnOutline mx-2" onclick="filterMedicalRecords('ongoing', this)">Ongoing</button>
+                <button class="filterBtnOutline mx-2" onclick="filterMedicalRecords('yes', this)">Yes</button>
+            </div>
+            <div id="medicalHistory">
+
+            </div>
 
             </div>
 
@@ -187,6 +191,8 @@
         } else {
             console.log('Service Workers are not supported by this browser.');
         }
+        fetchMedicalHistory();
+        setupMedicalRecordSearch();
     });
 
     function fetchMedicalHistory(userId = null) {
@@ -212,15 +218,20 @@
             })
             .catch(error => console.error("Error fetching medical history:", error));
     }
+    const upcomingButton = document.querySelector('#filterButtonsContainer button:nth-child(2)'); // Assuming "Upcoming" is the second button
 
+    if (upcomingButton) {
+        upcomingButton.className = 'filterBtn mx-2'; // Apply the selected style
+    }
     // Call the function without userId (session will be used)
     document.addEventListener("DOMContentLoaded", function () {
-        fetchMedicalHistory();
+
+
     });
 
 
     function populateMedicalHistory(medicalRecords) {
-        const historyContainer = document.getElementById("viewMedicalHistory");
+        const historyContainer = document.getElementById("medicalHistory");
         historyContainer.innerHTML = ""; // Clear existing content
 
         if (!medicalRecords || medicalRecords.length === 0) {
@@ -410,6 +421,95 @@
         });
     }
 
+    let selectedFilterStatus = null; // Track selected filter status
+
+    function filterMedicalRecords(status, clickedButton, isSearch = false, searchTerm = '') {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+
+        if (!isSearch) {
+            const buttons = document.querySelectorAll('#filterButtonsContainer button');
+            buttons.forEach(button => {
+                button.className = 'filterBtnOutline mx-2';
+            });
+
+            if (clickedButton) {
+                if (status === selectedFilterStatus) { // Check if already selected
+                    selectedFilterStatus = null; // Clear filter status
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+
+                } else {
+                    clickedButton.className = 'filterBtn mx-2';
+                    selectedFilterStatus = status; // Set filter status
+
+                }
+            }
+        } else {
+            const buttons = document.querySelectorAll('#filterButtonsContainer button');
+            buttons.forEach(button => {
+                button.className = 'filterBtnOutline mx-2';
+            });
+        }
+
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+
+        fetch('/api/medicalRecords/getByUserId', {
+            method: 'GET',
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch medical history");
+                }
+                return response.json();
+            })
+            .then(data => {
+                let filteredRecords = data;
+
+                if (startDate && endDate) {
+                    filteredRecords = filteredRecords.filter(record => {
+                        const recordDate = new Date(record.diagnosedDate);
+                        const start = new Date(startDate);
+                        const end = new Date(endDate);
+                        return recordDate >= start && recordDate <= end;
+                    });
+                }
+
+                if (selectedFilterStatus && !isSearch) { // Use selectedFilterStatus
+                    filteredRecords = filteredRecords.filter(record => record.isTreated === selectedFilterStatus);
+                }
+
+                if (isSearch && searchTerm) {
+                    filteredRecords = filteredRecords.filter(record => {
+                        const conditionName = record.conditionName.toLowerCase();
+                        return conditionName.includes(searchTerm);
+                    });
+                }
+                populateMedicalHistory(filteredRecords);
+            })
+            .catch(error => console.error("Error fetching medical history:", error));
+    }
+
+
+    document.getElementById('startDate').addEventListener('change', function() {
+        filterMedicalRecords(); // Call filter without status or clickedButton
+    });
+
+    document.getElementById('endDate').addEventListener('change', function() {
+        filterMedicalRecords(); // Call filter without status or clickedButton
+    });
+    function setupMedicalRecordSearch() {
+        const searchInput = document.getElementById('search'); // Assuming your search input has id="search"
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const searchTerm = searchInput.value.toLowerCase();
+                filterMedicalRecords(null, null, true, searchTerm); // Call with isSearch=true
+            });
+        }
+    }
+z
 </script>
 </body>
 </html>

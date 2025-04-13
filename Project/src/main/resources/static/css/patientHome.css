@@ -289,3 +289,12 @@ button{
     border-radius: 15px;
 
 }
+
+.upload:hover{
+    color: #07104e;
+    border: none;
+    background-color: rgba(7, 16, 78, 0.29);
+    box-shadow:0 1px 2px rgba(50, 49, 49, 0.28);
+    transform: scale(100%);
+
+}
