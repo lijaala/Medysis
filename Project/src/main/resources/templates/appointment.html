@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="/css/patientHome.css">
     <link rel="stylesheet" href="/css/navBar.css">
     <link rel="manifest" href="/manifest.json">
-<!--    <link rel="stylesheet" href="/css/login.css">-->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     </head>
 
@@ -61,7 +60,13 @@
 
         </div>
                 <div class="px-4 w-100" id="appHistory">
-
+                    <div class="d-flex justify-content-around mb-3">
+                        <button class="btn btn-outline-primary" onclick="filterAppointments('Completed')">Complete</button>
+                        <button class="btn btn-outline-primary" onclick="filterAppointments('Upcoming')">Upcoming</button>
+                        <button class="btn btn-outline-primary" onclick="filterAppointments('Cancelled')">Cancelled</button>
+                    </div>
+                    <div id="appointmentList">
+                    </div>
                 </div>
 
 
@@ -179,7 +184,9 @@
                     }
                 })
                 .catch(error => console.error('Error:', error));
-        });
+        })
+        filterAppointments('Upcoming');
+        setupAppointmentSearch();
     });
 
 
@@ -322,60 +329,64 @@
             .then(response => response.json())
             .then(appointments => {
                 console.log(appointments);
-                const appHistoryDiv = document.getElementById('appHistory');
-                appHistoryDiv.innerHTML = '';
-
-                appointments.forEach(appointment => {
-                    const appointmentDiv = document.createElement('div');
-                    appointmentDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'position-relative','navCard');
-
-                    const formattedDate = new Date(appointment.appDate).toLocaleDateString();
-                    const formattedTime = appointment.appTime;
-
-                    const rowDiv = document.createElement('div'); // Create row div here
-                    rowDiv.classList.add('row', 'align-items-center'); // Added align-items-center to align items vertically
-
-                    const detailsDiv = document.createElement('div');
-                    detailsDiv.classList.add('col');
-
-                    detailsDiv.innerHTML = `
-                    <p>Doctor: ${appointment.doctorID.staffName}</p>
-                    <p>Date:${formattedDate}</p>
-                    <p>Time: ${formattedTime}</p>
-                    <p>Status: ${appointment.status}</p>
-                `;
-
-                    const buttonDiv = document.createElement('div');
-                    buttonDiv.classList.add('col', 'text-end');
-
-                    if (appointment.status === 'Pending') {
-                        const rescheduleBtn = document.createElement('button');
-                        rescheduleBtn.textContent = 'Reschedule';
-                        rescheduleBtn.classList.add('m-1', 'btn', 'btn-sm', 'secondary', 'me-2');
-                        rescheduleBtn.onclick = () => {
-                            rescheduleAppointment(appointment);
-                            openEditForm();
-                        };
-
-                        const cancelBtn = document.createElement('button');
-                        cancelBtn.textContent = 'Cancel';
-                        cancelBtn.classList.add('m-1', 'btn', 'btn-sm', 'btn-outline-danger');
-                        cancelBtn.onclick = () => {
-                            cancelAppointment(appointment.appointmentID); // Pass appointment ID
-                        };
-
-                        buttonDiv.appendChild(rescheduleBtn);
-                        buttonDiv.appendChild(cancelBtn);
-                    }
-
-                    rowDiv.appendChild(detailsDiv); // Append details div to row
-                    rowDiv.appendChild(buttonDiv); // Append button div to row
-
-                    appointmentDiv.appendChild(rowDiv); // Append row div to appointment div
-                    appHistoryDiv.appendChild(appointmentDiv);
-                });
+                displayAppointments(appointments);
             })
             .catch(error => console.error('Error fetching appointment history:', error));
+    }
+
+    function displayAppointments(appointments) {
+        const appHistoryDiv = document.getElementById('appointmentList');
+        appHistoryDiv.innerHTML = '';
+
+        appointments.forEach(appointment => {
+            const appointmentDiv = document.createElement('div');
+            appointmentDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'position-relative', 'navCard');
+
+            const formattedDate = new Date(appointment.appDate).toLocaleDateString();
+            const formattedTime = appointment.appTime;
+
+            const rowDiv = document.createElement('div'); // Create row div here
+            rowDiv.classList.add('row', 'align-items-center'); // Added align-items-center to align items vertically
+
+            const detailsDiv = document.createElement('div');
+            detailsDiv.classList.add('col');
+
+            detailsDiv.innerHTML = `
+                <p>Doctor: ${appointment.doctorID.staffName}</p>
+                <p>Date:${formattedDate}</p>
+                <p>Time: ${formattedTime}</p>
+                <p>Status: ${appointment.status}</p>
+            `;
+
+            const buttonDiv = document.createElement('div');
+            buttonDiv.classList.add('col', 'text-end');
+
+            if (appointment.status === 'Pending') {
+                const rescheduleBtn = document.createElement('button');
+                rescheduleBtn.textContent = 'Reschedule';
+                rescheduleBtn.classList.add('m-1', 'btn', 'btn-sm', 'secondary', 'me-2');
+                rescheduleBtn.onclick = () => {
+                    rescheduleAppointment(appointment);
+                    openEditForm();
+                };
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.classList.add('m-1', 'btn', 'btn-sm', 'btn-outline-danger');
+                cancelBtn.onclick = () => {
+                    cancelAppointment(appointment.appointmentID); // Pass appointment ID
+                };
+
+                buttonDiv.appendChild(rescheduleBtn);
+                buttonDiv.appendChild(cancelBtn);
+            }
+
+            rowDiv.appendChild(detailsDiv); // Append details div to row
+            rowDiv.appendChild(buttonDiv); // Append button div to row
+
+            appointmentDiv.appendChild(rowDiv); // Append row div to appointment div
+            appHistoryDiv.appendChild(appointmentDiv);
+        });
     }
     function cancelAppointment(appointmentID) {
         fetch(`/appointment/cancel/${appointmentID}`, {
@@ -516,6 +527,50 @@ function closeEditForm(){
         document.getElementById('editAppointment').style.display="flex";
 
 }
+    function filterAppointments(status) {
+        fetch('/appointment/getByUserID')
+            .then(response => response.json())
+            .then(appointments => {
+                let filteredAppointments;
+                if (status === 'Upcoming') {
+                    filteredAppointments = appointments.filter(appointment => {
+                        const appointmentDate = new Date(appointment.appDate + 'T' + appointment.appTime);
+                        const now = new Date();
+                        return appointmentDate > now;
+                    });
+                } else {
+                    filteredAppointments = appointments.filter(appointment => appointment.status === status);
+                }
+                displayAppointments(filteredAppointments);
+            })
+            .catch(error => console.error('Error fetching appointment history:', error));
+    }
+    function setupAppointmentSearch() {
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                filterAppointmentsBySearch(searchTerm);
+            });
+        }
+    }
+
+    // Function to filter appointments based on search term
+    function filterAppointmentsBySearch(searchTerm) {
+        fetch('/appointment/getByUserID')
+            .then(response => response.json())
+            .then(appointments => {
+                const filteredAppointments = appointments.filter(appointment => {
+                    const doctorName = appointment.doctorID.staffName.toLowerCase();
+                    const appointmentDate = new Date(appointment.appDate).toLocaleDateString();
+
+                    return doctorName.includes(searchTerm) || appointmentDate.includes(searchTerm);
+                });
+                displayAppointments(filteredAppointments);
+            })
+            .catch(error => console.error('Error fetching appointments:', error));
+    }
+
 </script>
 </body>
 
