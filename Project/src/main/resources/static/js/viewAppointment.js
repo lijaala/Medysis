@@ -1,3 +1,4 @@
+let originalAppointments = [];
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const roleResponse = await fetch('api/auth/role', { method: 'GET', credentials: 'same-origin' });
@@ -45,7 +46,7 @@ async function fetchAppointments(userRole) {
             return;
         }
         const appointments = await appointmentResponse.json();
-        console.log("Appointments data:", appointments);
+        originalAppointments = appointments;
         const tbody = document.getElementById('appointmentTableBody');
 
         tbody.innerHTML = '';
@@ -53,6 +54,10 @@ async function fetchAppointments(userRole) {
         if (userRole.includes("DOCTOR")) {
             const headerCells = document.querySelectorAll('.appTable thead tr td.doctor-column');
             headerCells.forEach(cell => cell.remove());
+            document.querySelector('label[for="doctorFilter"]').style.display = 'none';
+            document.getElementById('doctorFilter').style.display = 'none';
+            document.getElementById('statusFilter').style.width='10vw';
+            document.querySelector(".filters").style.justifyContent="flex-start";
         }
         displayAppointments(appointments, userRole);
     } catch (error) {
@@ -482,4 +487,11 @@ function applyFilters(sortBy, order) {
             displayAppointments(filteredAppointments, userRole);
         })
         .catch(error => console.error('Error fetching appointments:', error));
+}
+
+function filterAppointments(query) {
+    const filteredAppointments = originalAppointments.filter(appointment =>
+        appointment.patientID?.name?.toLowerCase().includes(query.toLowerCase())
+    );
+    displayAppointments(filteredAppointments, userRole);
 }

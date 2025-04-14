@@ -233,10 +233,11 @@ canvas{
         border: none;
         border-radius: 20px;
         background-color: rgb(240, 242, 249);
-
         width: 30%
     }
-
+button{
+    width: fit-content;
+}
 
 }
 
@@ -602,4 +603,13 @@ button#addMedicationBtn {
 .sort-icon::after {
     content: '↕'; /* Default up/down arrow */
 }
+#statusFilter{
 
+        padding: 0.5vw 0.8vw;
+        background-color: rgb(238, 239, 248);
+        border: 1px solid rgb(245, 20, 125);
+        border-radius: .4vw;
+        height: 4vh;
+    width:10vw !important;
+        flex: none !important;
+}

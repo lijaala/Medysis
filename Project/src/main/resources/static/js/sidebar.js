@@ -16,14 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
             activeSection.style.display = 'flex';
 
         }
+        const searchInput = document.getElementById('search');
+
         if (target === 'patients') {
-            const searchInput = document.getElementById('search');
             if (searchInput) {
                 searchInput.addEventListener('input', () => {
                     filterPatients(searchInput.value);
                 });
-
-                filterPatients(searchInput.value); // Initial call when patient tab is selected
+                filterPatients(searchInput.value);
+            }
+        } else if (target === 'appointments') {
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    filterAppointments(searchInput.value);
+                });
+                filterAppointments(searchInput.value); // Initial call for appointments
             }
         }
 
