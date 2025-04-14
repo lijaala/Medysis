@@ -18,6 +18,10 @@
 
         <div class="row mainScreen">
             <div class="col-sm-12 mx-3 my-5 ">
+                <div class="d-flex justify-content-center mb-3" id="filterButtonsContainer">
+                    <input type="date" id="startDate" placeholder="Start Date">
+                    <input type="date" id="endDate" placeholder="End Date">
+                </div>
                 <div class="d-flex flex-column px-4 w-100" id="prescriptionBody">
 
                 </div>
@@ -32,6 +36,14 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         fetchPrescriptions(); // Call the function to fetch prescriptions
+        setupPrescriptionSearch();
+        document.getElementById('startDate').addEventListener('change', function () {
+            filterPrescriptions();
+        });
+        document.getElementById('endDate').addEventListener('change', function () {
+            filterPrescriptions();
+        });
+
     });
     function fetchPrescriptions() {
         fetch('/api/prescriptions/getByUserId')
@@ -42,57 +54,7 @@
                 return response.json();
             })
             .then(prescriptions => {
-                console.log(prescriptions)
-                const prescriptionBodyDiv = document.getElementById('prescriptionBody');
-                prescriptionBodyDiv.innerHTML = '';
-
-                if (prescriptions && prescriptions.length > 0) {
-                    prescriptions.forEach(prescription => {
-                        const prescriptionDiv = document.createElement('div');
-                        prescriptionDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'navCard');
-
-                        const prescriptionDate = new Date(prescription.prescriptionDate).toLocaleDateString();
-
-                        let prescriptionInfo = `
-                        <p>Prescription Date:&nbsp; ${prescriptionDate} </p>
-                        <p>Prescribed By:&nbsp; Dr. ${prescription.prescribedBy}</p>
-
-                    `;
-
-                        // Medications
-                        if (prescription.medications && prescription.medications.length > 0) {
-                            prescriptionInfo += `<h5 class="my-3">Prescribed Medicines</h5>`
-                            prescription.medications.forEach(medication => {
-                                prescriptionInfo += `
-
-                                    <p>${medication.medicationName}</p>
-                                    <p>Dosage: ${medication.dosage} &nbsp;| &nbsp; Intake: ${medication.intake}</p>
-                                    <p>Interval: ${medication.medicationInterval} &nbsp; | &nbsp;Days: ${medication.daysOfIntake}</p>
-                                    <hr>
-                            `;
-                            });
-                            prescriptionInfo += '</ul>';
-                        } else {
-                            prescriptionInfo += '<p>No medications prescribed.</p>';
-                        }
-                        prescriptionDiv.innerHTML = prescriptionInfo;
-
-                        // Print Button
-                        const printButton = document.createElement('button');
-                        printButton.textContent = 'Print Prescription';
-                        printButton.classList.add('btn', 'primary', 'btn-sm', 'mt-2');
-                        printButton.onclick = () => {
-                            printPrescription(prescription); // Pass the prescription object
-                        };
-
-                        prescriptionDiv.appendChild(printButton);
-                        prescriptionBodyDiv.appendChild(prescriptionDiv);
-
-
-                    });
-                } else {
-                    prescriptionBodyDiv.innerHTML = '<p>No prescriptions found.</p>';
-                }
+                displayPrescriptions(prescriptions);
             })
             .catch(error => {
                 console.error('Error fetching prescriptions:', error);
@@ -100,6 +62,54 @@
                 prescriptionBodyDiv.innerHTML = '<p>Failed to load prescriptions.</p>';
             });
     }
+
+    function displayPrescriptions(prescriptions) {
+        const prescriptionBodyDiv = document.getElementById('prescriptionBody');
+        prescriptionBodyDiv.innerHTML = '';
+
+        if (prescriptions && prescriptions.length > 0) {
+            prescriptions.forEach(prescription => {
+                const prescriptionDiv = document.createElement('div');
+                prescriptionDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'navCard');
+
+                const prescriptionDate = new Date(prescription.prescriptionDate).toLocaleDateString();
+
+                let prescriptionInfo = `
+                        <p>Prescription Date:&nbsp; ${prescriptionDate} </p>
+                        <p>Prescribed By:&nbsp; Dr. ${prescription.prescribedBy}</p>
+                    `;
+
+                if (prescription.medications && prescription.medications.length > 0) {
+                    prescriptionInfo += `<h5 class="my-3">Prescribed Medicines</h5>`
+                    prescription.medications.forEach(medication => {
+                        prescriptionInfo += `
+                                    <p>${medication.medicationName}</p>
+                                    <p>Dosage: ${medication.dosage} &nbsp;| &nbsp; Intake: ${medication.intake}</p>
+                                    <p>Interval: ${medication.medicationInterval} &nbsp; | &nbsp;Days: ${medication.daysOfIntake}</p>
+                                    <hr>
+                            `;
+                    });
+                    prescriptionInfo += '</ul>';
+                } else {
+                    prescriptionInfo += '<p>No medications prescribed.</p>';
+                }
+                prescriptionDiv.innerHTML = prescriptionInfo;
+
+                const printButton = document.createElement('button');
+                printButton.textContent = 'Print Prescription';
+                printButton.classList.add('btn', 'primary', 'btn-sm', 'mt-2');
+                printButton.onclick = () => {
+                    printPrescription(prescription);
+                };
+
+                prescriptionDiv.appendChild(printButton);
+                prescriptionBodyDiv.appendChild(prescriptionDiv);
+            });
+        } else {
+            prescriptionBodyDiv.innerHTML = '<p>No prescriptions found.</p>';
+        }
+    }
+
     function printPrescription(prescription) {
         let reportContent = `
         <!DOCTYPE html>
@@ -203,6 +213,50 @@ printWindow.focus();
 printWindow.print();
 printWindow.close();
 }
+    function filterPrescriptions(isSearch = false, searchTerm = '') {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        fetch('/api/prescriptions/getByUserId')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch prescriptions');
+                }
+                return response.json();
+            })
+            .then(prescriptions => {
+                let filteredPrescriptions = prescriptions;
+
+                if (startDate && endDate) {
+                    filteredPrescriptions = filteredPrescriptions.filter(prescription => {
+                        const prescriptionDate = new Date(prescription.prescriptionDate);
+                        const start = new Date(startDate);
+                        const end = new Date(endDate);
+                        return prescriptionDate >= start && prescriptionDate <= end;
+                    });
+                }
+
+                if (isSearch && searchTerm) {
+                    filteredPrescriptions = filteredPrescriptions.filter(prescription => {
+                        return prescription.medications.some(medication => medication.medicationName.toLowerCase().includes(searchTerm));
+                    });
+                }
+
+                displayPrescriptions(filteredPrescriptions);
+            })
+            .catch(error => console.error('Error fetching prescriptions:', error));
+    }
+
+    function setupPrescriptionSearch() {
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const searchTerm = searchInput.value.toLowerCase();
+                filterPrescriptions(true, searchTerm);
+            });
+        }
+    }
+
 </script>
 
 
