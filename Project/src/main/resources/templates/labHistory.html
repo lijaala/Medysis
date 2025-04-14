@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/navBar.css">
     <link rel="stylesheet" href="css/patientHome.css">
+
     <link rel="manifest" href="/manifest.json">
 </head>
 <body>
@@ -18,6 +19,10 @@
 
         <div class="d-flex flex-column mainScreen">
             <div class=" my-5 ">
+                <div class="d-flex justify-content-center mb-3" id="filterButtonsContainer">
+                    <input type="date" id="startDate" placeholder="Start Date" class="mx-2">
+                    <input type="date" id="endDate" placeholder="End Date" class="mx-2">
+                </div>
                 <div  id="labHistory">
 
                 </div>
@@ -55,6 +60,13 @@
         } else {
             console.log('Service Workers are not supported by this browser.');
         }
+        setupLabReportSearch();
+        document.getElementById('startDate').addEventListener('change', function () {
+            filterLabReports();
+        });
+        document.getElementById('endDate').addEventListener('change', function () {
+            filterLabReports();
+        });
 
     });
     function fetchLabHistory() {
@@ -66,71 +78,67 @@
                 return response.json();
             })
             .then(labOrders => {
-
-                const labHistoryDiv = document.getElementById('labHistory');
-                console.log(labOrders);
-                labHistoryDiv.innerHTML = '';
-
-                if (labOrders && labOrders.length > 0) {
-                    labOrders.forEach(labOrder => {
-                        const labOrderDiv = document.createElement('div');
-                        labOrderDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'navCard');
-
-                        const orderDate = new Date(labOrder.orderDate).toLocaleDateString();
-
-                        let labOrderInfo = `
-                        <p><strong>Order Date:</strong> ${orderDate}</p>
-                        <p><strong>Status:</strong> ${labOrder.labStatus}</p>
-                        <p><strong>Ordered By:</strong> ${labOrder.doctorName}</p>
-                    `;
-
-
-
-                        // Test Names
-                        if (labOrder.labResults && labOrder.labResults.length > 0) {
-                            labOrderInfo += '<h5>Tests:</h5><ul>';
-                            labOrder.labResults.forEach(result => {
-                                labOrderInfo += `<li>${result.testName}</li>`;
-                            });
-                            labOrderInfo += '</ul>';
-                        }
-
-                        // View Result Button (Conditional)
-                        if (labOrder.labStatus === 'Completed' || labOrder.labStatus === 'Ongoing') {
-                            const viewResultButton = document.createElement('button');
-                            viewResultButton.textContent = 'View Result';
-                            viewResultButton.classList.add('btn', 'primary', 'btn-sm');
-                            viewResultButton.onclick = () => {
-                                displayLabResultsModal(labOrder);
-                            };
-                            labOrderDiv.innerHTML = labOrderInfo;
-                            labOrderDiv.appendChild(viewResultButton);
-                        } else {
-                            labOrderDiv.innerHTML = labOrderInfo;
-                        }
-
-                        // Print Report Button (Conditional)
-                        if (labOrder.labStatus === 'Completed') {
-                            const printButton = document.createElement('button');
-                            printButton.textContent = 'Print Report';
-                            printButton.classList.add('btn', 'secondary', 'btn-sm', 'mt-2');
-                            printButton.onclick = () => {
-                                printLabReport(labOrder.orderID); // Pass only the orderID
-                            };
-                            labOrderDiv.appendChild(printButton);
-                        }
-
-                        labHistoryDiv.appendChild(labOrderDiv);
-                    });
-                } else {
-                    labHistoryDiv.innerHTML = '<p>No lab history found.</p>';
-                }
+                displayLabOrders(labOrders);
             })
             .catch(error => {
                 console.error('Error fetching lab history:', error);
                 const labHistoryDiv = document.getElementById('labHistory');
                 labHistoryDiv.innerHTML = '<p>No Lab History Found</p>';
             });
+    }
+    function displayLabOrders(labOrders) {
+        const labHistoryDiv = document.getElementById('labHistory');
+        labHistoryDiv.innerHTML = '';
+
+        if (labOrders && labOrders.length > 0) {
+            labOrders.forEach(labOrder => {
+                const labOrderDiv = document.createElement('div');
+                labOrderDiv.classList.add('col-sm-12', 'mb-3', 'p-3', 'border', 'rounded', 'navCard');
+
+                const orderDate = new Date(labOrder.orderDate).toLocaleDateString();
+
+                let labOrderInfo = `
+                         <p><strong>Order Date:</strong> ${orderDate}</p>
+                         <p><strong>Status:</strong> ${labOrder.labStatus}</p>
+                         <p><strong>Ordered By:</strong> ${labOrder.doctorName}</p>
+                     `;
+
+                if (labOrder.labResults && labOrder.labResults.length > 0) {
+                    labOrderInfo += '<h5>Tests:</h5><ul>';
+                    labOrder.labResults.forEach(result => {
+                        labOrderInfo += `<li>${result.testName}</li>`;
+                    });
+                    labOrderInfo += '</ul>';
+                }
+
+                if (labOrder.labStatus === 'Completed' || labOrder.labStatus === 'Ongoing') {
+                    const viewResultButton = document.createElement('button');
+                    viewResultButton.textContent = 'View Result';
+                    viewResultButton.classList.add('btn', 'primary', 'btn-sm');
+                    viewResultButton.onclick = () => {
+                        displayLabResultsModal(labOrder);
+                    };
+                    labOrderDiv.innerHTML = labOrderInfo;
+                    labOrderDiv.appendChild(viewResultButton);
+                } else {
+                    labOrderDiv.innerHTML = labOrderInfo;
+                }
+
+                if (labOrder.labStatus === 'Completed') {
+                    const printButton = document.createElement('button');
+                    printButton.textContent = 'Print Report';
+                    printButton.classList.add('btn', 'secondary', 'btn-sm', 'mt-2');
+                    printButton.onclick = () => {
+                        printLabReport(labOrder.orderID);
+                    };
+                    labOrderDiv.appendChild(printButton);
+                }
+
+                labHistoryDiv.appendChild(labOrderDiv);
+            });
+        } else {
+            labHistoryDiv.innerHTML = '<p>No lab history found.</p>';
+        }
     }
 
     function printLabReport(orderID) {
@@ -220,7 +228,7 @@
 
                             <!-- Signature Section -->
                             <div class="signature-section">
-                                <div>
+                                <div class="my-5>
                                     <div class="signature-line"></div>
                                     <p><strong>Lab Technician Signature</strong></p>
 
@@ -282,6 +290,49 @@
 
     function closeLabResultModal() {
         document.getElementById('labResultModal').style.display = 'none';
+    }
+    function filterLabReports(isSearch = false, searchTerm = '') {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        fetch('api/LabOrder/getByUserId')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch lab history');
+                }
+                return response.json();
+            })
+            .then(labOrders => {
+                let filteredLabOrders = labOrders;
+
+                if (startDate && endDate) {
+                    filteredLabOrders = filteredLabOrders.filter(labOrder => {
+                        const orderDate = new Date(labOrder.orderDate);
+                        const start = new Date(startDate);
+                        const end = new Date(endDate);
+                        return orderDate >= start && orderDate <= end;
+                    });
+                }
+
+                if (isSearch && searchTerm) {
+                    filteredLabOrders = filteredLabOrders.filter(labOrder => {
+                        return labOrder.labResults.some(result => result.testName.toLowerCase().includes(searchTerm));
+                    });
+                }
+
+                displayLabOrders(filteredLabOrders);
+            })
+            .catch(error => console.error('Error fetching lab history:', error));
+    }
+
+    function setupLabReportSearch() {
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const searchTerm = searchInput.value.toLowerCase();
+                filterLabReports(true, searchTerm);
+            });
+        }
     }
 </script>
 
