@@ -138,7 +138,7 @@ input,select, textarea, option {
     border: 1px solid rgb(245, 20, 125);
     border-radius: .4vw;
     height: 4vh;
-    /*flex: 1;*/
+    flex: 1;
 }
 .form-field label{
     flex: 1;

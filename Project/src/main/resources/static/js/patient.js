@@ -1,5 +1,25 @@
-    document.addEventListener("DOMContentLoaded", function (){
+let originalPatientList = [];
+
+document.addEventListener("DOMContentLoaded", function (){
         fetchPatientData();
+        document.querySelectorAll('.Table thead td[data-sort]').forEach(header => {
+            header.addEventListener('click', () => {
+                const sortBy = header.getAttribute('data-sort');
+                const order = header.getAttribute('data-order');
+                const newOrder = order === 'asc' ? 'desc' : 'asc';
+                header.setAttribute('data-order', newOrder);
+
+                // Remove active class from other headers
+                document.querySelectorAll('.Table thead td').forEach(h => {
+                    h.classList.remove('sort-active', 'sort-asc', 'sort-desc');
+                });
+
+                // Add active class to the clicked header
+                header.classList.add('sort-active', newOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+
+                applyPatientSort(sortBy, newOrder); // Call applyPatientSort with sort parameters
+            });
+        });
 
     })
 
@@ -13,6 +33,7 @@
 
         })
             .then(data =>{
+                originalPatientList = data;
                 populatePatientTable(data);
             })
             .catch(error=>{
@@ -151,7 +172,41 @@
         patientModal.style.display="none";
 
     }
+    function applyPatientSort(sortBy, order) {
+        fetch("api/user/all")
+            .then(response => response.json())
+            .then(patients => {
+                patients.sort((a, b) => {
+                    let valueA, valueB;
 
+                    switch (sortBy) {
+                        case 'name':
+                            valueA = a.name || '';
+                            valueB = b.name || '';
+                            break;
+                        case 'email':
+                            valueA = a.email || '';
+                            valueB = b.email || '';
+                            break;
+                        case 'phone':
+                            valueA = a.phone || '';
+                            valueB = b.phone || '';
+                            break;
+                        case 'verified':
+                            valueA = a.verified ? 'TRUE' : 'FALSE';
+                            valueB = b.verified ? 'TRUE' : 'FALSE';
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    const comparison = valueA.localeCompare(valueB);
+                    return order === 'asc' ? comparison : -comparison;
+                });
+                populatePatientTable(patients);
+            })
+            .catch(error => console.error('Error fetching patients:', error));
+    }
 
         // Show the popup and spinner
         const popUp = document.getElementById('popUp');
@@ -192,3 +247,11 @@
                 popupMessage.innerText = ""; // Clear the "Sending Email..." message
                 responseMessageElement.innerText = "An error occurred. Please try again later.";
             });
+function filterPatients(query) {
+    console.log("filterPatients called with query:", query);
+    console.log("originalPatientList:", originalPatientList);
+    const filteredPatients = originalPatientList.filter(patient =>
+        patient.name.toLowerCase().includes(query.toLowerCase())
+    );
+    populatePatientTable(filteredPatients);
+}

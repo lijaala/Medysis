@@ -14,10 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeItem && activeSection) {
             activeItem.classList.add('active');
             activeSection.style.display = 'flex';
-        }
-    };
 
-    // Event listener for menu item clicks
+        }
+        if (target === 'patients') {
+            const searchInput = document.getElementById('search');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    filterPatients(searchInput.value);
+                });
+
+                filterPatients(searchInput.value); // Initial call when patient tab is selected
+            }
+        }
+
+    };
     menuItems.forEach(item => {
         item.addEventListener('click', () => {
             const target = item.getAttribute('data-target');
