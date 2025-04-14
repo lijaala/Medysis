@@ -1,24 +1,40 @@
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="appointments">
-    <div class="search2">
-        <button class="primary" id="openAddApp" > Add Appointments</button>
 
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 3H2l8 9.46V19l4 2v-8.54z" />
-        </svg>
+    <div id="filterContainer">
+        <div class="search2">
+            <button class="primary" id="openAddApp" > Add Appointments</button>
+        </div>
+        <div class="filters">
 
+        <label for="statusFilter">Status:</label>
+        <select id="statusFilter">
+            <option value="">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+
+        <label for="doctorFilter">Doctor:</label>
+        <select id="doctorFilter">
+            <option value="">All</option>
+        </select>
+
+            <button id="applyFilters">Apply Filters</button>
+        </div>
 
 
     </div>
+
     <div>
 
         <table class="Table appTable" >
             <thead>
             <tr>
-                <td>Patient</td>
-                <td class="doctor-column">Doctor</td>
-                <td>Date</td>
-                <td>Time</td>
-                <td>Status</td>
+                <td data-sort="patient" data-order="asc">Patient <span class="sort-icon"></span></td>
+                <td class="doctor-column" data-sort="doctor" data-order="asc">Doctor <span class="sort-icon"></span></td>
+                <td data-sort="date" data-order="asc">Date <span class="sort-icon"></span></td>
+                <td data-sort="time" data-order="asc">Time <span class="sort-icon"></span></td>
+                <td data-sort="status" data-order="asc">Status <span class="sort-icon"></span></td>
                 <td>Actions</td>
             </tr>
             </thead>

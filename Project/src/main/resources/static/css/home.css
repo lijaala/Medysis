@@ -237,11 +237,6 @@ canvas{
         width: 30%
     }
 
-    button {
-        width: fit-content;
-    }
-
-
 
 }
 
@@ -563,3 +558,48 @@ button#addMedicationBtn {
 .settingBody .active{
     display:flex ;
 }
+#filterContainer{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap:5vh;
+    align-items: center;
+
+    button {
+        width: max-content;
+    }
+
+
+}
+.filters{
+    display: flex;
+    width:100%;
+    gap:5%;
+    align-items: center;
+    justify-content: center;
+
+}
+#applyFilters{
+    border-radius: 10px;
+    border: 1px solid rgb(255, 52, 147);
+    background-color: white;
+    color: rgb(255, 52, 147);
+    width: fit-content;
+    text-wrap: nowrap;
+}
+.sort-active {
+     /* Light gray background */
+}
+
+.sort-asc .sort-icon::after {
+    content: '▲'; /* Up arrow */
+}
+
+.sort-desc .sort-icon::after {
+    content: '▼'; /* Down arrow */
+}
+
+.sort-icon::after {
+    content: '↕'; /* Default up/down arrow */
+}
+
