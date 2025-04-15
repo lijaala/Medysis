@@ -1,4 +1,5 @@
 let originalAppointments = [];
+let currentAppointments = [];
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const roleResponse = await fetch('api/auth/role', { method: 'GET', credentials: 'same-origin' });
@@ -11,7 +12,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         await fetchAppointments(userRole);
         await populateDoctorFilter();
-        document.getElementById('applyFilters').addEventListener('click', applyFilters);
+
+        document.getElementById('applyAppFilters').addEventListener('click', () => {
+            filterAppointments();
+        });
 
         // Add click event listeners to table headers for sorting
         document.querySelectorAll('.appTable thead td').forEach(header => {
@@ -21,15 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const newOrder = order === 'asc' ? 'desc' : 'asc';
                 header.setAttribute('data-order', newOrder);
 
-                // Remove active class from other headers
-                document.querySelectorAll('.appTable thead td').forEach(h => {
-                    h.classList.remove('sort-active', 'sort-asc', 'sort-desc');
-                });
-
-                // Add active class to the clicked header
-                header.classList.add('sort-active', newOrder === 'asc' ? 'sort-asc' : 'sort-desc');
-
-                applyFilters(sortBy, newOrder); // Call applyFilters with sort parameters
+                sortAppointments(sortBy, newOrder);
             });
         });
 
@@ -47,18 +43,7 @@ async function fetchAppointments(userRole) {
         }
         const appointments = await appointmentResponse.json();
         originalAppointments = appointments;
-        const tbody = document.getElementById('appointmentTableBody');
-
-        tbody.innerHTML = '';
-
-        if (userRole.includes("DOCTOR")) {
-            const headerCells = document.querySelectorAll('.appTable thead tr td.doctor-column');
-            headerCells.forEach(cell => cell.remove());
-            document.querySelector('label[for="doctorFilter"]').style.display = 'none';
-            document.getElementById('doctorFilter').style.display = 'none';
-            document.getElementById('statusFilter').style.width='10vw';
-            document.querySelector(".filters").style.justifyContent="flex-start";
-        }
+        currentAppointments = appointments; // Add this line
         displayAppointments(appointments, userRole);
     } catch (error) {
         console.error("Error fetching data:", error);
@@ -432,66 +417,55 @@ async function handleAddAppointmentSubmit(event) {
 }
 
 addAppointmentForm.addEventListener("submit", handleAddAppointmentSubmit);
-
-function applyFilters(sortBy, order) {
+function filterAppointments() {
     const status = document.getElementById('statusFilter').value;
     const doctorId = document.getElementById('doctorFilter').value;
 
-    fetch('/appointment/list')
-        .then(response => response.json())
-        .then(appointments => {
-            let filteredAppointments = appointments;
+    let filteredAppointments = originalAppointments.filter(appointment => {
+        let statusMatch = !status || appointment.status === status;
+        let doctorMatch = !doctorId || appointment.doctorID?.staffID === doctorId;
+        return statusMatch && doctorMatch;
+    });
 
-            if (status) {
-                filteredAppointments = filteredAppointments.filter(appointment => appointment.status === status);
-            }
-
-            if (doctorId) {
-                filteredAppointments = filteredAppointments.filter(appointment => appointment.doctorID?.staffID === doctorId);
-            }
-
-            if (sortBy) { // Only sort if sortBy is provided
-                filteredAppointments.sort((a, b) => {
-                    let valueA, valueB;
-
-                    switch (sortBy) {
-                        case 'patient':
-                            valueA = a.patientID?.name || '';
-                            valueB = b.patientID?.name || '';
-                            break;
-                        case 'doctor':
-                            valueA = a.doctorID?.staffName || '';
-                            valueB = b.doctorID?.staffName || '';
-                            break;
-                        case 'date':
-                            valueA = a.appDate || '';
-                            valueB = b.appDate || '';
-                            break;
-                        case 'time':
-                            valueA = a.appTime || '';
-                            valueB = b.appTime || '';
-                            break;
-                        case 'status':
-                            valueA = a.status || '';
-                            valueB = b.status || '';
-                            break;
-                        default:
-                            return 0;
-                    }
-
-                    const comparison = valueA.localeCompare(valueB);
-                    return order === 'asc' ? comparison : -comparison;
-                });
-            }
-
-            displayAppointments(filteredAppointments, userRole);
-        })
-        .catch(error => console.error('Error fetching appointments:', error));
-}
-
-function filterAppointments(query) {
-    const filteredAppointments = originalAppointments.filter(appointment =>
-        appointment.patientID?.name?.toLowerCase().includes(query.toLowerCase())
-    );
+    currentAppointments = filteredAppointments; // Update currentAppointments
     displayAppointments(filteredAppointments, userRole);
 }
+
+function sortAppointments(sortBy, order) {
+    let sortedAppointments = [...originalAppointments];
+
+    sortedAppointments.sort((a, b) => {
+        let valueA, valueB;
+
+        switch (sortBy) {
+            case 'patient':
+                valueA = a.patientID?.name || '';
+                valueB = b.patientID?.name || '';
+                break;
+            case 'doctor':
+                valueA = a.doctorID?.staffName || '';
+                valueB = b.doctorID?.staffName || '';
+                break;
+            case 'date':
+                valueA = a.appDate || '';
+                valueB = b.appDate || '';
+                break;
+            case 'time':
+                valueA = a.appTime || '';
+                valueB = b.appTime || '';
+                break;
+            case 'status':
+                valueA = a.status || '';
+                valueB = b.status || '';
+                break;
+            default:
+                return 0;
+        }
+
+        const comparison = valueA.localeCompare(valueB);
+        return order === 'asc' ? comparison : -comparison;
+    });
+
+    displayAppointments(sortedAppointments, userRole);
+}
+

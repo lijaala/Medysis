@@ -33,6 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 filterAppointments(searchInput.value); // Initial call for appointments
             }
         }
+        else if (target === 'staff') {
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    filterStaff(searchInput.value);
+                });
+                filterStaff(searchInput.value); // Initial staff load
+            }
+        }
 
     };
     menuItems.forEach(item => {

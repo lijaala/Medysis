@@ -148,23 +148,30 @@
 </section>
 
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="staff">
+
     <div class="search2">
         <button class="primary" id="openStaffFrom" onclick="openAddStaffForm()"> Add Staff</button>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 3H2l8 9.46V19l4 2v-8.54z" />
-        </svg>
-
-
-
     </div>
+        <div class="filters">
+            <label for="roleFilter">Filter by Role:</label>
+            <select id="roleFilter">
+                <option value="">All Roles</option>
+                <option value="ROLE_ADMIN">Admin</option>
+                <option value="ROLE_DOCTOR">Doctor</option>
+                <option value="ROLE_LAB TECHNICIAN">Lab Technician</option>
+            </select>
+        </div>
+
+
+
+
         <table class="Table">
             <thead>
                 <tr>
-                    <td>Name</td>
-                    <td>Role</td>
-                    <td>Email</td>
-                    <td>Phone</td>
+                    <td data-sort="name" data-order="asc">Name <span class="sort-icon"></span></td>
+                    <td data-sort="role" data-order="asc">Role <span class="sort-icon"></span></td>
+                    <td data-sort="email" data-order="asc">Email <span class="sort-icon"></span></td>
+                    <td data-sort="phone" data-order="asc">Phone <span class="sort-icon"></span></td>
                     <td>Action</td>
                 </tr>
             </thead>

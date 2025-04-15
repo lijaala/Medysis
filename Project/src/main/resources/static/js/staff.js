@@ -1,8 +1,5 @@
-
-
+let originalStaffList = [];
 document.addEventListener("DOMContentLoaded", function () {
-
-
 
     fetchRoles();
     fetchStaffData();
@@ -10,7 +7,30 @@ document.addEventListener("DOMContentLoaded", function () {
     setupProfileFormSubmission();
     loadProfilePicture();
 
-})
+    document.querySelectorAll('.Table thead td').forEach(header => {
+        header.addEventListener('click', () => {
+            const sortBy = header.getAttribute('data-sort'); // Get header text for sorting
+            const order = header.getAttribute('data-order');
+            const newOrder = order === 'asc' ? 'desc' : 'asc';
+            header.setAttribute('data-order', newOrder);
+
+            // Remove active class from other headers
+            document.querySelectorAll('.Table thead td').forEach(h => {
+                h.classList.remove('sort-active', 'sort-asc', 'sort-desc');
+            });
+
+            // Add active class to the clicked header
+            header.classList.add('sort-active', newOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+
+            sortStaff(originalStaffList, sortBy, newOrder);
+        });
+    });
+    document.getElementById('roleFilter').addEventListener('change', () => {
+        filterStaff(document.getElementById('search').value);
+    });
+
+
+});
 
 async function fetchRoles() {
     try {
@@ -136,6 +156,7 @@ function fetchStaffData() {
             return response.json();
         })
         .then(data => {
+            originalStaffList = data;
             populateStaffTable(data);
         })
         .catch(error => {
@@ -557,6 +578,54 @@ function deleteProfilePicture() {
 
         })
         .catch(error => alert("Error deleting profile picture."));
+}
+function filterStaff(query) {
+    const roleFilter = document.getElementById('roleFilter').value;
+    let filteredStaff = originalStaffList;
+
+    if (query) {
+        filteredStaff = filteredStaff.filter(staff =>
+            staff.staffName.toLowerCase().includes(query.toLowerCase())
+        );
+    }
+
+    if (roleFilter) {
+        filteredStaff = filteredStaff.filter(staff =>
+            staff.role && staff.role.role === roleFilter
+        );
+    }
+
+    populateStaffTable(filteredStaff);
+}
+function sortStaff(staffList, sortBy, order) {
+    staffList.sort((a, b) => {
+        let valueA, valueB;
+
+        switch (sortBy) {
+            case 'name':
+                valueA = a.staffName || '';
+                valueB = b.staffName || '';
+                break;
+            case 'role':
+                valueA = a.role && a.role.role ? a.role.role.replace('ROLE_', '') : '';
+                valueB = b.role && b.role.role ? b.role.role.replace('ROLE_', '') : '';
+                break;
+            case 'email':
+                valueA = a.staffEmail || '';
+                valueB = b.staffEmail || '';
+                break;
+            case 'phone':
+                valueA = a.staffPhone || '';
+                valueB = b.staffPhone || '';
+                break;
+            default:
+                return 0;
+        }
+
+        const comparison = valueA.localeCompare(valueB);
+        return order === 'asc' ? comparison : -comparison;
+    });
+    populateStaffTable(staffList);
 }
 
 

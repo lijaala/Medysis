@@ -1,17 +1,35 @@
 <section  xmlns:th="http://www.thymeleaf.org" th:fragment="labRequests">
 
-    <div>
+
+        <div id="filterContainer">
+        <div class="filters">
+            <label for="dateFilter">Filter by Date:</label>
+            <input type="date" id="dateFilter">
+
+            <label for="urgencyFilter">Filter by Urgency:</label>
+            <select id="urgencyFilter">
+                <option value="">All</option>
+                <option value="no">Routine</option>
+                <option value="yes">Urgent</option>
+            </select>
+
+            <button id="applyLabFilters" class="primary">Apply Filters</button>
+
+        </div>
+        </div>
+<div>
+
 
         <table class="Table" >
             <thead>
             <tr>
-                <td>ID</td>
-                <td>Patient</td>
-                <td>Doctor</td>
-                <td>Request Date</td>
-                <td>Test Count</td>
-                <td>Urgency</td>
-                <td>Status</td>
+                <td data-sort="orderID" data-order="asc">ID <span class="sort-icon"></span></td>
+                <td data-sort="userName" data-order="asc">Patient <span class="sort-icon"></span></td>
+                <td data-sort="doctorName" data-order="asc">Doctor <span class="sort-icon"></span></td>
+                <td data-sort="orderDate" data-order="asc">Request Date <span class="sort-icon"></span></td>
+                <td data-sort="testCount" data-order="asc">Test Count <span class="sort-icon"></span></td>
+                <td data-sort="urgency" data-order="asc">Urgency <span class="sort-icon"></span></td>
+                <td data-sort="labStatus" data-order="asc">Status <span class="sort-icon"></span></td>
                 <td>Actions</td>
             </tr>
             </thead>
@@ -20,22 +38,27 @@
 
             </tbody>
         </table>
-    </div>
-
-    <div id="overlay"></div>
-    <div id="labDetailsModal">
-    <div class="modal-body"></div>
 </div>
+
+<div class="modal" id="labDetails">
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content">
+
+
+    </div>
+</div>
+
 
     <div id="labResults" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="closeLabResults close" onclick="closeLabResultsModal()">&times</span>
+            <span class="closeLabResults close" >&times</span>
             <h3>Add Lab Results</h3>
             <div id="patientDoc">
 
 
             </div>
-            <div class="labResult-message"></div>
+
             <table class="Table">
                 <thead>
                 <tr>
