@@ -5,16 +5,27 @@ const modalContent = modal.querySelector('.modal-content');
 const labResultsModal = document.getElementById('labResults');
 const closeLabResults = labResultsModal.querySelector('.closeLabResults');
 const submitButton = document.getElementById('submitSingleResult');
-
+let originalLabOrders = []; // Store original lab orders for search
+let currentLabOrders = []; // Store current lab orders for display
+let currentDateFilter = '';
+let currentUrgencyFilter = '';
+let currentSortColumn = null;
+let currentSortOrder = 'asc';
 document.addEventListener('DOMContentLoaded', () => {
     displayLabOrders();
 });
 
 document.getElementById('applyLabFilters').addEventListener('click', () => {
+    currentDateFilter = document.getElementById('dateFilter').value;
+    currentUrgencyFilter = document.getElementById('urgencyFilter').value.toLowerCase();
     displayLabOrders();
 });
 
 function displayLabOrders(sortColumn, sortOrder) {
+    if (typeof sortColumn === 'undefined') {
+        sortColumn = currentSortColumn;
+        sortOrder = currentSortOrder;
+    }
     fetch('/api/LabOrder/all')
         .then(response => {
             if (!response.ok) {
@@ -23,46 +34,14 @@ function displayLabOrders(sortColumn, sortOrder) {
             return response.json();
         })
         .then(labOrders => {
-            let filteredOrders = applyFilters(labOrders);
-            let sortedOrders = applySorting(filteredOrders, sortColumn, sortOrder);
+            originalLabOrders = labOrders;
+            currentLabOrders = labOrders;
 
-            labRequestTable.innerHTML = '';
-
-            document.querySelectorAll('thead td[data-sort]').forEach(header => {
-                header.addEventListener('click', () => {
-                    const sortColumn = header.getAttribute('data-sort');
-                    const currentOrder = header.getAttribute('data-order') || 'asc';
-                    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-                    header.setAttribute('data-order', newOrder);
-
-                    displayLabOrders(sortColumn, newOrder);
-                });
-            });
-
-            if (Array.isArray(sortedOrders) && sortedOrders.length > 0) {
-                sortedOrders.forEach(order => {
-                    const row = labRequestTable.insertRow();
-                    row.setAttribute('data-id', order.orderID);
-
-                    row.innerHTML = `
-                        <td>${order.orderID}</td>
-                        <td>${order.userName || 'Unknown'}</td>
-                        <td>${order.doctorName || 'Unknown'}</td>
-                        <td>${order.orderDate}</td>
-                        <td>${order.labResults?.length || 0}</td>
-                        <td>${(order.urgency || 'N/A').toUpperCase()}</td>
-                        <td>${(order.labStatus)}</td>
-                        <td class="actions">
-                            <button type="button" class="secondary view-details" data-order-id="${order.orderID}">View Details</button>
-                            <button type="button" class="primary add-results" data-order-id="${order.orderID}">Add Results</button>
-                        </td>
-                    `;
-
-                    row.querySelector('.view-details').addEventListener('click', handleViewDetailsClick);
-                    row.querySelector('.add-results').addEventListener('click', handleAddResultsClick);
-                });
+            const searchInput = document.getElementById('search');
+            if (searchInput && searchInput.value) {
+                searchLabOrders(searchInput.value);
             } else {
-                labRequestTable.innerHTML = '<tr><td colspan="7">No lab orders found</td></tr>';
+                applyAndDisplay(sortColumn, sortOrder); // Use stored sort state
             }
         })
         .catch(error => {
@@ -71,6 +50,60 @@ function displayLabOrders(sortColumn, sortOrder) {
         });
 }
 
+function applyAndDisplay(sortColumn, sortOrder) {
+    let filteredOrders = applyFilters(currentLabOrders);
+    let sortedOrders = applyResultSorting(filteredOrders, sortColumn, sortOrder);
+    updateTable(sortedOrders, sortColumn, sortOrder);
+}
+function updateTable(sortedOrders, sortColumn, sortOrder) {
+    labRequestTable.innerHTML = '';
+    const headers = document.querySelectorAll('.orderTable thead td[data-sort]');
+
+    // Remove existing event listeners
+    headers.forEach(header => {
+        header.replaceWith(header.cloneNode(true));
+    });
+
+    // Re-select headers after cloning to get the new elements
+    const newHeaders = document.querySelectorAll('thead td[data-sort]');
+
+    newHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            currentSortColumn = header.getAttribute('data-sort');
+            currentSortOrder = header.getAttribute('data-order') || 'asc';
+            currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            header.setAttribute('data-order', currentSortOrder);
+
+            applyAndDisplay(currentSortColumn, currentSortOrder);
+        });
+    });
+
+    if (Array.isArray(sortedOrders) && sortedOrders.length > 0) {
+        sortedOrders.forEach(order => {
+            const row = labRequestTable.insertRow();
+            row.setAttribute('data-id', order.orderID);
+
+            row.innerHTML = `
+                <td>${order.orderID}</td>
+                <td>${order.userName || 'Unknown'}</td>
+                <td>${order.doctorName || 'Unknown'}</td>
+                <td>${order.orderDate}</td>
+                <td>${order.labResults?.length || 0}</td>
+                <td>${(order.urgency || 'N/A').toUpperCase()}</td>
+                <td>${(order.labStatus)}</td>
+                <td class="actions">
+                    <button type="button" class="secondary view-details" data-order-id="${order.orderID}">View Details</button>
+                    <button type="button" class="primary add-results" data-order-id="${order.orderID}">Add Results</button>
+                </td>
+            `;
+
+            row.querySelector('.view-details').addEventListener('click', handleViewDetailsClick);
+            row.querySelector('.add-results').addEventListener('click', handleAddResultsClick);
+        });
+    } else {
+        labRequestTable.innerHTML = '<tr><td colspan="7">No lab orders found</td></tr>';
+    }
+}
 function handleViewDetailsClick(event) {
     const orderId = event.target.dataset.orderId;
     fetch(`/api/LabOrder/details/${orderId}`)
@@ -303,35 +336,48 @@ function closeDetailsModal() {
 }
 
 function applyFilters(labOrders) {
-    const dateFilter = document.getElementById('dateFilter').value;
-    const urgencyFilter = document.getElementById('urgencyFilter').value.toLowerCase();
-
     return labOrders.filter(order => {
-        const matchesDate = !dateFilter || order.orderDate === dateFilter;
-        const matchesUrgency = !urgencyFilter || (order.urgency && order.urgency.toLowerCase() === urgencyFilter);
-
+        const matchesDate = !currentDateFilter || order.orderDate === currentDateFilter;
+        const matchesUrgency = !currentUrgencyFilter || (order.urgency && order.urgency.toLowerCase() === currentUrgencyFilter);
         return matchesDate && matchesUrgency;
     });
 }
 
-function applySorting(orders, sortColumn, sortOrder) {
+function searchLabOrders(query) {
+    let searchedOrders = originalLabOrders.filter(order => {
+        const patientName = order.userName?.toLowerCase() || '';
+        const doctorName = order.doctorName?.toLowerCase() || '';
+        const orderId = String(order.orderID).toLowerCase();
+        return patientName.includes(query.toLowerCase()) || doctorName.includes(query.toLowerCase()) || orderId.includes(query.toLowerCase());
+    });
+    currentLabOrders = searchedOrders;
+    applyAndDisplay();
+}
+
+function applyResultSorting(orders, sortColumn, sortOrder) {
     if (!sortColumn) return orders;
 
     return orders.slice().sort((a, b) => {
-        const valA = a[sortColumn];
-        const valB = b[sortColumn];
+        let valA = a[sortColumn];
+        let valB = b[sortColumn];
 
         if (valA == null) return 1;
         if (valB == null) return -1;
 
-        if (typeof valA === 'string') {
+        if (sortColumn === 'orderID') {
+            const numA = typeof valA === 'string' ? parseInt(valA, 10) : valA;
+            const numB = typeof valB === 'string' ? parseInt(valB, 10) : valB;
+            return sortOrder === 'asc' ? numA - numB : numB - numA;
+        } else if (sortColumn === 'orderDate'){
+            const dateA = new Date(valA);
+            const dateB = new Date(valB);
+            return sortOrder === 'asc'? dateA - dateB : dateB - dateA;
+        }else if (typeof valA === 'string') {
             return sortOrder === 'asc'
                 ? valA.localeCompare(valB)
                 : valB.localeCompare(valA);
+        } else {
+            return sortOrder === 'asc' ? valA - valB : valB - valA;
         }
-
-        return sortOrder === 'asc'
-            ? valA - valB
-            : valB - valA;
     });
 }

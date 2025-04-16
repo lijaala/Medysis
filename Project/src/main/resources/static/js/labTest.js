@@ -1,40 +1,96 @@
+let currentLabTests = [];
+let currentTestSortColumn = null;
+let currentTestSortOrder = 'asc';
+let sortOrders = {};
 
 
 document.addEventListener("DOMContentLoaded", function () {
     fetch("/api/labTests/availableTests")
         .then(response => response.json())
         .then(data => {
-            const tableBody = document.getElementById("labTestTable");
-            tableBody.innerHTML = ""; // Clear any existing rows
+            console.log("Fetched data:", data); // Check the fetched data
+            currentLabTests = data;
+            updateTestTable(currentLabTests);
 
-            data.forEach(test => {
-                let row = `<tr id="row-${test.testID}">
-                            <td>${test.testID}</td>
-                            <td>${test.testName}</td>
-                            <td>${test.measurementUnit}</td>
-                            <td>${test.normalRange}</td>
-                            <td class="actions">
-                                <button type="button" class="edit"> 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" onclick="editTest(${test.testID})">
-                                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                        <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
-                                    </g>
-                                </svg>
-                                </button>
-                                <button onclick="deleteTest(${test.testID})" class="delete">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
-                                    </svg>
-                                </button>
-                            </td>
-                        </tr>`;
-                tableBody.innerHTML += row;
+            const headers = document.querySelectorAll('.testTable thead td[data-sort]');
+
+
+            headers.forEach(header => {
+                const sortColumn = header.getAttribute('data-sort');
+                sortOrders[sortColumn] = 'asc';
+                    header.addEventListener('click', () => {
+                    currentTestSortColumn = sortColumn;
+                    sortOrders[sortColumn] = sortOrders[sortColumn] === 'asc' ? 'desc' : 'asc';
+                    currentTestSortOrder = sortOrders[sortColumn];
+                    sortAndUpdateTestTable();
+                });
+
             });
+            sortAndUpdateTestTable(); // Direct function call test
+
         })
+
         .catch(error => console.error("Error fetching lab tests:", error));
+
 });
 
+function sortAndUpdateTestTable() {
+    let sortedTests = sortTestTableData(currentLabTests, currentTestSortColumn, currentTestSortOrder);
+    updateTestTable(sortedTests);
+}
+
+function sortTestTableData(tests, sortColumn, sortOrder) {
+    if (!sortColumn) return tests;
+      return tests.slice().sort((a, b) => {
+        let valA = a[sortColumn];
+        let valB = b[sortColumn];
+
+        if (valA == null) return 1;
+        if (valB == null) return -1;
+
+        if (typeof valA === 'string') {
+            return sortOrder === 'asc'
+                ? valA.localeCompare(valB)
+                : valB.localeCompare(valA);
+        } else {
+            return sortOrder === 'asc' ? valA - valB : valB - valA;
+        }
+    });
+}
+
+
+function updateTestTable(tests) {
+    const tableBody = document.getElementById("labTestTable");
+    tableBody.innerHTML = "";
+
+    tests.forEach(test => {
+        let row = `<tr id="row-${test.testID}">
+                    <td>${test.testID}</td>
+                    <td>${test.testName}</td>
+                    <td>${test.measurementUnit}</td>
+                    <td>${test.normalRange}</td>
+                    <td class="actions">
+                        <button type="button" class="edit" onclick="editTest(${test.testID})">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                    <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+                                </g>
+                            </svg>
+                        </button>
+                        <button onclick="deleteTest(${test.testID})" class="delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>`;
+        tableBody.innerHTML += row;
+    });
+
+
+
+}
 
 function editTest(testID) {
     const row = document.getElementById(`row-${testID}`);

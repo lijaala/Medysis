@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
+
     } catch (error) {
         console.error("Error on page load:", error);
     }
@@ -427,9 +428,10 @@ function filterAppointments() {
         return statusMatch && doctorMatch;
     });
 
-    currentAppointments = filteredAppointments; // Update currentAppointments
+    currentAppointments = filteredAppointments;
     displayAppointments(filteredAppointments, userRole);
 }
+
 
 function sortAppointments(sortBy, order) {
     let sortedAppointments = [...originalAppointments];
@@ -469,3 +471,12 @@ function sortAppointments(sortBy, order) {
     displayAppointments(sortedAppointments, userRole);
 }
 
+function searchAppointments(query) {
+    let searchedAppointments = originalAppointments.filter(appointment => {
+        const patientName = appointment.patientID?.name?.toLowerCase() || '';
+        const doctorName = appointment.doctorID?.staffName?.toLowerCase() || '';
+        return patientName.includes(query.toLowerCase()) || doctorName.includes(query.toLowerCase());
+    });
+    currentAppointments = searchedAppointments;
+    displayAppointments(searchedAppointments, userRole);
+}

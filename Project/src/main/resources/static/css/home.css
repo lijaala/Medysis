@@ -549,7 +549,7 @@ button#addMedicationBtn {
 
 
 }
-#applyFilters{
+#applyFilters, .filterBtn{
     border-radius: 10px;
     border: 1px solid rgb(255, 52, 147);
     background-color: white;

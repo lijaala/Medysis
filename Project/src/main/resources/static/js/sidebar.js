@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (target === 'appointments') {
             if (searchInput) {
                 searchInput.addEventListener('input', () => {
-                    filterAppointments(searchInput.value);
+                    searchAppointments(searchInput.value);
                 });
                 filterAppointments(searchInput.value); // Initial call for appointments
             }
@@ -39,6 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     filterStaff(searchInput.value);
                 });
                 filterStaff(searchInput.value); // Initial staff load
+            }
+        }
+        else if(target==='testRequests'){
+            if(searchInput){
+                searchInput.addEventListener('input', () => {
+                    searchLabOrders(searchInput.value);
+                });
+                searchLabOrders(searchInput.value);
             }
         }
 

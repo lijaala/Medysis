@@ -20,7 +20,7 @@
 <div>
 
 
-        <table class="Table" >
+        <table class="orderTable  Table" >
             <thead>
             <tr>
                 <td data-sort="orderID" data-order="asc">ID <span class="sort-icon"></span></td>
@@ -89,19 +89,15 @@
 
     <div class="search2">
         <button class="primary" onclick="openTest()"> Add Test</button>
-
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 3H2l8 9.46V19l4 2v-8.54z" />
-        </svg>
     </div>
     <div>
-        <table class="Table" >
+        <table class="testTable Table" >
             <thead>
             <tr>
-                <td>ID</td>
-                <td>Test Name</td>
-                <td>Measurement Unit</td>
-                <td>Normal Range</td>
+                <td data-sort="testID" data-order="asc">ID<span class="sort-icon"></span></td>
+                <td data-sort="testName" data-order="asc">Test Name<span class="sort-icon"></span></td>
+                <td data-sort="measurementUnit" data-order="asc">Measurement Unit<span class="sort-icon"></span></td>
+                <td data-sort="normalRange" data-order="asc">Normal Range<span class="sort-icon"></span></td>
                 <td>Actions</td>
             </tr>
             </thead>
@@ -137,7 +133,7 @@
         </div>
 
     </div>
+    <script src="js/labTest.js"></script>
 
     <script src="js/lab.js"></script>
-    <script src="js/labTest.js"></script>
 </section>
