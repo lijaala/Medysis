@@ -4,6 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/login.css">
     <!-- Toastify CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="manifest" href="/manifest.json">
 
@@ -11,10 +13,11 @@
     <title>Login</title>
 </head>
 <body class="container">
+<div class="myHeader p-2" th:replace="userHome::header"></div>
 
 
-    <h1>WELCOME</h1>
-    <section class="form">
+    <section class="formMain">
+        <h1>WELCOME</h1>
         <div class="form-container">
             <form id="loginForm" class="form">
                 <div class="form-field">
@@ -27,14 +30,13 @@
                     <input type="password" id="password"  name="password" placeholder="Enter your password">
 
                 </div>
-                <div id="message" class="message-container form-field"></div> <!-- Message container -->
 
 
                 <div class="form-field">
                     <span><a id="forgotPasswordLink">Forgot Password?</a>  </span>
 
                     <button class="primary loginBtn" type="submit"> LOGIN</button>
-                    <button class="secondary loginBtn" type="submit"> <a href="/register">SIGNUP</a></button>
+                    <button class="secondary loginBtn" type="button"> <a href="/register">SIGNUP</a></button>
 
                 </div>
 
@@ -195,6 +197,7 @@
             console.log('Service Workers are not supported by this browser.');
         }
     </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

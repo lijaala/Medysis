@@ -45,14 +45,17 @@ html,body{
     align-items: center;
 }
 
-.search-container {
+.search-container  {
+
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
+
 .search-bar {
     padding: 5px;
+    flex:none !important;
     width: 80%;
     border: none;
     border-radius:12px;
