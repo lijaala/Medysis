@@ -10,11 +10,11 @@
 <body class="register">
 
     <section class="right">
-        <img src="image/NEO BEAUTY SALON.jpg" >
+<img src="image/NEO BEAUTY SALON.jpg">
 
     </section>
-
-
+<div class="left">
+    <img src="image/logo.png" class="logoLogin">
     <section class="form" xmlns:th="http://www.thymeleaf.org" th:fragment="user">
         <form action="/api/auth/signup" method="POST" class="form-container">
             <!-- First Row: First Name, Middle Name, Last Name -->
@@ -84,6 +84,7 @@
             </div>
         </form>
     </section>
+</div>
 
     <section class="popUp" id="popUp" style="display: none;">
         <div id="popupModal" class="popup-modal" style="display: none;">

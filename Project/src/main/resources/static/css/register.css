@@ -4,10 +4,10 @@
 .register {
     margin: 0;
     padding: 0;
-    width: 90vw;
+    width: 100%;
     height: 100vh;
     display: flex;
-    gap: 3vw;
+    gap: 1vh;
     flex-direction: row;
     align-self: center;
     background-color: #FDFDFF;
@@ -17,20 +17,38 @@
     background-repeat: no-repeat;
     background-size: contain;
     width: 70%;
-    img {
-        width: 100%;
-        height: 100%;
-        border-radius: 1vw;
-        object-fit: cover;
-        filter: brightness(.75);
-    }
+    height: 97%;
+img{
+    width:100%;
+    height: 100%;
+    filter: brightness(.75);
+    border-radius: 1vw;
+    object-fit: cover;
+}
  }
+.left{
+    margin-top: 2%;
+    width: 60%;
+    padding-right:2%;
+}
+.logoLogin{
+    height:15%;
+    margin-top: 1%;
+    width:40%;
+    object-fit: cover;
+    padding-left: 2%;
+
+}
+.form{
+    width: 100%;
+}
 .form-container {
-    margin-top: 13vh;
+    margin-top: 1vh;
     display: flex;
     flex-direction: column;
     padding: 2%;
     border-radius: 2vw;
+    width:100% !important;
 }
 .form-field button {
     margin-top: 1vh;
@@ -64,4 +82,37 @@
     height:60vh;
 
 
+}
+@media screen and (max-width: 767px){
+    .register{
+        width: 100%;
+        padding:2%;
+    }
+    .right{
+        display: none;
+    }
+    .left{
+        width:100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+    }
+    .form{
+        display: flex;
+        width:90%;
+        padding:5%;
+        align-items: center;
+    }
+    .form-field{
+        gap:1vh;
+    }
+    .form-container{
+        gap:2vh;
+
+    }
+    input, select, textarea, option{
+        border-radius: 1vw;
+        flex: none !important;
+    }
 }
