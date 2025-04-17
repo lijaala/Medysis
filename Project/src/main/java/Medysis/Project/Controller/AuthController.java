@@ -57,31 +57,16 @@ public class AuthController {
                          @RequestParam Integer age,
                          @RequestParam String gender,
                          @RequestParam MultipartFile image) {
-        System.out.println("Received signup request with name: " + name + ", email: " + email + ", password: " + password);
+        System.out.println("Received signup request with email: " + email);
 
-        try{
-            User user=new User();
-            user.setName(name);
-            user.setEmail(email);
-            user.setAddress(address);
-            user.setPhone(phone);
-            user.setAge(age);
-            user.setGender(gender);
-            String imageUrl= uploadImageService.saveImage(image);
-            user.setImage(imageUrl);
-            user.setPassword(password);
-
-
-
-            userService.registerUser(user);
+        try {
+            userService.registerUser(name, password, email, address, phone, age, gender, image);
             return "Registered successfully. Please check your email to verify your account";
-
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return "Email already exists";
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return "An unexpected error occured. Please try again later";
+            return "An unexpected error occurred. Please try again later";
         }
     }
     @GetMapping("/verify")

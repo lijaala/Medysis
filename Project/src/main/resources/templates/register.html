@@ -3,7 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/register.css">
-
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <title>Register</title>
     <link rel="manifest" href="/manifest.json">
 </head>
@@ -96,7 +96,7 @@
 
         </div>
     </section>
-
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         document.querySelector('.form-container').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -131,22 +131,56 @@
         .then(response => response.text())
         .then(data => {
             loadingSpinner.style.display = 'none'; // Hide spinner
+            let toastText = "";
+            let backgroundColor = "";
+            let textColor = "";
 
-            if (data.includes("success")) {
-                popupMessage.innerText = ""; // Clear the "Sending Email..." message
-                responseMessageElement.innerText = "Email sent successfully! Please check your inbox.";
-                responseMessageElement.classList.add('success');
+            if (data.includes("successfully")) {
+                toastText = data; // Display the exact success message
+                backgroundColor = "rgba(200,253,223,0.8)"; // Slightly more opaque
+                textColor = "rgb(15,94,27)";
+            } else if (data.includes("exists")) {
+                toastText = data; // Display the exact error message
+                backgroundColor = "rgba(255,204,204,0.8)";
+                textColor = "rgb(139,0,0)"; // Dark red
+            } else if (data.includes("unexpected error")) {
+                toastText = data; // Display the exact error message
+                backgroundColor = "rgba(255,230,179,0.8)";
+                textColor = "rgb(139,69,19)"; // Saddle brown
             } else {
-                popupMessage.innerText = ""; // Clear the "Sending Email..." message
-                responseMessageElement.innerText = "Failed to send email. Please try again.";
-                responseMessageElement.classList.add('error');
+                toastText = "Unknown response from server.";
+                backgroundColor = "rgba(220,220,220,0.8)"; // Light gray
+                textColor = "rgb(50,50,50)"; // Dark gray
             }
+
+            Toastify({
+                text: toastText,
+                duration: 3000, // Adjust duration as needed
+                backgroundColor: backgroundColor,
+                gravity: "top",
+                position: "right",
+                style:{
+                    color: textColor,
+                    borderRadius: "8px"
+                },
+                onClick: function(){}
+            }).showToast();
         })
         .catch(error => {
             console.error('Error:', error);
-            loadingSpinner.style.display = 'none'; // Hide spinner
-            popupMessage.innerText = ""; // Clear the "Sending Email..." message
-            responseMessageElement.innerText = "An error occurred. Please try again later.";
+            loadingSpinner.style.display = 'none';
+            Toastify({
+                text: "An error occurred. Please try again later.",
+                duration: 3000,
+                backgroundColor: "rgba(255,204,204,0.8)",
+                gravity: "top",
+                position: "right",
+                style:{
+                    color: "rgb(139,0,0)",
+                    borderRadius: "8px"
+                },
+                onClick: function(){}
+            }).showToast();
         });
 });
         if ('serviceWorker' in navigator) {

@@ -47,28 +47,32 @@ public class UserService {
         this.roleService = roleService;
         this.notificationService = notificationService;
     }
-
-    public void registerUser(User user) {
-
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already registered");
+    public void registerUser(String name, String password, String email, String address, String phone, Integer age, String gender, MultipartFile imageFile) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        LocalDateTime now = LocalDateTime.now();
-        Role userRole = roleService.findRoleById(4);
-        user.setRole(userRole);
-        user.setCreated_at(now);
-        user.setUpdated_at(now);
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setAddress(address);
+        user.setPhone(phone);
+        user.setAge(age);
+        user.setGender(gender);
+        user.setPassword(passwordEncoder.encode(password));
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageUrl = uploadImageService.saveImage(imageFile);
+            user.setImage(imageUrl);
+        }
 
         String verificationCode = UUID.randomUUID().toString();
         user.setVerificationCode(verificationCode);
 
 
-        userRepository.save(user);
         emailService.sendVerificationEmail(user);
-
+        userRepository.save(user);
     }
+
 
     public User findUserByVerificationCode(String verificationCode) {
         return userRepository.findByVerificationCode(verificationCode);
