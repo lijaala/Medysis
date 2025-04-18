@@ -117,7 +117,17 @@ public class AppointmentService {
             logger.error("Could not send follow-up reminder notification for Appointment ID: {}. Patient or follow-up date is missing.", appointment.getAppointmentID());
         }
     }
+    public List<Appointment> getAppointmentsByDoctorAndDate(String doctorID, LocalDate date) {
+        // Fetch the Staff entity from the repository
+        Optional<Staff> staffOpt = staffRepository.findById(doctorID);
 
+        if (staffOpt.isPresent()) {
+            Staff doctor = staffOpt.get();
+            return appointmentRepository.findByDoctorIDAndAppDate(doctor, date);
+        } else {
+            throw new RuntimeException("Doctor with ID " + doctorID + " not found.");
+        }
+    }
     @Scheduled(cron = "0 45 8 * * *") // Run every day at 8:00 AM (server's time)
     public void checkAndSendFollowUpReminders() {
         LocalDate todayInNepal = LocalDate.now(nepalTimeZone); // Explicitly use Nepal Time Zone
@@ -281,17 +291,7 @@ public class AppointmentService {
         return appointmentRepository.findAll();
     }
 
-    public List<Appointment> getAppointmentsByDoctorAndDate(String doctorID, LocalDate date) {
-        // Fetch the Staff entity from the repository
-        Optional<Staff> staffOpt = staffRepository.findById(doctorID);
 
-        if (staffOpt.isPresent()) {
-            Staff doctor = staffOpt.get();
-            return appointmentRepository.findByDoctorIDAndAppDate(doctor, date);
-        } else {
-            throw new RuntimeException("Doctor with ID " + doctorID + " not found.");
-        }
-    }
     public List<Appointment> getAppointmentByUserId(Integer userID) {
         User user=userRepository.findById(userID).orElseThrow(() -> new RuntimeException("Patient not found"));
 

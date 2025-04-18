@@ -26,7 +26,7 @@
                     <button class="primary w-100" id="bookBtn" onclick="openAppointmentForm()">Book Appointment</button>
                 </div>
 
-                <div class="row  w-100" id="appHistory">
+                <div class="row row align-items-center px-1" id="appHistory">
                 <form action="/appointment/book" method="POST"  id="appointmentFormSubmit" style="display: none;">
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn-close" aria-label="Close" onclick="closeAppointmentForm()"></button>
@@ -34,7 +34,7 @@
                 <div class="mb-3">
                     <label for="doctor" onchange="updateTimeSlots()">Select Doctor</label>
                     <select class="form-control" id="doctor" name="doctor" required>
-                        <option value="" disabled selected>Select a doctor</option>
+                        <option value="" selected>Select a doctor</option>
 
                     </select>
                 </div>
@@ -123,6 +123,7 @@
 
         fetchDoctors();
         fetchAppointmentHistory();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -137,16 +138,24 @@
             console.log('Service Workers are not supported by this browser.');
         }
         const doctorSelect = document.getElementById('doctor');
-
         if (doctorSelect) {
             doctorSelect.addEventListener('change', updateTimeSlots);
+        }
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            dateInput.addEventListener('change', updateTimeSlots); // Add event listener for date change
         }
 
         const appointmentForm = document.getElementById('appointmentFormSubmit');
         appointmentForm.addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
             const formData = new FormData(appointmentForm);
+            const selectedTime12hr = formData.get('time');
+            const selectedTime24hr = convert12to24(selectedTime12hr);
+
+            formData.set('time', selectedTime24hr); // Update the form data with the 24-hour format
+
             fetch('/appointment/book', {
                 method: 'POST',
                 body: formData,
@@ -161,11 +170,9 @@
                             gravity: "top",
                             position: "right",
                             style:{
-
                                 color:"rgb(15,94,27)",
                                 borderRadius:"8px"
                             }
-
                         }).showToast();
                         appointmentForm.reset();
                         closeAppointmentForm();
@@ -185,7 +192,7 @@
                     }
                 })
                 .catch(error => console.error('Error:', error));
-        })
+        });
 
         setupAppointmentSearch();
     });
@@ -218,112 +225,111 @@
             })
             .catch(error => console.log('Error fetching doctors:', error));
     }
-
-
     function updateTimeSlots() {
         const doctorSelect = document.getElementById('doctor');
-        const selectedDoctorID = doctorSelect.value; // Get the selected doctor ID
+        const selectedDoctorID = doctorSelect.value;
+        const dateInput = document.getElementById('date');
+        const selectedDate = dateInput.value;
+        const timeSelect = document.getElementById('time');
 
-        console.log("Selected Doctor ID:", selectedDoctorID); // Log the selected doctor ID
-
-        if (selectedDoctorID) {
-            const selectedOption = doctorSelect.options[doctorSelect.selectedIndex]; // Get the selected option
-            const startTime = selectedOption.getAttribute('data-startTime'); // Get the startTime from data attributes
-            const endTime = selectedOption.getAttribute('data-endTime'); // Get the endTime from data attributes
-
-            const dateInput = document.getElementById('date');
-            const timeSelect = document.getElementById('time');
-
-            console.log("Selected Start Time:", startTime); // Log the start time
-            console.log("Selected End Time:", endTime); // Log the end time
-
-            // Clear previous time slots
+        if (selectedDoctorID && selectedDate) {
             timeSelect.innerHTML = '<option value="" disabled selected>Select a time</option>';
+            timeSelect.disabled = false;
 
-            if (startTime && endTime) {
-                // Generate time slots if a doctor, start/end time, and date are selected
-                const availableSlots = generateSlots(
-                    startTime,
-                    endTime,
-                    8 // Duration in minutes
-                );
+            const encodedDoctorID = encodeURIComponent(selectedDoctorID);
+            const encodedDate = encodeURIComponent(selectedDate);
 
+            fetch(`/appointment/availableSlots?doctorID=${encodedDoctorID}&date=${encodedDate}`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.error("Failed to fetch available slots:", response.status);
+                        return response.json().then(data => {
+                            console.error("Server response:", data);
+                            Toastify({
+                                text: `Failed to fetch time slots: ${data && data.message ? data.message : response.statusText}`,
+                                duration: 3000,
+                                backgroundColor: "rgba(253,200,200)",
+                                color: "rgb(167,6,14)",
+                                gravity: "top",
+                                position: "right",
+                                style: { borderRadius: "8px" }
+                            }).showToast();
+                            timeSelect.disabled = true;
+                        });
+                    }
+                    return response.json();
+                })
+                .then(slots => {
 
-                console.log("Generated Available Time Slots:", availableSlots);
+                    if (slots && slots.length > 0) {
+                        slots.forEach(slot12hr => {
 
-                if (availableSlots.length > 0) {
-                    availableSlots.forEach(slot => {
+                            const slot24hr = convert12to24(slot12hr);
+                            const option = document.createElement('option');
+                            option.value = slot24hr; // Store 24-hour format as value
+                            option.textContent = slot12hr; // Display in 12-hour format for user
+                            timeSelect.appendChild(option);
+                            console.log("Appended option:", option, "to", timeSelect);
+                        });
+                    } else {
                         const option = document.createElement('option');
-                        const formattedSlot=formatTo12Hour(slot);
-                        option.value = slot;
-                        option.textContent = formattedSlot;
+                        option.value = "";
+                        option.textContent = "No slots available for this doctor and date.";
                         timeSelect.appendChild(option);
-                    });
-                } else {
-                    console.log("No available time slots.");
-                }
-            }
+                        timeSelect.disabled = true;
+                    }
+                    console.log("timeSelect innerHTML after populating:", timeSelect.innerHTML);
+                })
+                .catch(error => {
+                    console.error("Error fetching available slots:", error);
+                    Toastify({
+                        text: "Error fetching available time slots. Please try again.",
+                        duration: 3000,
+                        backgroundColor: "rgba(253,200,200)",
+                        color: "rgb(167,6,14)",
+                        gravity: "top",
+                        position: "right",
+                        style: { borderRadius: "8px" }
+                    }).showToast();
+                    timeSelect.innerHTML = '<option value="" disabled selected>Select a time</option>';
+                    timeSelect.disabled = true;
+                });
         } else {
-            console.log("No doctor selected.");
+            timeSelect.innerHTML = '<option value="" disabled selected>Select a time</option>';
+            timeSelect.disabled = true;
+            console.log("No doctor or date selected, clearing time slots.");
         }
     }
 
-    // Generate available time slots based on doctor's working hours
-    function generateSlots(startTime, endTime, intervalMinutes) {
-        const slots = [];
-        console.log("Starting slot generation...");
+    // Function to convert 12-hour time
+    function convert12to24(time12h) {
+        const [time, modifier] = time12h.split(' ');
+        let [hours, minutes] = time.split(':');
 
-        // Split start and end times
-        const [startHour, startMinute] = startTime.split(":");
-        const [endHour, endMinute] = endTime.split(":");
-
-        console.log("Parsed start time:", startHour, startMinute);
-        console.log("Parsed end time:", endHour, endMinute);
-
-        // Create Date objects for start and end times
-        const start = new Date();
-        start.setHours(parseInt(startHour), parseInt(startMinute), 0, 0); // Set time to start hour and minute
-
-        const end = new Date();
-        end.setHours(parseInt(endHour), parseInt(endMinute), 0, 0); // Set time to end hour and minute
-
-        console.log("Start date object:", start);
-        console.log("End date object:", end);
-
-        const interval = intervalMinutes * 60 * 1000; // Convert minutes to milliseconds
-
-        let current = start;
-        while (current < end) {
-            slots.push(current.toTimeString().substring(0, 5)); // Format as HH:MM
-            console.log("Added time slot:", current.toTimeString().substring(0, 5));
-            current = new Date(current.getTime() + interval);
+        if (hours === '12') {
+            hours = '00';
         }
 
-        console.log("Generated Time Slots:", slots); // Log the generated slots
-        return slots;
-    }
-    function formatTo12Hour(time24) {
-        const [hours, minutes] = time24.split(":");
-        let formattedHours = parseInt(hours);
-        const period = formattedHours >= 12 ? "PM" : "AM";
-
-        if (formattedHours > 12) {
-            formattedHours -= 12;
-        } else if (formattedHours === 0) {
-            formattedHours = 12; // For midnight case (00:00 -> 12:00 AM)
+        if (modifier === 'PM') {
+            hours = parseInt(hours, 10) + 12;
         }
 
-        return `${formattedHours}:${minutes} ${period}`;
+        return `${hours}:${minutes}`;
     }
+
+
     function openAppointmentForm(){
         document.getElementById('appointmentFormSubmit').style.display="block";
         document.getElementById('bookBtn').style.display="none";
-       // document.getElementById('appointmentList').style.display="none";
+        document.getElementById('filterButtonsContainer').style.display="none !important";
+       document.getElementById('appointmentList').style.display="none";
     }
     function closeAppointmentForm(){
         document.getElementById('appointmentFormSubmit').style.display="none";
         document.getElementById('bookBtn').style.display="block";
-        //document.getElementById('appointmentList').style.display="block";
+        document.getElementById('filterButtonsContainer').style.display="block";
+
+        document.getElementById('appointmentList').style.display="block";
     }
     function fetchAppointmentHistory() {
         fetch('/appointment/getByUserID')
