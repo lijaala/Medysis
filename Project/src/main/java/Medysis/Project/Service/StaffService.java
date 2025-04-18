@@ -2,8 +2,10 @@ package Medysis.Project.Service;
 
 
 import Medysis.Project.DTO.StaffDTO;
+import Medysis.Project.Model.Role;
 import Medysis.Project.Model.Staff;
 import Medysis.Project.Model.User;
+import Medysis.Project.Repository.RoleRepository;
 import Medysis.Project.Repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -32,36 +37,74 @@ public class StaffService {
     @Autowired
     private final NotificationService notificationService;
 
+    @Autowired
+    private RoleRepository roleRepository;
 
 
-    public StaffService( StaffRepository staffRepository, PasswordEncoder passwordEncoder, UploadImageService uploadImageService, EmailService emailService, NotificationService notificationService) {
+
+    public StaffService( StaffRepository staffRepository, PasswordEncoder passwordEncoder, UploadImageService uploadImageService, EmailService emailService, NotificationService notificationService,RoleRepository roleRepository) {
         this.staffRepository = staffRepository;
         this.passwordEncoder = passwordEncoder;
         this.uploadImageService = uploadImageService;
         this.emailService = emailService;
         this.notificationService = notificationService;
+        this.roleRepository = roleRepository;
     }
 
     //staff registration method
-    public Staff save(Staff staff) {
-
-        if (staffRepository.findByStaffEmail(staff.getStaffEmail()).isPresent()) {
-            throw new IllegalArgumentException("Staff with email address  already exists");
-
+    public String save(
+            String staffName, String staffEmail, String staffPhone, String staffAddress, String gender,
+            Integer age, String imageUrl, Integer roleId, String startTimeStr, String endTimeStr, String addedByAdminId
+    ) {
+        if (staffRepository.findByStaffEmail(staffEmail).isPresent()) {
+            throw new IllegalArgumentException("Staff with email address already exists");
         }
-        String staffId = generateUniqueStaffId(staff.getStaffName());
+
+        Staff staff = new Staff();
+        staff.setStaffName(staffName);
+        staff.setStaffEmail(staffEmail);
+        staff.setStaffPhone(staffPhone);
+        staff.setStaffAddress(staffAddress);
+        staff.setGender(gender);
+        staff.setAge(age);
+        staff.setLastUpdatedBy(addedByAdminId);
+        staff.setImage(imageUrl);
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found with ID: " + roleId));
+        staff.setRole(role);
+
+        if ("ROLE_DOCTOR".equalsIgnoreCase(role.getRole())) {
+            if (startTimeStr == null || startTimeStr.isEmpty() || endTimeStr == null || endTimeStr.isEmpty()) {
+                throw new IllegalArgumentException("Start and end times are required for doctors.");
+            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
+            try {
+                LocalTime startTime = LocalTime.parse(startTimeStr, formatter);
+                LocalTime endTime = LocalTime.parse(endTimeStr, formatter);
+                if (endTime.isBefore(startTime)) {
+                    throw new IllegalArgumentException("End time cannot be before start time");
+                }
+                staff.setStartTime(startTime);
+                staff.setEndTime(endTime);
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid time format for start or end time.");
+            }
+        }
+
+        // Generate and set Staff ID and Password
+        String staffId = generateUniqueStaffId(staffName);
         String password = passwordEncoder.encode(staffId);
         staff.setStaffID(staffId);
         staff.setPassword(password);
-        LocalDateTime now= LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         staff.setAddedOn(now);
         staff.setLastUpdated(now);
 
         Staff savedStaff = staffRepository.save(staff);
         notifyAdminsNewStaffAdded(savedStaff);
 
-        // Save the staff entity
-        return staffRepository.save(staff);
+        return savedStaff.getStaffID();
     }
     private void notifyAdminsNewStaffAdded(Staff staff) {
         List<Staff> admins = staffRepository.findByRoleRoleID(1);

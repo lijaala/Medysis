@@ -9,6 +9,8 @@ import Medysis.Project.Service.StaffService;
 import Medysis.Project.Service.UploadImageService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,7 +44,7 @@ public class AdminController {
     }
 
     @PostMapping("/addStaff")
-    public String addStaff(@RequestParam String staffName,
+    public ResponseEntity<String> addStaff(@RequestParam String staffName,
                            @RequestParam String staffEmail,
                            @RequestParam String staffPhone,
                            @RequestParam String staffAddress,
@@ -57,52 +59,27 @@ public class AdminController {
     ) {
         String userRole = (String) session.getAttribute("userRole");
         if (userRole == null || !userRole.equals("ROLE_ADMIN")) {
-            return "Access denied ";
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
         }
-        String adminId= session.getAttribute("userId").toString();
-        Staff staff;
+        String adminId = session.getAttribute("userId").toString();
+
         try {
-            staff = new Staff();
-            staff.setStaffName(staffName);
-            staff.setStaffEmail(staffEmail);
-            staff.setStaffPhone(staffPhone);
-            staff.setStaffAddress(staffAddress);
-            staff.setGender(gender);
-            staff.setAge(age);
-            staff.setLastUpdatedBy(adminId);
             String imageUrl = uploadImageService.saveImage(image);
-            staff.setImage(imageUrl);
-
-           Role roleId = roleRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
-            staff.setRole(roleId);
-            if (roleId.getRole().equalsIgnoreCase("ROLE_DOCTOR")) {
-                if (startTime == null || startTime.isEmpty() || endTime == null || endTime.isEmpty()) {
-                    return "Start and end times are required for doctors.";
-                }
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[HH:mm:ss][HH:mm]");
-                try {
-                    LocalTime start_Time = LocalTime.parse(startTime, formatter);
-                    LocalTime end_Time = LocalTime.parse(endTime, formatter);
-                    if (end_Time.isBefore(start_Time)) {
-                        return "End time cannot be before start time";
-                    }
-                    staff.setStartTime(start_Time);
-                    staff.setEndTime(end_Time);
-                } catch (DateTimeParseException e) {
-                    return "Invalid time format for start or end time.";
-                }
-            } else {
-                staff.setStartTime(null); // Not required for other roles
-                staff.setEndTime(null);
-            }
-
-            staffService.save(staff);
-            return "Staff added successfully. Generated Staff ID: " + staff.getStaffID();
-
+            String staffId = staffService.save(
+                    staffName, staffEmail, staffPhone, staffAddress, gender, age,
+                    imageUrl, role, startTime, endTime, adminId
+            );
+            return ResponseEntity.ok("Staff added successfully. Generated Staff ID: " + staffId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         } catch (Exception e) {
-            return "Error:" + e.getMessage();
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error: An unexpected error occurred");
         }
     }
+
 
 
 }

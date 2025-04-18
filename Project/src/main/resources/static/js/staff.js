@@ -77,32 +77,57 @@ function addStaff(event) {
     let form = document.getElementById("addStaffForm");
     let formData = new FormData(form); // Collect form data
 
-    fetch("/api/admin/addStaff", {
+    fetch("/addStaff", { // Updated API endpoint URL
         method: "POST",
         body: formData
     })
         .then(response => response.text()) // Convert response to text
         .then(message => {
-            let responseMessage = document.getElementById("responseMessage");
-            responseMessage.textContent = message;
-            responseMessage.style.color = message.includes("Error") ? "red" : "green"; // Color feedback
+            let backgroundColor = "";
+            let textColor = "";
 
-            setTimeout(() => {
-                responseMessage.textContent = "";
-                if (!message.includes("Error")) {
+            if (message.includes("successfully")) {
+                backgroundColor = "rgba(200,253,223,0.8)";
+                textColor = "rgb(15,94,27)";
+                setTimeout(() => {
                     closeStaffModal(); // Close modal on success
                     form.reset(); // Clear form fields
-                }
-            }, 5000);
+                }, 1000); // Small delay before closing
+            } else if (message.includes("Error")) {
+                backgroundColor = "rgba(255,204,204,0.8)";
+                textColor = "rgb(139,0,0)";
+            } else {
+                backgroundColor = "rgba(220,220,220,0.8)";
+                textColor = "rgb(50,50,50)";
+                message = "Unknown response from server.";
+            }
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                backgroundColor: backgroundColor,
+                color: textColor,
+                gravity: "top",
+                position: "right",
+                style: {
+                    borderRadius: "8px"
+                },
+                onClick: function(){}
+            }).showToast();
         })
         .catch(error => {
-            let responseMessage = document.getElementById("responseMessage");
-            responseMessage.textContent = "Error: " + error;
-            responseMessage.style.color = "red";
-
-            setTimeout(() => {
-                responseMessage.textContent = "";
-            }, 5000);
+            Toastify({
+                text: "Error: " + error,
+                duration: 3000,
+                backgroundColor: "rgba(255,204,204,0.8)",
+                color: "rgb(139,0,0)",
+                gravity: "top",
+                position: "right",
+                style: {
+                    borderRadius: "8px"
+                },
+                onClick: function(){}
+            }).showToast();
         });
 }
 
