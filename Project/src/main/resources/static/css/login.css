@@ -65,8 +65,8 @@ h1 {
     z-index: 9999;
     cursor: pointer;
     transition: all 0.3s ease;
-    align-items: center;
-    justify-content: center;
+    align-content: center;
+    justify-items: center;
 
 }
 

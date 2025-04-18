@@ -267,3 +267,79 @@ document.getElementById('labTest').addEventListener('submit', function(event) {
             .catch(error => console.error("Error deleting test:", error));
     }
 }*/
+document.getElementById('addTestBtn').addEventListener('click',setupAddLabTestForm)
+function setupAddLabTestForm() {
+    const addLabTestForm = document.getElementById('labTest');
+
+    if (addLabTestForm) {
+        addLabTestForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const testName = document.getElementById('testName').value;
+            const measurementUnit = document.getElementById('measurementUnit').value;
+            const normalRange = document.getElementById('normalRange').value;
+
+            const formData = new URLSearchParams();
+            formData.append('testName', testName);
+            formData.append('measurementUnit', measurementUnit);
+            formData.append('normalRange', normalRange);
+
+            fetch('/api/labTests/add', { // Ensure this matches your form's action attribute
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            })
+                .then(response => {
+                    if (response.ok) {
+                        Toastify({
+                            text: 'Lab test added successfully!',
+                            duration: 3000,
+                            backgroundColor: 'rgba(200, 253, 223)',
+                            close: true,
+                            gravity: 'top',
+                            position: 'right',
+                            style: {
+                                color: 'rgb(15, 94, 27)',
+                                borderRadius: '8px'
+                            }
+                        }).showToast();
+                        addLabTestForm.reset(); // Clear the form after successful submission
+                    } else {
+                        return response.text().then(errorMessage => {
+                            Toastify({
+                                text: `Failed to add lab test: ${errorMessage || 'An error occurred.'}`,
+                                duration: 5000,
+                                backgroundColor: 'rgba(253, 200, 200)',
+                                close: true,
+                                gravity: 'top',
+                                position: 'right',
+                                style: {
+                                    color: 'rgb(167, 6, 14)',
+                                    borderRadius: '8px'
+                                }
+                            }).showToast();
+                            console.error('Error adding lab test:', errorMessage);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding lab test:', error);
+                    Toastify({
+                        text: 'An unexpected error occurred while adding the lab test.',
+                        duration: 5000,
+                        backgroundColor: 'rgba(253, 200, 200)',
+                        close: true,
+                        gravity: 'top',
+                        position: 'right',
+                        style: {
+                            color: 'rgb(167, 6, 14)',
+                            borderRadius: '8px'
+                        }
+                    }).showToast();
+                });
+        });
+    }
+}
+

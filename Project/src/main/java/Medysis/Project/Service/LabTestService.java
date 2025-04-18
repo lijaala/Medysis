@@ -43,7 +43,11 @@ public class LabTestService {
         labTestRepository.deleteById(id);
     }
 
-    public LabTests addLabTest(LabTests labTest) {
+    public LabTests addLabTest(String testName, String measurementUnit, String normalRange) {
+        LabTests labTest = new LabTests();
+        labTest.setTestName(testName);
+        labTest.setMeasurementUnit(measurementUnit);
+        labTest.setNormalRange(normalRange);
         return labTestRepository.save(labTest);
     }
 }

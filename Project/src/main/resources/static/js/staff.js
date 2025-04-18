@@ -77,7 +77,7 @@ function addStaff(event) {
     let form = document.getElementById("addStaffForm");
     let formData = new FormData(form); // Collect form data
 
-    fetch("/addStaff", { // Updated API endpoint URL
+    fetch("api/admin/addStaff", { // Updated API endpoint URL
         method: "POST",
         body: formData
     })

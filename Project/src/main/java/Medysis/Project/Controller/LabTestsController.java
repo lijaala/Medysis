@@ -4,6 +4,7 @@ package Medysis.Project.Controller;
 import Medysis.Project.Model.LabTests;
 import Medysis.Project.Service.LabTestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,15 +39,12 @@ public class LabTestsController {
             @RequestParam String normalRange) {
 
         try {
-            LabTests labTest = new LabTests();
-            labTest.setTestName(testName);
-            labTest.setMeasurementUnit(measurementUnit);
-            labTest.setNormalRange(normalRange);
+            LabTests savedLabTest = labTestService.addLabTest(testName, measurementUnit, normalRange);
 
-            LabTests savedLabTest = labTestService.addLabTest(labTest);
-            return ResponseEntity.ok(savedLabTest);
+            return ResponseEntity.ok(savedLabTest); // Or a different response
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error adding lab test");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding lab test");
         }
     }
+
 }
